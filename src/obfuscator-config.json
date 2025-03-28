@@ -1,0 +1,18 @@
+{
+    "compact": true,
+    "controlFlowFlattening": true,
+    "controlFlowFlatteningThreshold": 0.8,
+    "deadCodeInjection": true,
+    "deadCodeInjectionThreshold": 0.5,
+    "debugProtection": true,
+    "debugProtectionInterval": true,
+    "disableConsoleOutput": true,
+    "identifierNamesGenerator": "hexadecimal",
+    "selfDefending": true,
+    "stringArray": true,
+    "stringArrayEncoding": ["base64", "rc4"],
+    "stringArrayThreshold": 0.85,
+    "transformObjectKeys": true,
+    "unicodeEscapeSequence": true
+  }
+  

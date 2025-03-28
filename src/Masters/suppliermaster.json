@@ -1,0 +1,18 @@
+[
+    {
+      "srNo": 1,
+      "AccountCode": "12",
+      "AccountName": "Narayan",
+      "TypeCode": "S"
+      
+    },
+
+    {
+        "srNo": 2,
+        "AccountCode": "12",
+        "AccountName": "Narayan",
+        "TypeCode": "S"
+        
+      }
+  ]
+  

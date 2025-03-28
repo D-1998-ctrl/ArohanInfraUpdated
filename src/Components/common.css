@@ -1,0 +1,24 @@
+:root {
+    --primary-color: #074e2c; 
+    /* --primary-color: #e4f5f7; */
+   --secondary-color:#347c54;
+   --color: #defdf8;
+   --testcolor: rgba(255, 86, 8, 0.178);
+   --tershary-color:#77B0AA;
+   --complementary-color: #DF6D2D;
+
+   --accent-color: #3f83f8;
+   --text-color: #333333;
+   /* --background-color: #ffffff; */
+   --light-gray: #f0f0f0;
+   --gray: #808080;
+   --dark-gray: #555;
+   --link-color: #6365F2;
+   --background-color:rgb(224, 233 ,240,0.6);
+   --main: #e1f3ee;
+   
+}
+
+.saveBtn{
+    background-color: var(--primary-color);
+}
