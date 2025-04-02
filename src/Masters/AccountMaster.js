@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import { Alert, IconButton, Menu, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
+import { Alert, InputLabel, IconButton, Menu, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
 import suppliermaster from './suppliermaster.json'
@@ -7,6 +7,10 @@ import { useTheme } from "@mui/material/styles";
 import { toast } from "react-toastify";
 import axios from 'axios';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
 
 const AccountMaster = () => {
   const theme = useTheme();
@@ -22,19 +26,16 @@ const AccountMaster = () => {
     setIsDrawerOpen(false);
   };
   //table
+  const [pageNo, setPageNo] = useState(1)
   const columns = useMemo(() => {
     return [
       {
         accessorKey: 'srNo',
         header: 'Sr No',
         size: 100,
-        Cell: ({ row }) => row.index + 1,
+        Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
       },
-      // {
-      //   accessorKey: 'AccountCode',
-      //   header: 'Account Code',
-      //   size: 150,
-      // },
+
       {
         accessorKey: 'AccountName',
         header: 'Account Name',
@@ -72,7 +73,7 @@ const AccountMaster = () => {
 
       },
     ];
-  }, []);
+  }, [pageNo]);
 
   //
   const [AccountName, setAccountName] = useState('');
@@ -169,7 +170,7 @@ const AccountMaster = () => {
       )
       .then((response) => {
         console.log("API Response:", response.data);
-      
+
         toast.success("Account Master created successfully");
         handleClearTemplate();
         handleDrawerClose()
@@ -242,96 +243,104 @@ const AccountMaster = () => {
 
     try {
 
-      const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Account", requestOptions);
+      const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=account&PageNo=${pageNo}`, requestOptions);
       const result = await response.json();
-      // console.log("Fetched result:", result);
-      setData(result);
+      console.log("Fetched result:", result.data);
+      setData(result.data);
+      setTotalPages(result.total_pages)
+
+
     } catch (error) {
       console.error(error);
     }
   };
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [pageNo]);
 
 
-    //update 
-    const UpdateAccountMaster = () => {
-      const urlencoded = new URLSearchParams();
-      // urlencoded.append("MaterialCode", updatematerialCode);
-      urlencoded.append("AccountName", updatedAccountName);
-      urlencoded.append("GroupId", selectedGroupOption);
-      urlencoded.append("SubGroupId", selectedSubGroupOption);
-      urlencoded.append("OpeningBalance", updatedcurrentBal);
-      urlencoded.append("DrORCr", debitCredit);
-      urlencoded.append("TypeCode", typecode);
-      urlencoded.append("IsSystem", '0');
+  //update 
+  const UpdateAccountMaster = () => {
+    const urlencoded = new URLSearchParams();
+    // urlencoded.append("MaterialCode", updatematerialCode);
+    urlencoded.append("AccountName", updatedAccountName);
+    urlencoded.append("GroupId", selectedGroupOption);
+    urlencoded.append("SubGroupId", selectedSubGroupOption);
+    urlencoded.append("OpeningBalance", updatedcurrentBal);
+    urlencoded.append("DrORCr", debitCredit);
+    urlencoded.append("TypeCode", typecode);
+    urlencoded.append("IsSystem", '0');
 
-      urlencoded.append("Id", idwiseData);
-      const requestOptions = {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      };
-  
-      axios
-        .post(
-          "https://arohanagroapi.microtechsolutions.co.in/php/updateaccount.php",
-          urlencoded,
-          requestOptions
-        )
-        .then((response) => {
-          console.log("API Response:", response.data);
-          
-          toast.success("Account Master Updated successfully");
-          handleEditDrawerClose()
-          fetchData()
-
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
+    urlencoded.append("Id", idwiseData);
+    const requestOptions = {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
     };
 
+    axios
+      .post(
+        "https://arohanagroapi.microtechsolutions.co.in/php/updateaccount.php",
+        urlencoded,
+        requestOptions
+      )
+      .then((response) => {
+        console.log("API Response:", response.data);
+
+        toast.success("Account Master Updated successfully");
+        handleEditDrawerClose()
+        fetchData()
+
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
 
 
-     //for delete 
-      const DeleteAccountMaster = () => {
-        // if (currentRow) {
-        //   console.log("Editing item with ID:", currentRow.original.Id);
-    
-        // }
-        const requestOptions = {
-          method: "GET",
-          redirect: "follow"
-        };
-        const url = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=Account&Id=${currentRow.original.Id}`
-        console.log(url)
-        fetch(url, requestOptions)
-          .then((response) => response.json())
-          .then((result) => {
-            console.log(result)
-    
-            toast.success("Material deleted successfully!");
-    
-    
-          })
-          .catch((error) => console.error(error));
-      }
+
+  //for delete 
+  const DeleteAccountMaster = () => {
+    // if (currentRow) {
+    //   console.log("Editing item with ID:", currentRow.original.Id);
+
+    // }
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow"
+    };
+    const url = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=Account&Id=${currentRow.original.Id}`
+    console.log(url)
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result)
+
+        toast.success("Material deleted successfully!");
+
+
+      })
+      .catch((error) => console.error(error));
+  }
+
+
+  ///Pagination
+
+  const [totalPages, setTotalPages] = useState(1);
 
   return (
-   
-      <Box >
-        <Box textAlign={'center'}>
-          <Typography sx={{ color: 'var(--complementary-color)', }} variant='h4'><b>Account Master</b></Typography>
-        </Box>
+
+    <Box >
+      <Box textAlign={'center'}>
+        <Typography sx={{ color: 'var(--complementary-color)', }} variant='h4'><b>Account Master</b></Typography>
+      </Box>
 
 
 
-        <Box sx={{
+      <Box sx={{
         //  background: 'rgb(236, 253, 230)', 
         p: 5, height: 'auto'
-      }}> 
+      }}>
 
         <Box sx={{ display: 'flex', gap: 3 }}>
           <Button sx={{ background: 'var(--complementary-color)', }} variant="contained" onClick={handleDrawerOpen}>Create Account Master </Button>
@@ -342,13 +351,35 @@ const AccountMaster = () => {
           <MaterialReactTable
             columns={columns}
             data={data}
+            enablePagination={false}
             muiTableHeadCellProps={{
               sx: {
 
                 color: 'var(--primary-color)',
 
               },
+
+
             }}
+            renderBottomToolbarCustomActions={() => (
+              <Box mt={2} alignItems={'center'} display={'flex'}  justifyContent="flex-end" 
+              width="100%" >
+                <FirstPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(1)} />
+                <KeyboardArrowLeftIcon sx={{ cursor: "pointer" }} onClick={() =>
+                  setPageNo((prev) => Math.max(Number(prev) - 1, 1))
+                } />
+                <Box > Page No </Box>
+                <TextField
+                  sx={{ width: "4.5%" ,ml: 1}}
+                  value={pageNo}
+                  onChange={(e) => setPageNo(e.target.value)}
+                  size="small" />
+                <KeyboardArrowRightIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo((prev) => Number(prev) + 1)} />
+                <LastPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(totalPages)} />
+                Total Pages : {totalPages}
+              </Box>
+
+            )}
 
           />
           <Menu
@@ -360,11 +391,17 @@ const AccountMaster = () => {
               onClick={handleEditDrawerOpen}
             >Edit </MenuItem>
             <MenuItem
-               onClick={DeleteAccountMaster}
+              onClick={DeleteAccountMaster}
             >
               Delete</MenuItem>
           </Menu>
+
+
+
+
         </Box>
+
+
 
         <Drawer
           anchor="right"
@@ -395,7 +432,7 @@ const AccountMaster = () => {
               <TextField
                 value={AccountName}
                 onChange={(e) => setAccountName(e.target.value)}
-                size="small"  placeholder="Enter Account Name" fullWidth />
+                size="small" placeholder="Enter Account Name" fullWidth />
             </Box>
 
             <Box display={'flex'} gap={2} alignItems={'center'}>
@@ -467,7 +504,7 @@ const AccountMaster = () => {
                   type="number"
 
                   size="small"
-                  
+
                   placeholder="Enter Opening Balance"
                   fullWidth
                   InputProps={{
@@ -555,7 +592,7 @@ const AccountMaster = () => {
               <TextField
                 value={updatedAccountName}
                 onChange={(e) => setUpdatedAccountName(e.target.value)}
-                size="small"  placeholder="Enter Account Name" fullWidth />
+                size="small" placeholder="Enter Account Name" fullWidth />
             </Box>
 
             <Box display={'flex'} gap={2} alignItems={'center'}>
@@ -627,7 +664,7 @@ const AccountMaster = () => {
                   type="number"
 
                   size="small"
-                 
+
                   placeholder="Enter Opening Balance"
                   fullWidth
                   InputProps={{
@@ -669,9 +706,9 @@ const AccountMaster = () => {
           <Box display={'flex'} alignItems={'center'} justifyContent={'center'} gap={2} mt={5}>
             <Box>
               <Button onClick={UpdateAccountMaster}
-               sx={{
-                background: 'var(--primary-color)',
-              }} variant='contained'>Save </Button>
+                sx={{
+                  background: 'var(--primary-color)',
+                }} variant='contained'>Save </Button>
             </Box>
 
             <Box>
@@ -680,8 +717,8 @@ const AccountMaster = () => {
           </Box>
         </Drawer>
 
-        </Box>
       </Box>
+    </Box>
 
 
   )

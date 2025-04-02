@@ -146,14 +146,9 @@ const InwordAtStore = () => {
     //for get data in main table and form
     const handleSubmit = (rowData) => {
         console.log("This row has been clicked:", rowData);
-
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
-
-
         setIsEditing(!!rowData.Id);
-
-
         setInwordNo(rowData.InwardNo)
         setInwordDate(rowData.InwardDate?.date.split(" ")[0])
         setChallanDate(rowData.ChallanDate?.date.split(" ")[0])
@@ -385,7 +380,7 @@ const InwordAtStore = () => {
     };
 
 
-    
+
 
     //create and update Inword At Store
     const handleSubmitInWord = async (e) => {
@@ -469,7 +464,7 @@ const InwordAtStore = () => {
             );
             resetForm();
             fetchInwardHeader();
-
+            fetchInwarddetails();
 
         } catch (error) {
             console.error("Error submitting Inword:", error);
@@ -669,7 +664,7 @@ const InwordAtStore = () => {
                             </Box>
 
 
-            
+
 
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, m: 2 }}>
                                 {/* First Row: Product, Batch No, Batch Date */}

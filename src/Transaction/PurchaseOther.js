@@ -1,6 +1,6 @@
 
 import React, { useMemo, useState, useEffect } from 'react'
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Grid, Menu, Table, Autocomplete, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Alert, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
+import { Dialog, InputAdornment, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Grid, Menu, Table, Autocomplete, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Alert, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   MaterialReactTable,
@@ -18,7 +18,8 @@ import "react-toastify/dist/ReactToastify.css";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import BorderColorIcon from '@mui/icons-material/BorderColor';
-
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import SearchIcon from '@mui/icons-material/Search';
 
 const PurchaseOtherEntry = () => {
   const theme = useTheme();
@@ -48,7 +49,7 @@ const PurchaseOtherEntry = () => {
         "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=PurchaseOtherHeader"
       );
       setPurchaseheaders(response.data);
-      console.log('header', response.data)
+      // console.log('header', response.data)
     } catch (error) { }
   };
 
@@ -60,7 +61,7 @@ const PurchaseOtherEntry = () => {
         "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=purchaseotherdetail"
       );
       setPurchasedetails(response.data);
-      console.log('detail', response.data)
+      // console.log('detail', response.data)
     } catch (error) { }
   };
 
@@ -238,7 +239,7 @@ const PurchaseOtherEntry = () => {
       const response = await axios.get(
         'https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=ProductMaster',
       );
-      console.log(response.data);
+      // console.log(response.data);
       processMaterialData(response.data)
     } catch (error) {
       console.error(error);
@@ -262,24 +263,13 @@ const PurchaseOtherEntry = () => {
         purchaseRate: account?.SellPrice,
       }));
 
-      console.log('options', options)
+      // console.log('options', options)
       setProductOptions(options);
     }
   };
 
 
-  const fetchTypeCodeS = async () => {
-    try {
-      const response = await axios.get(
-        'https://arohanagroapi.microtechsolutions.co.in/php/gettypecode.php?TypeCode=S',
-        // "https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=Account&Colname=TypeCode&Colvalue=S"
-      );
-      console.log("fetchTypeCodeS", response.data);
-      setOptions(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+
 
 
   const fetchCompanyMaster = async () => {
@@ -300,7 +290,7 @@ const PurchaseOtherEntry = () => {
   useEffect(() => {
     fetchCompanyMaster();
     fetchMaterialMaster();
-    fetchTypeCodeS();
+    // fetchTypeCodeS();
   }, []);
 
   const handleQuantityChange = (e) => {
@@ -365,24 +355,9 @@ const PurchaseOtherEntry = () => {
     // Update rows state and ensure the new row is added to the table
     setRows((prevRows) => [...prevRows, newRow]);
 
-    // Clear all fields after adding a row
-    // setSelectedProduct(""); 
-    // setProductName(""); 
-    // setQuantity(""); 
-    // setRate(""); 
-    // SetAmount("");
-    // setSelectedCGST(""); 
-    // setCGSTAmount(""); 
-    // setSelectedSGST("");
-    // setSGSTAmount(""); 
-    // setSelectedIGST(""); 
-    // setIGSTAmount("");
   };
 
   const handleSaveOrAddRow = () => {
-    // const gstOutput = GSTcal();
-    // const { igstAmount, cgstAmount, sgstAmount } = gstOutput;
-    // console.log("handleSaveOrAddRow", gstOutput);
 
     if (editingRow !== null) {
       // Update the existing row
@@ -432,6 +407,16 @@ const PurchaseOtherEntry = () => {
     setOther(rowData.Other)
     setSelectedId(rowData.SupplierId)
     setSelectedLocation(rowData.StorelocId)
+
+
+    //
+    fetchAccounts(rowData.SupplierId)
+    fetchAccountName(rowData.SupplierId)
+    setCustomerName(rowData.SupplierId)
+
+
+
+
     const dateStr = rowData.PurchaseDate.date.split(" ")[0];
     const [year, month, day] = dateStr.split("-").map(Number);
     const formattedDate = `${year}-${month}-${day}`;
@@ -444,13 +429,6 @@ const PurchaseOtherEntry = () => {
     const invdetail = purchasedetails.filter((detail) => detail.PurchaseotherId === rowData.Id)
     setBrandName(invdetail[0]?.Brandname ?? null);
 
-    //set GST no
-    const selectedItem = options.find(option => option.Id === rowData.SupplierId);
-    console.log("options:", options);
-    console.log('rowId', rowData.SupplierId)
-    console.log("selectedItem:", selectedItem);
-    console.log("gstno", selectedItem.GSTNo)
-    setSelectedGSTNo(selectedItem ? selectedItem.GSTNo : "")
   };
 
   const table = useMaterialReactTable({
@@ -470,27 +448,6 @@ const PurchaseOtherEntry = () => {
   });
 
 
-  // const subtotal = rows.reduce(
-  //   (acc, row) => acc + (parseFloat(row.Amount) || 0),
-  //   0,
-  // );
-
-  // const totalCGST = rows.reduce(
-  //   (acc, row) => acc + (parseFloat(row.CGSTAmount) || 0),
-  //   0
-  // );
-
-  // const totalSGST = rows.reduce(
-  //   (acc, row) => acc + (parseFloat(row.SGSTAmount) || 0),
-  //   0
-  // );
-  // const totalIGST = rows.reduce(
-  //   (acc, row) => acc + (parseFloat(row.IGSTAmount) || 0),
-  //   0
-  // );
-  // const grandTotal =
-  //   subtotal + totalCGST + totalSGST + totalIGST + (parseFloat(transport) || 0) + (parseFloat(other) || 0);
-
   const [editId, setEditId] = useState("");
   const [PurchaseDate, setPurchaseDate] = useState(null);
   const [BillDate, setBillDate] = useState(null);
@@ -507,7 +464,7 @@ const PurchaseOtherEntry = () => {
       Id: rowId,
       PurchaseNo: parseInt(PurchaseNo),
       PurchaseDate: formattedPurchasedate,
-      SupplierId: parseInt(selectedId),
+      SupplierId: parseInt(selectedId) ? parseInt(selectedId) : customerName,
       BillNo: parseInt(billNo),
       BillDate: formattedBillDate,
       StorelocId: selectedLocation,
@@ -520,7 +477,7 @@ const PurchaseOtherEntry = () => {
       SubTotal: subTotalcal,
       IsLocked: 'true'
     };
-    console.log("purchaseheaderdata", purchaseheaderdata);
+    //("purchaseheaderdata", purchaseheaderdata);
     try {
       const invoiceurl = isEditing
         ? "https://arohanagroapi.microtechsolutions.co.in/php/updatepurchaseotherheader.php"
@@ -533,19 +490,18 @@ const PurchaseOtherEntry = () => {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
-      console.log('postpurchaseheader', response.data)
+
       let PurchaseId = isEditing ? rowId : parseInt(response.data.ID, 10);
-      console.log("Purchase Id ", PurchaseId);
-      console.log("rows", rows);
+
 
       for (const row of rows) {
-        console.log("this row   ", row);
+        //("this row   ", row);
         const rowData = {
           Id: parseInt(row.Id, 10),
           PurchaseotherId: parseInt(PurchaseId, 10),
           SerialNo: rows.indexOf(row) + 1,
           ProductId: parseInt(row.ProductId, 10),
-          // MaterialId: parseInt(row.selectedProduct, 10),
+
           Quantity: parseFloat(row.Quantity),
           Rate: parseFloat(row.Rate),
           Amount: parseInt(row.Amount),
@@ -559,14 +515,14 @@ const PurchaseOtherEntry = () => {
         };
 
 
-        console.log("this row has rowData ", rowData);
+        //("this row has rowData ", rowData);
 
         const invoicdedetailurl =
           row.Id
             ? "https://arohanagroapi.microtechsolutions.co.in/php/updatepurchaseotherdetail.php"
             : "https://arohanagroapi.microtechsolutions.co.in/php/postpurchaseotherdetail.php";
 
-        console.log(" invoicdedetailurl is used ", invoicdedetailurl);
+        //(" invoicdedetailurl is used ", invoicdedetailurl);
         try {
           const response = await axios.post(
             invoicdedetailurl,
@@ -578,7 +534,7 @@ const PurchaseOtherEntry = () => {
             }
           );
 
-          console.log("Response:", response);
+          //("Response:", response);
         } catch (error) {
           console.error("Error:", error);
         }
@@ -596,7 +552,8 @@ const PurchaseOtherEntry = () => {
       );
       resetForm();
       fetchpurchaseHeader();
-      console.log("Purchase Header Data:", purchaseheaderdata);
+      fetchpurchasedetails();
+      //("Purchase Header Data:", purchaseheaderdata);
 
     } catch (error) {
       console.error("Error submitting Purchase:", error);
@@ -629,11 +586,11 @@ const PurchaseOtherEntry = () => {
 
 
   const handleEdit = () => {
-    console.log("Editing item with ID:", rowId);
+    //("Editing item with ID:", rowId);
 
     const invdetail = purchasedetails.filter(
       (detail) => detail.PurchaseotherId === rowId);
-    console.log('invdetail', invdetail)
+    //('invdetail', invdetail)
 
     const mappedRows = invdetail.map((detail) => ({
       Id: detail.Id,
@@ -651,7 +608,7 @@ const PurchaseOtherEntry = () => {
       IGSTAmount: parseFloat(detail.IGSTAmount) || 0,
     }));
 
-    console.log('mappedRows', mappedRows)
+    //('mappedRows', mappedRows)
     // // Set the rows for the table with all the details
     setRows(mappedRows);
     // // Set editing state
@@ -666,7 +623,7 @@ const PurchaseOtherEntry = () => {
     );
     if (specificDetail) {
       setInvdetailId(specificDetail.Id);
-      console.log("specificDetail.Id", specificDetail.Id);
+      //("specificDetail.Id", specificDetail.Id);
     }
     fetchpurchaseHeader();
     setIsDrawerOpen(true);
@@ -725,7 +682,7 @@ const PurchaseOtherEntry = () => {
     )
       .then((response) => response.json())
       .then((result) => {
-        // console.log("API Response:", result); // Debugging log
+        // //("API Response:", result); // Debugging log
         const storelocationOptions = result.map((storelocation) => ({
           value: storelocation?.Id || "",
           label: storelocation?.Storelocation,
@@ -755,12 +712,12 @@ const PurchaseOtherEntry = () => {
       redirect: "follow"
     };
 
-    console.log("Deleted Id:", rowId);
+    //("Deleted Id:", rowId);
 
     fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=PurchaseOtherHeader&Id=${rowId}`, requestOptions)
       .then((response) => response.text())
       .then((result) => {
-        console.log(result);
+        //(result);
         setOpen(false);
         handleDrawerClose();
         fetchpurchaseHeader();
@@ -770,6 +727,152 @@ const PurchaseOtherEntry = () => {
       })
       .catch((error) => console.error(error));
   };
+  ///
+
+
+  //serchapi for Party
+  const [text, setText] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const serchParty = () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow"
+    };
+
+    fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/searchaccount.php?TypeCode=S&Text=${text}`, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+
+        setOptions(Array.isArray(result) ? result : []);
+
+
+      })
+      .catch((error) => console.error(error));
+  }
+  useEffect(() => {
+    serchParty();
+  }, [text]);
+
+
+
+
+  //create new Party 
+  const [accountName, setAccountName] = useState("");
+  const [customerName, setCustomerName] = useState("");
+
+  const Namevalidation = () => {
+    let temp = accountName.split(" ")
+    let surname = temp[1]
+    if (surname && surname.length > 1) {
+      return true;
+    } else {
+      toast.error("Need to Insert First and last Name ");
+      return false;
+    }
+  }
+
+  const CreateSupplierMaster = () => {
+
+    if (!Namevalidation()) {
+      return;
+    }
+
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const urlencoded = new URLSearchParams();
+    urlencoded.append("AccountName", accountName);
+    urlencoded.append("GroupId", "3");
+    urlencoded.append("SubGroupId", "1");
+    urlencoded.append("OpeningBalance", "100");
+    urlencoded.append("DrORCr", "D");
+    urlencoded.append("TypeCode", "S");
+    urlencoded.append("IsSystem", "false");
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: urlencoded,
+      redirect: "follow",
+    };
+
+    fetch("https://arohanagroapi.microtechsolutions.co.in/php/postaccount.php", requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        //  //("Customer Created:", result);
+        toast.success('User created')
+        if (result && result.Id) {
+          //  //(result.Id)
+
+
+          // Now set the address and GSTNo for this customer
+          const addressData = new URLSearchParams();
+
+          addressData.append("AccountId", result.Id);
+
+          addressData.append("GSTNo", "270000000000000");
+
+          return fetch("https://arohanagroapi.microtechsolutions.co.in/php/postaddress.php", {
+            method: "POST",
+            headers: myHeaders,
+            body: addressData,
+            redirect: "follow",
+          });
+        } else {
+          throw new Error("Customer ID not received from API.");
+        }
+      })
+      .then((response) => response.json())
+      .then((addressResult) => console.log("Address Added:", addressResult))
+      .catch((error) => console.error("Error:", error));
+  };
+
+
+  //set GSTno
+  const fetchAccounts = (customerId) => {
+
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow"
+    };
+    fetch(`https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=Address&Colname=AccountId&Colvalue=${customerId}`, requestOptions)
+
+      .then((response) => response.json())
+      .then((result) => {
+        // console.log(result)
+        let temp = result[0]
+        // console.log("gstno", temp.GSTNo)
+        setSelectedGSTNo(temp.GSTNo)
+      }
+
+      )
+      .catch((error) => console.error(error));
+  };
+
+  const fetchAccountName = (acctname) => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow"
+    };
+    fetch(`https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=Account&Colname=Id&Colvalue=${acctname}`, requestOptions)
+
+      .then((response) => response.json())
+      .then((result) => {
+        //  console.log('accountname', result)
+
+        setOptions(Array.isArray(result) ? result : []);
+      }
+
+      )
+      .catch((error) => console.error(error));
+  };
+
+
+
+
+
 
 
   return (
@@ -860,25 +963,71 @@ const PurchaseOtherEntry = () => {
                       />
                     </Box>
 
-                    <Box>
-                      <Typography>Party</Typography>
-                      <Select
+                    <Box flex={1} position="relative">
+                      <Typography variant="body2">Party</Typography>
+                      <TextField
                         fullWidth
                         size="small"
-                        value={selectedId || ""}
-                        onChange={(event) => {
-                          const selectedValue = event.target.value;
-                          setSelectedId(selectedValue);
-                          const selectedItem = options.find(option => option.Id.toString() === selectedValue);
-                          setSelectedGSTNo(selectedItem ? selectedItem.GSTNo : "");
-                        }}
-                      >
-                        {options.map((option) => (
-                          <MenuItem key={option.Id} value={option.Id.toString()}>
-                            {option.AccountName}
-                          </MenuItem>
-                        ))}
-                      </Select>
+
+                        value={selectedId
+                          ? options.find(({ Id }) => String(Id) === selectedId)?.AccountName || ""
+                          : options.map((option) => option.AccountName)}
+                        placeholder="Select Customer"
+                        onClick={() => setShowDropdown(true)}
+
+                      />
+
+                      {showDropdown && (
+                        <Paper
+                          sx={{ position: "absolute", width: "100%", maxHeight: 250, overflowY: "auto", zIndex: 10, mt: 1, p: 2 }}
+                        >
+                          <TextField
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                            size="small"
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  <SearchIcon />
+                                </InputAdornment>
+                              ),
+                            }}
+                            placeholder="Enter Customer Name"
+                            fullWidth
+                          />
+                          <Box display="flex" gap={1} mt={1}>
+                            <TextField
+                              value={accountName}
+                              onChange={(e) => setAccountName(e.target.value)}
+                              size="small" placeholder="New Customer" fullWidth />
+
+                            <Button
+                              onClick={CreateSupplierMaster}
+
+                              variant="contained"
+                              startIcon={<AddCircleIcon sx={{ fontSize: '20px' }} />}
+                            >
+
+                              Party
+                            </Button>
+                          </Box>
+                          <Box mt={1}>
+
+                            {options.map((option) => (
+                              <MenuItem
+                                key={option.Id}
+                                onClick={() => {
+                                  setSelectedId(option.Id.toString());
+                                  fetchAccounts(option.Id.toString())
+                                  setShowDropdown(false);
+                                }}
+                              >
+                                {option.AccountName}
+                              </MenuItem>
+                            ))}
+                          </Box>
+                        </Paper>
+                      )}
                     </Box>
 
                     <Box>
@@ -962,7 +1111,7 @@ const PurchaseOtherEntry = () => {
                         <Box>
                           <Typography>Item</Typography>
 
-                           <Select
+                          <Select
                             fullWidth
                             size="small"
                             value={selectedProduct || ""}
@@ -993,15 +1142,20 @@ const PurchaseOtherEntry = () => {
                                 setSelectedIGST("0");
                               }
                             }}
+
+
                           >
                             {productOptions.map((option) => (
                               <MenuItem key={option.value} value={option.value.toString()}>
                                 {option.label}
                               </MenuItem>
                             ))}
-                          </Select> 
+                          </Select>
 
-{/* <Autocomplete
+
+
+
+                          {/* <Autocomplete
   fullWidth
   size="small"
   options={productOptions}

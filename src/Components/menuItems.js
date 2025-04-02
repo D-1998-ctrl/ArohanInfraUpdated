@@ -150,12 +150,12 @@ export const menuItems = [
 
 
 
-  {
-    title: "Company Information",
-    path: "commonpage",
-    icon: <PermIdentityIcon />,
-    submenus: [],
-  },
+  // {
+  //   title: "Company Information",
+  //   path: "commonpage",
+  //   icon: <PermIdentityIcon />,
+  //   submenus: [],
+  // },
 
   {
     title: "Settings",

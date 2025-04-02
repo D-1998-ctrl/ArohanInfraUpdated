@@ -93,6 +93,7 @@ const Receipt = () => {
     const table = useMaterialReactTable({
         columns,
         data: data,
+        enablePagination: false,
         muiTableHeadCellProps: {
             style: {
                 backgroundColor: "#E9ECEF",

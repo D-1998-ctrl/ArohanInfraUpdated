@@ -1,6 +1,6 @@
 
 import React, { useMemo, useState, useEffect } from 'react'
-import {Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Table, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
+import { TableBody, Autocomplete, TableCell, TableContainer, TableHead, TableRow, Paper, Table, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
 import { DatePicker } from "@mui/x-date-pickers";
@@ -11,14 +11,14 @@ import axios from 'axios';
 import { toast } from "react-toastify";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import moment from 'moment';
+import dayjs from "dayjs";
 import qs from "qs";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-
+import DeleteIcon from '@mui/icons-material/Delete';
 import {
 
     useMaterialReactTable,
 } from "material-react-table";
-
 
 const DeliveryChallan = () => {
     const theme = useTheme();
@@ -38,7 +38,7 @@ const DeliveryChallan = () => {
 
     const resetForm = () => {
         setChallanNo('');
-        setChallanNo('');
+       
         setChallanDate('');
         setBatchNo('');
         setBatchDate('');
@@ -50,16 +50,52 @@ const DeliveryChallan = () => {
         setRows([]);
     };
 
-    const handleDrawerOpen = () => {
-        setIsDrawerOpen(true);
 
+    const handleDrawerOpen = () => {
+        setRowId('')
+        setIsDrawerOpen(true);
         setIsEditing(false);
+        
+        console.log(rowId)
     };
 
     const handleDrawerClose = () => {
+        setRowId('')
         setIsDrawerOpen(false);
         resetForm();
     };
+
+    //api to call fetchInwardHeader
+    const fetchInwardHeader = async () => {
+        try {
+            const response = await axios.get(
+                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=DeliveryChallanHeader"
+            );
+            setChallanheaders(response.data);
+            // console.log('header', response.data)
+        } catch (error) { }
+    };
+
+
+    //  api to call fetchInwarddetails
+    const fetchInwarddetails = async () => {
+        try {
+            const response = await axios.get(
+                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=DeliveryChallanDetail"
+            );
+            setChallandetails(response.data);
+            // console.log('detail', response.data)
+        } catch (error) { }
+    };
+
+    useEffect(() => {
+        fetchInwardHeader();
+        fetchInwarddetails();
+        fetchLocation();
+        fetchProduct();
+    }, []);
+
+
 
     //main table
     const columns = useMemo(() => {
@@ -77,7 +113,7 @@ const DeliveryChallan = () => {
                 Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
             },
 
-
+           
             {
                 accessorKey: 'Total',
                 header: 'Total',
@@ -90,30 +126,30 @@ const DeliveryChallan = () => {
                 size: 150,
             },
 
+
+
         ];
     }, [challanheaders]);
 
     //for get data in main table and form
     const handleSubmit = (rowData) => {
-        // console.log("This row has been clicked:", rowData);
+        console.log("This row has been clicked:", rowData);
+
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
-        //setIsEditing(false);
         setIsEditing(!!rowData.Id);
-
         setChallanNo(rowData.ChallanNo)
         setChallanDate(rowData.ChallanDate?.date.split(" ")[0])
         setVehicleNo(rowData.VehicleNo)
         setSelectedLocation(rowData.StoreLocation);
-        // console.log("storelocation", rowData.StoreLocation);
-
-        const deliverychallandetail = challandetails.filter(
+        //console.log("storelocation", rowData.StoreLocation);
+        const inwdetail = challandetails.filter(
             (detail) => detail.ChallanId === rowData.Id);
-        // console.log('invdetail', deliverychallandetail)
+        //console.log('invdetail', inwdetail)
 
-        const mappedRows = deliverychallandetail.map((detail) => ({
+        const mappedRows = inwdetail.map((detail) => ({
             Id: detail.Id,
-            InwardId: detail.InwardId,
+            ChallanId: detail.ChallanId,
             ProductId: detail.ProductId,
             BatchNo: detail.BatchNo,
             BatchDate: detail.BatchDate?.date.split(" ")[0],
@@ -142,30 +178,23 @@ const DeliveryChallan = () => {
         }),
     });
 
+    //for drawer table row btn
+    const [rows, setRows] = useState([]);
+    const totalAmount = rows.reduce((total, row) => total + (row.Amount || 0), 0).toFixed(2);
+    const [rowId, setRowId] = useState('');
+    //for drawer table menu btn
+    const [anchorEl1, setAnchorEl1] = useState(null);
+    const [selectedRow, setSelectedRow] = useState(null);
 
-    ////api to call fetchInwardHeader
-    const fetchChallanHeader = async () => {
-        try {
-            const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=DeliveryChallanHeader"
-            );
-            setChallanheaders(response.data);
-            // console.log('header', response.data)
-        } catch (error) { }
+    const handleMenutableOpen = (event, index) => {
+        setAnchorEl1(event.currentTarget);
+        setSelectedRow(index);
     };
 
-    //  api to call fetchInwarddetails
-    const fetchChallandetails = async () => {
-        try {
-            const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=DeliveryChallanDetail"
-            );
-            setChallandetails(response.data);
-            // console.log('detail', response.data)
-        } catch (error) { }
+    const handletableMenuClose = () => {
+        setAnchorEl1(null);
+        setSelectedRow(null);
     };
-
-
 
     //for Store locations
     const [options, setOptions] = useState([]);
@@ -184,6 +213,8 @@ const DeliveryChallan = () => {
             .then((response) => response.json())
             .then((result) => {
                 // console.log("API Response:", result); // Debugging log
+
+
                 const storelocationOptions = result.map((storelocation) => ({
                     value: storelocation?.Id || "",
                     label: storelocation?.Storelocation,
@@ -198,7 +229,8 @@ const DeliveryChallan = () => {
 
     //for Product
     const [productOptions, setProductOptions] = useState([]);
-    const [selectedProduct, setSelectedProduct] = useState("");
+    const [selectedProduct, setSelectedProduct] = useState(null);
+
 
     // const fetchProduct = async () => {
     //     const requestOptions = {
@@ -226,6 +258,7 @@ const DeliveryChallan = () => {
     //         .catch((error) => console.error("Error fetching Storelocation:", error));
     // };
 
+
     const fetchProduct = async () => {
         try {
             const response = await axios.get(
@@ -238,6 +271,7 @@ const DeliveryChallan = () => {
 
         }
     };
+
 
     const processMaterialData = (data) => {
         if (Array.isArray(data)) {
@@ -253,12 +287,6 @@ const DeliveryChallan = () => {
         }
     };
 
-    useEffect(() => {
-        fetchChallanHeader();
-        fetchChallandetails();
-        fetchLocation();
-        fetchProduct();
-    }, []);
 
 
     //for amount calculation
@@ -280,16 +308,71 @@ const DeliveryChallan = () => {
         const amt = qtyNum * rateNum;
         setAmount(amt);
     };
+    //for add data in table after click on Add to table
+    const [editingRow, setEditingRow] = useState(null);
+    //Add Rows
+    const handleAddRow = () => {
+        const newRow = {
+            ProductId: selectedProduct,
+            Quantity: quentity,
+            Rate: rate,
+            Amount: amount,
+            BatchNo: batchNo,
+            BatchDate: batchDate,
+        };
 
-    const [rows, setRows] = useState([]);
-    //create and update Delivery challan
-    const totalAmount = rows.reduce((total, row) => total + (row.Amount || 0), 0).toFixed(2);
+        console.log("newRow", newRow);
+        // Update rows state and ensure the new row is added to the table
+        setRows((prevRows) => [...prevRows, newRow]);
+    };
+
+    //for updaterows
+    const handleSaveOrAddRow = () => {
+        if (editingRow !== null) {
+            // Update the existing row
+            const updatedRows = [...rows];
+            updatedRows[editingRow] = {
+                ...updatedRows[editingRow],
+                ProductId: selectedProduct,
+                Quantity: quentity,
+                Rate: rate,
+                Amount: amount,
+                BatchNo: batchNo,
+                BatchDate: batchDate,
+            };
+            setRows(updatedRows);
+            setEditingRow(null);
+
+        }
+        else {
+            handleAddRow();
+        }
+
+        if (editingRow === null) {
+            resetFields(); // Clear fields only when adding a new row
+        }
+    };
+
+
+    // Function to reset form fields (only for new row addition)
+    const resetFields = () => {
+        setSelectedProduct("");
+        setBatchNo('');
+        setBatchDate('');
+        setQuantity("");
+        setRate("");
+        setAmount("");
+
+    };
+
+
+
 
     //create and update Inword At Store
-    const handleSubmitDelivery = async (e) => {
+    const handleSubmitInWord = async (e) => {
         e.preventDefault();
         const formattedChallanDate = moment(challanDate).format("YYYY-MM-DD");
-
+        console.log(rowId)
         const purchaseheaderdata = {
             Id: rowId,
             ChallanNo: parseInt(challanNo),
@@ -298,12 +381,11 @@ const DeliveryChallan = () => {
             VehicleNo: vehicleNo,
             Total: totalAmount,
         };
-        // console.log("ChallanNo", challanNo)
-        // console.log("deliveryheders", challanheaders);
+
         try {
             const invoiceurl = rowId
-                ? "https://arohanagroapi.microtechsolutions.co.in/php/updatedeliverychallanheader.php"
-                : "https://arohanagroapi.microtechsolutions.co.in/php/postdeliverychallanheader.php";
+            ? "https://arohanagroapi.microtechsolutions.co.in/php/updatedeliverychallanheader.php"
+            : "https://arohanagroapi.microtechsolutions.co.in/php/postdeliverychallanheader.php";
 
             const response = await axios.post(
                 invoiceurl,
@@ -312,33 +394,35 @@ const DeliveryChallan = () => {
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 }
             );
-            console.log('postchallanheders', response.data)
+            console.log('postinwardheaders', response.data)
+
             let InwardId = rowId ? rowId : parseInt(response.data.ID, 10);
-            // console.log("Inward Id ", InwardId);
+            //console.log("Inward Id ", InwardId);
             console.log("rows", rows);
 
             for (const row of rows) {
-                console.log("this row   ", row);
+
                 const formattedBatchDate = moment(row.BatchDate).format("YYYY-MM-DD");
+                //console.log('b date', formattedBatchDate)
 
                 const rowData = {
                     Id: parseInt(row.Id, 10),
                     ChallanId: parseInt(InwardId, 10),
-
                     ProductId: parseInt(row.ProductId, 10),
-
                     BatchNo: parseInt(row.BatchNo),
                     BatchDate: formattedBatchDate,
                     Quantity: parseFloat(row.Quantity),
                     Rate: parseFloat(row.Rate),
-                    Amount: parseInt(row.Amount),
+                    Amount: parseInt(row.Amount)
                 };
-                // console.log("this row has rowData ", rowData);
-                const invoicdedetailurl =
-                    row.Id
-                        ? "https://arohanagroapi.microtechsolutions.co.in/php/updatedeliverychallandetail.php"
-                        : "https://arohanagroapi.microtechsolutions.co.in/php/postdeliverychallandetail.php";
+                console.log("this row has rowData ", rowData);
+
+                const invoicdedetailurl = row.Id
+                ? "https://arohanagroapi.microtechsolutions.co.in/php/updatedeliverychallandetail.php"
+                : "https://arohanagroapi.microtechsolutions.co.in/php/postdeliverychallandetail.php";
+
                 console.log(" invoicdedetailurl is used ", invoicdedetailurl);
+
                 try {
                     const response = await axios.post(
                         invoicdedetailurl,
@@ -353,9 +437,7 @@ const DeliveryChallan = () => {
                 } catch (error) {
                     console.error("Error:", error);
                 }
-                if (isEditing && row.Id) {
-                    handleSaveOrAddRow();
-                }
+
             }
             setIsDrawerOpen(false);
             toast.success(
@@ -364,91 +446,13 @@ const DeliveryChallan = () => {
                     : "Delivery challan detail Created successfully!"
             );
             resetForm();
-            fetchChallanHeader();
-            // console.log("Inword Header Data:", purchaseheaderdata);
+            fetchInwardHeader();
+            fetchInwarddetails();
+
         } catch (error) {
             console.error("Error submitting Inword:", error);
         }
     };
-
-    //for drawer table row btn
-
-    const [rowId, setRowId] = useState('');
-    //for drawer table menu btn
-    const [anchorEl1, setAnchorEl1] = useState(null);
-    const [selectedRow, setSelectedRow] = useState(null);
-
-    const handleMenutableOpen = (event, index) => {
-        setAnchorEl1(event.currentTarget);
-        setSelectedRow(index);
-    };
-
-    const handletableMenuClose = () => {
-        setAnchorEl1(null);
-        setSelectedRow(null);
-    };
-
-    //for add data in table after click on Add to table
-    const [editingRow, setEditingRow] = useState(null);
-    //Add Rows
-    const handleAddRow = () => {
-        const newRow = {
-            ProductId: selectedProduct,
-            Quantity: quentity,
-            Rate: rate,
-            Amount: amount,
-            BatchNo: batchNo,
-            BatchDate: batchDate,
-        };
-        // console.log("newRow", newRow);
-        // Update rows state and ensure the new row is added to the table
-        setRows((prevRows) => [...prevRows, newRow]);
-        // console.log("Updated Rows:", rows);
-    };
-
-
-    //for updaterows
-    const handleSaveOrAddRow = () => {
-        if (editingRow !== null) {
-            // Update the existing row
-            const updatedRows = [...rows];
-            updatedRows[editingRow] = {
-                ...updatedRows[editingRow],
-                ProductId: selectedProduct,
-
-                Quantity: quentity,
-                Rate: rate,
-                Amount: amount,
-                BatchNo: batchNo,
-                BatchDate: batchDate,
-            };
-            setRows(updatedRows);
-            setEditingRow(null);
-        }
-        else {
-            // Add a new row
-            handleAddRow();
-        }
-
-        // Ensure state is not cleared when editing
-    if (editingRow === null) {
-        resetFields(); // Clear fields only when adding a new row
-      }
-    };
-
-
-    // Function to reset form fields (only for new row addition)
-  const resetFields = () => {
-    setSelectedProduct("");
-   setBatchNo('');
-   setBatchDate('');
-    setQuantity("");
-    setRate("");
-    setAmount("");
-
-  };
-
-
 
     //update rows
     const handleEditRow = (index) => {
@@ -463,12 +467,12 @@ const DeliveryChallan = () => {
     };
 
 
+    //delete rows 
     const handleDeleteRow = (index) => {
         const updatedRows = [...rows];
         updatedRows.splice(index, 1);
         setRows(updatedRows);
     };
-
 
     //for delete Header
 
@@ -494,9 +498,9 @@ const DeliveryChallan = () => {
                 console.log(result);
                 setOpen(false);
                 handleDrawerClose();
-                fetchChallanHeader();
+                fetchInwardHeader();
                 toast.success(
-                    "DeliveryChallan Deleted successfully!"
+                    "Inword At Store for  Deleted successfully!"
                 );
             })
             .catch((error) => console.error(error));
@@ -511,7 +515,10 @@ const DeliveryChallan = () => {
             <Box sx={{ p: 5, height: 'auto' }}>
 
                 <Box sx={{ display: 'flex', gap: 3 }}>
-                    <Button sx={{ background: 'var(--complementary-color)', }} variant="contained" onClick={handleDrawerOpen}>Create Delivery Challan </Button>
+                    <Button sx={{ background: 'var(--complementary-color)', }}
+                        variant="contained"
+                        onClick={handleDrawerOpen}
+                    >Create Delivery Challan </Button>
                 </Box>
 
                 {/* main table */}
@@ -538,9 +545,10 @@ const DeliveryChallan = () => {
                 >
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <Box sx={{ padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgb(236, 253, 230)' }}>
-
+                         
                             <Typography m={2} fontWeight="bold" variant="h6">
                                 {isEditing ? "Update Delivery Challan At Godown" : "Create Delivery Challan At Godown"}
+                              
                             </Typography>
                             <CloseIcon sx={{ cursor: 'pointer' }} onClick={handleDrawerClose} />
                         </Box>
@@ -548,7 +556,7 @@ const DeliveryChallan = () => {
 
                         <Box>
                             <Box display={'flex'} alignItems={'center'} mt={2} m={2} gap={2} >
-                                <Box flex={1} >
+                            <Box flex={1} >
                                     <Box >
                                         <Typography variant="body2">Challan No</Typography>
                                         <TextField
@@ -562,6 +570,7 @@ const DeliveryChallan = () => {
 
 
                                 <Box flex={1} >
+                               
                                     <Box>
                                         <Typography variant="body2">Challan Date</Typography>
                                         <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -576,7 +585,7 @@ const DeliveryChallan = () => {
                                             />
                                         </LocalizationProvider>
                                     </Box>
-                                </Box>
+                                </Box> 
 
 
                                 <Box flex={1} >
@@ -607,14 +616,46 @@ const DeliveryChallan = () => {
                                 </FormControl>
                             </Box>
 
+                           
+
+
+
+
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, m: 2 }}>
                                 {/* First Row: Product, Batch No, Batch Date */}
                                 <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                                     <Box sx={{ flex: 1 }}>
                                         <Typography>Product</Typography>
                                         <FormControl fullWidth size="small">
-                                            {/*                                     
-                                            <Select
+                                            <Autocomplete
+                                                fullWidth
+                                                size="small"
+                                                options={productOptions}
+                                                value={productOptions.find(option => option.value === selectedProduct) || null}
+                                                getOptionLabel={(option) => option.label}
+                                                onChange={(event, newValue) => {
+                                                    if (newValue) {
+                                                        setSelectedProduct(newValue.value);
+                                                        setRate(newValue.purchaseRate);
+                                                        console.log("Selected Product:", newValue.label);
+                                                        console.log("Purchase Rate:", newValue.purchaseRate);
+
+                                                        // Recalculate the amount with the existing quantity
+                                                        calculateAmount(quentity, newValue.purchaseRate);
+                                                    } else {
+                                                        setSelectedProduct(null);
+                                                        setRate(0);
+                                                    }
+                                                }}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+
+                                                        variant="outlined"
+                                                    />
+                                                )}
+                                            />
+                                            {/* <Select
                                                 fullWidth
                                                 size="small"
                                                 value={selectedProduct || ""}
@@ -639,34 +680,6 @@ const DeliveryChallan = () => {
                                                     </MenuItem>
                                                 ))}
                                             </Select> */}
-
-                                            <Autocomplete
-                                                fullWidth
-                                                size="small"
-                                                options={productOptions}
-                                                value={productOptions.find(option => option.value.toString() === selectedProduct?.toString()) || null}
-                                                getOptionLabel={(option) => option.label}
-                                                onChange={(event, newValue) => {
-                                                    if (newValue) {
-                                                        setSelectedProduct(newValue.value);
-                                                        setRate(newValue.purchaseRate);
-                                                        console.log("Selected Product:", newValue.label);
-                                                        console.log("Purchase Rate:", newValue.purchaseRate);
-
-                                                        // Recalculate the amount with the existing quantity
-                                                        calculateAmount(quentity, newValue.purchaseRate);
-                                                    } else {
-                                                        setSelectedProduct(null);
-                                                        setRate(0);
-                                                    }
-                                                }}
-                                                renderInput={(params) => (
-                                                    <TextField {...params} variant="outlined" />
-                                                )}
-                                                isOptionEqualToValue={(option, value) => option.value.toString() === value?.toString()}
-                                            />
-
-
                                         </FormControl>
                                     </Box>
 
@@ -783,14 +796,13 @@ const DeliveryChallan = () => {
                                                         onClose={handletableMenuClose}
                                                     >
                                                         <MenuItem onClick={() => handleEditRow(index)}>Edit</MenuItem>
-
                                                         <MenuItem onClick={() => handleDeleteRow(index)}>Delete</MenuItem>
                                                     </Menu>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
 
-
+                                        {/* Total Row */}
                                         <TableRow>
                                             <TableCell colSpan={6} align="right"><strong>Total:</strong></TableCell>
                                             <TableCell><strong>{totalAmount}</strong></TableCell>
@@ -806,8 +818,7 @@ const DeliveryChallan = () => {
                                 <Button
                                     sx={{
                                         background: 'var(--primary-color)',
-                                    }} onClick={handleSubmitDelivery}
-
+                                    }} onClick={handleSubmitInWord}
                                     variant="contained"
                                 >
                                     {isEditing ? "Update" : "Save"}
@@ -868,40 +879,8 @@ export default DeliveryChallan
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // import React, { useMemo, useState, useEffect } from 'react'
-// import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Table, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
+// import {Autocomplete, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Table, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
 // import CloseIcon from '@mui/icons-material/Close';
 // import { MaterialReactTable, } from 'material-react-table';
 // import { DatePicker } from "@mui/x-date-pickers";
@@ -1099,7 +1078,7 @@ export default DeliveryChallan
 
 //     //for Product
 //     const [productOptions, setProductOptions] = useState([]);
-//     const [selectedProduct, setSelectedProduct] = useState(null);
+//     const [selectedProduct, setSelectedProduct] = useState("");
 
 //     // const fetchProduct = async () => {
 //     //     const requestOptions = {
@@ -1254,9 +1233,7 @@ export default DeliveryChallan
 //                 } catch (error) {
 //                     console.error("Error:", error);
 //                 }
-//                 if (isEditing && row.Id) {
-//                     handleSaveOrAddRow();
-//                 }
+            
 //             }
 //             setIsDrawerOpen(false);
 //             toast.success(
@@ -1265,10 +1242,11 @@ export default DeliveryChallan
 //                     : "Delivery challan detail Created successfully!"
 //             );
 //             resetForm();
-//             fetchChallanHeader();
+
+
 //             // console.log("Inword Header Data:", purchaseheaderdata);
 //         } catch (error) {
-//             console.error("Error submitting Inword:", error);
+//             console.error("Error submitting Delivery Challan:", error);
 //         }
 //     };
 
@@ -1330,7 +1308,25 @@ export default DeliveryChallan
 //             // Add a new row
 //             handleAddRow();
 //         }
+
+//         // Ensure state is not cleared when editing
+//     if (editingRow === null) {
+//         resetFields(); // Clear fields only when adding a new row
+//       }
 //     };
+
+
+//     // Function to reset form fields (only for new row addition)
+//   const resetFields = () => {
+//     setSelectedProduct("");
+//    setBatchNo('');
+//    setBatchDate('');
+//     setQuantity("");
+//     setRate("");
+//     setAmount("");
+
+//   };
+
 
 
 //     //update rows
@@ -1490,71 +1486,30 @@ export default DeliveryChallan
 //                                 </FormControl>
 //                             </Box>
 
-//                             {/* <Box display={'flex'} alignItems={'center'} mt={2} m={2} gap={2}>
-//                                 <Box flex={1} >
-//                                     <Box >
-//                                         <Typography variant="body2">Challan No</Typography>
-//                                         <TextField
-//                                             // value={challanNo}
-//                                             // onChange={(e) => setChallanNo(e.target.value)}
-//                                             size="small" fullWidth />
-//                                     </Box>
-//                                 </Box>
-
-
-//                                 <Box flex={1} >
-//                                     <Box>
-//                                         <Typography variant="body2">Challan Date</Typography>
-//                                         <LocalizationProvider dateAdapter={AdapterDateFns}>
-//                                             <DatePicker
-//                                                 // value={challanDate ? new Date(challanDate) : null}
-//                                                 // onChange={(newValue) => setChallanDate(newValue)}
-//                                                 slotProps={{
-//                                                     textField: { size: "small", fullWidth: true },
-//                                                 }}
-//                                                 renderInput={(params) => <TextField />}
-//                                             />
-//                                         </LocalizationProvider>
-//                                     </Box>
-//                                 </Box>
-
-//                             </Box> */}
-
-
-
 //                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, m: 2 }}>
 //                                 {/* First Row: Product, Batch No, Batch Date */}
 //                                 <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
 //                                     <Box sx={{ flex: 1 }}>
 //                                         <Typography>Product</Typography>
 //                                         <FormControl fullWidth size="small">
-//                                             {/* <Select
-//                                                 value={selectedProduct || ""}
-//                                                 onChange={(event) => setSelectedProduct(event.target.value)}
-//                                             >
-//                                                 {productOptions.map((option) => (
-//                                                     <MenuItem key={option.value} value={option.value}>
-//                                                         {option.label}
-//                                                     </MenuItem>
-//                                                 ))}
-//                                             </Select> */}
-
+//                                             {/*                                     
 //                                             <Select
 //                                                 fullWidth
 //                                                 size="small"
 //                                                 value={selectedProduct || ""}
 //                                                 onChange={(event) => {
 //                                                     const selectedValue = event.target.value;
-//                                                     // setSelectedProduct(selectedValue);
-                                                    
 //                                                     const selectedItem = productOptions.find(option => option.value.toString() === selectedValue);
-//                                                     console.log("selected Items", selectedItem)
-//                                                     // setSelectedProduct(selectedItem.label)
-//                                                     console.log('selected product',selectedItem.label)
-//                                                     setRate(selectedItem.purchaseRate);
-//                                                     console.log("Purchase rate:", selectedItem.purchaseRate);
 
-                                   
+//                                                     if (selectedItem) {
+//                                                         setSelectedProduct(selectedItem.value);
+//                                                         setRate(selectedItem.purchaseRate);
+//                                                         console.log("Selected Product:", selectedItem.label);
+//                                                         console.log("Purchase Rate:", selectedItem.purchaseRate);
+
+//                                                         // Recalculate the amount with the existing quantity
+//                                                         calculateAmount(quentity, selectedItem.purchaseRate);
+//                                                     }
 //                                                 }}
 //                                             >
 //                                                 {productOptions.map((option) => (
@@ -1562,7 +1517,35 @@ export default DeliveryChallan
 //                                                         {option.label}
 //                                                     </MenuItem>
 //                                                 ))}
-//                                             </Select>
+//                                             </Select> */}
+
+//                                             <Autocomplete
+//                                                 fullWidth
+//                                                 size="small"
+//                                                 options={productOptions}
+//                                                 value={productOptions.find(option => option.value.toString() === selectedProduct?.toString()) || null}
+//                                                 getOptionLabel={(option) => option.label}
+//                                                 onChange={(event, newValue) => {
+//                                                     if (newValue) {
+//                                                         setSelectedProduct(newValue.value);
+//                                                         setRate(newValue.purchaseRate);
+//                                                         console.log("Selected Product:", newValue.label);
+//                                                         console.log("Purchase Rate:", newValue.purchaseRate);
+
+//                                                         // Recalculate the amount with the existing quantity
+//                                                         calculateAmount(quentity, newValue.purchaseRate);
+//                                                     } else {
+//                                                         setSelectedProduct(null);
+//                                                         setRate(0);
+//                                                     }
+//                                                 }}
+//                                                 renderInput={(params) => (
+//                                                     <TextField {...params} variant="outlined" />
+//                                                 )}
+//                                                 isOptionEqualToValue={(option, value) => option.value.toString() === value?.toString()}
+//                                             />
+
+
 //                                         </FormControl>
 //                                     </Box>
 
@@ -1749,6 +1732,94 @@ export default DeliveryChallan
 // }
 
 // export default DeliveryChallan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

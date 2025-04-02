@@ -966,7 +966,7 @@ const CustomerMaster = () => {
                   <TextField
                     value={updatedtypecode}
                     disabled
-                    onChange={(e) => setUpdatedTypecode(e.target.value)}
+                     onChange={(e) => setUpdatedTypecode(e.target.value)}
                     size="small" placeholder="Enter Type Code" fullWidth />
                 </Box>
 
