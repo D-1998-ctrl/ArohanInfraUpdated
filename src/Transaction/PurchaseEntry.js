@@ -205,7 +205,7 @@ const PurchaseEntry = () => {
         purchaseRate: account?.PurchaseRate,
       }));
 
-     //  console.log('options', options)
+      //  console.log('options', options)
       setProductOptions(options);
     }
   };
@@ -303,7 +303,7 @@ const PurchaseEntry = () => {
       IGSTPercentage: selectedIGST,
       IGSTAmount: igstAmount,
     };
-   //  console.log("newRow", newRow);
+    //  console.log("newRow", newRow);
     // Update rows state and ensure the new row is added to the table
     setRows((prevRows) => [...prevRows, newRow]);
 
@@ -312,6 +312,12 @@ const PurchaseEntry = () => {
 
   //productOptions.find(option => option.value.toString() === selectedValue
   const handleSaveOrAddRow = () => {
+    if (!selectedProduct !== isEditing  ) {
+      alert("Please select an item before adding or saving the row.");
+      return;
+    }
+
+
     if (editingRow !== null) {
       // Update the existing row
       const updatedRows = [...rows];
@@ -333,15 +339,17 @@ const PurchaseEntry = () => {
       };
       setRows(updatedRows);
       setEditingRow(null);
+
     } else {
       // Add a new row
       handleAddRow();
     }
 
     // Ensure state is not cleared when editing
-    if (editingRow === null) {
-      resetFields(); // Clear fields only when adding a new row
-    }
+    // if (editingRow === null) {
+    //   resetFields(); // Clear fields only when adding a new row
+    // }
+    resetFields();
   };
 
   // Function to reset form fields (only for new row addition)
@@ -362,7 +370,7 @@ const PurchaseEntry = () => {
 
   //for  Update Purchase Entry
   const handleSubmit213 = (rowData) => {
-   //  console.log("This row has been clicked:", rowData);
+    //  console.log("This row has been clicked:", rowData);
     setRowId(rowData.Id)
     setIsDrawerOpen(true);
     setIsEditing(false);
@@ -387,7 +395,7 @@ const PurchaseEntry = () => {
     setSgstTotalshow(rowData.SGSTAmount)
     setTransport(rowData.TransportCharges)
     setOther(rowData.Other)
-
+    setSelectedId(rowData.SupplierId)
 
     // setSelectedId(rowData.SupplierId)
     setSelectedLocation(rowData.Storelocation)
@@ -409,7 +417,7 @@ const PurchaseEntry = () => {
       .filter((detail) => detail.PurchaseId === rowData.Id)
 
     setBrandName(invdetail[0]?.Brandname ?? null);
-   //  console.log('invdetail', invdetail)
+    //  console.log('invdetail', invdetail)
   };
 
 
@@ -514,7 +522,7 @@ const PurchaseEntry = () => {
       SubTotal: subTotalcal,
       IsLocked: 'true'
     };
-   //  console.log("purchaseheaderdata", purchaseheaderdata);
+    //  console.log("purchaseheaderdata", purchaseheaderdata);
     try {
       const invoiceurl = isEditing
         ? "https://arohanagroapi.microtechsolutions.co.in/php/updatepurchaseheader.php"
@@ -527,13 +535,13 @@ const PurchaseEntry = () => {
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
         }
       );
-     //  console.log('postpurchaseheader', response.data)
+      //  console.log('postpurchaseheader', response.data)
       let PurchaseId = isEditing ? rowId : parseInt(response.data.PurchaseId, 10);
-     //  console.log("Purchase Id ", PurchaseId);
-     //  console.log("rows", rows);
+      //  console.log("Purchase Id ", PurchaseId);
+      //  console.log("rows", rows);
 
       for (const row of rows) {
-       //  console.log("this row   ", row);
+        //  console.log("this row   ", row);
         const rowData = {
           Id: parseInt(row.Id, 10),
           PurchaseId: parseInt(PurchaseId, 10),
@@ -553,14 +561,14 @@ const PurchaseEntry = () => {
         };
 
 
-       //  console.log("this row has rowData ", rowData);
+        //  console.log("this row has rowData ", rowData);
 
         const invoicdedetailurl =
           row.Id
             ? "https://arohanagroapi.microtechsolutions.co.in/php/updatepurchasedetail.php"
             : "https://arohanagroapi.microtechsolutions.co.in/php/postpurchasedetail.php";
 
-       //  console.log(" invoicdedetailurl is used ", invoicdedetailurl);
+        //  console.log(" invoicdedetailurl is used ", invoicdedetailurl);
         try {
           const response = await axios.post(
             invoicdedetailurl,
@@ -572,7 +580,7 @@ const PurchaseEntry = () => {
             }
           );
 
-         //  console.log("Response:", response);
+          //  console.log("Response:", response);
         } catch (error) {
           console.error("Error:", error);
         }
@@ -592,7 +600,7 @@ const PurchaseEntry = () => {
       fetchpurchaseHeader();
       fetchpurchasedetails();
 
-     //  console.log("Purchase Header Data:", purchaseheaderdata);
+      //  console.log("Purchase Header Data:", purchaseheaderdata);
 
     } catch (error) {
       console.error("Error submitting Purchase:", error);
@@ -619,12 +627,13 @@ const PurchaseEntry = () => {
     setOther("");
     setTransport("");
     setSelectedLocation('')
+    setOptions([])
     setRows([]);
   };
 
 
   const handleEdit = () => {
-   //  console.log("Editing item with ID:", rowId);
+    //  console.log("Editing item with ID:", rowId);
     const invdetail = purchasedetails.filter(
       (detail) => detail.PurchaseId === rowId);
 
@@ -635,6 +644,7 @@ const PurchaseEntry = () => {
       PurchaseId: detail.PurchaseId,
       MaterialId: detail.MaterialId,
       MaterialName: productOptions.find((data) => data.value === detail.MaterialId)?.label || "",
+
       Quantity: parseFloat(detail.Quantity) || 0,
       Rate: parseFloat(detail.Rate) || 0,
       Amount: parseFloat(detail.Amount) || 0,
@@ -646,7 +656,7 @@ const PurchaseEntry = () => {
       IGSTAmount: parseFloat(detail.IGSTAmount) || 0,
     }));
 
-   //  console.log('mappedRows', mappedRows)
+    //  console.log('mappedRows', mappedRows)
     // // Set the rows for the table with all the details
     setRows(mappedRows);
     // // Set editing state
@@ -662,7 +672,7 @@ const PurchaseEntry = () => {
     );
     if (specificDetail) {
       setInvdetailId(specificDetail.Id);
-     //  console.log("specificDetail.Id", specificDetail.Id);
+      //  console.log("specificDetail.Id", specificDetail.Id);
     }
     fetchpurchaseHeader();
     setIsDrawerOpen(true);
@@ -696,6 +706,7 @@ const PurchaseEntry = () => {
     setSelectedIGST(row.IGSTPercentage || "0");
     setIGSTAmount(row.IGSTAmount || "0");
     setSelectedProduct(row.MaterialId);
+    setMaterialName(row.MaterialName)
 
   };
 
@@ -752,12 +763,12 @@ const PurchaseEntry = () => {
       redirect: "follow"
     };
 
-   //  console.log("Deleted Id:", rowId);
+    //  console.log("Deleted Id:", rowId);
 
     fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=PurchaseHeader&Id=${rowId}`, requestOptions)
       .then((response) => response.text())
       .then((result) => {
-       //  console.log(result);
+        //  console.log(result);
         setOpen(false);
         handleDrawerClose();
         fetchpurchaseHeader();
@@ -769,7 +780,7 @@ const PurchaseEntry = () => {
   };
 
   //serchapi for Party
-  const [text, setText] = useState("");
+  const [text, setText] = useState("a");
   const [showDropdown, setShowDropdown] = useState(false);
 
   const serchParty = () => {
@@ -788,6 +799,7 @@ const PurchaseEntry = () => {
       })
       .catch((error) => console.error(error));
   }
+
   useEffect(() => {
     serchParty();
   }, [text]);
@@ -798,23 +810,21 @@ const PurchaseEntry = () => {
   const [customerName, setCustomerName] = useState("");
 
   const Namevalidation = () => {
-      let temp = accountName.split(" ")
-      let surname = temp[1]
-      if (surname && surname.length > 1) {
-        return true;
-      } else {
-        toast.error("Need to Insert First and last Name ");
-        return false;
-      }
+    let temp = accountName.split(" ")
+    let surname = temp[1]
+    if (surname && surname.length >= 1) {
+      return true;
+    } else {
+      toast.error("Need to Insert First and last Name ");
+      return false;
     }
+  }
 
   const CreateSupplierMaster = () => {
 
     if (!Namevalidation()) {
       return;
     }
-
-
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -837,12 +847,10 @@ const PurchaseEntry = () => {
     fetch("https://arohanagroapi.microtechsolutions.co.in/php/postaccount.php", requestOptions)
       .then((response) => response.json())
       .then((result) => {
-       //  console.log("Customer Created:", result);
+        //  console.log("Customer Created:", result);
         toast.success('User created')
         if (result && result.Id) {
-         //  console.log(result.Id)
-
-
+          //  console.log(result.Id)
           // Now set the address and GSTNo for this customer
           const addressData = new URLSearchParams();
 
@@ -860,8 +868,15 @@ const PurchaseEntry = () => {
           throw new Error("Customer ID not received from API.");
         }
       })
-      .then((response) => response.json())
-      .then((addressResult) => console.log("Address Added:", addressResult))
+      .then((response) => response.json()
+      )
+      // .then((addressResult) => console.log("Address Added:", addressResult))
+      .then((addressResult) => {
+        console.log("Address Added:", addressResult);
+        // Clear the input field after successful creation
+        setAccountName("");
+
+      })
       .catch((error) => console.error("Error:", error));
   };
 
@@ -905,6 +920,31 @@ const PurchaseEntry = () => {
       .catch((error) => console.error(error));
   };
 
+
+  const handleItemChange = (event) => {
+
+    const selectedValue = event.target.value;
+    setSelectedProduct(selectedValue);
+    const selectedItem = productOptions.find(option => option.value.toString() === selectedValue);
+    console.log("selected Items", selectedItem)
+    setMaterialName(selectedItem.label)
+    setRate(selectedItem.purchaseRate);
+    console.log("Purchase rate:", selectedItem.purchaseRate);
+    if (selectedItem) {
+      let gstfromCompanyInfo = gstNoComp?.substring(0, 2) || "";
+      let gstfromAccount = selectedGSTNo?.substring(0, 2) || "";
+      setSelectedCGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.cgstpercent : "0");
+      setSelectedSGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.sgstpercent : "0");
+      setSelectedIGST(gstfromCompanyInfo !== gstfromAccount ? selectedItem.igstpercent : "0");
+      // Recalculate the amount with the existing quantity
+      calculateAmount(quantity, selectedItem.purchaseRate);
+    } else {
+      setSelectedCGST("0");
+      setSelectedSGST("0");
+      setSelectedIGST("0");
+
+    }
+  }
 
   return (
 
@@ -989,11 +1029,11 @@ const PurchaseEntry = () => {
                       <Typography>Purchase No</Typography>
                       <TextField
                         value={PurchaseNo}
-                        disabled
-                        onChange={(e) => setPurchaseNo(e.target.value)}
+                        // disabled
+                        // onChange={(e) => setPurchaseNo(e.target.value)}
                         size="small"
                         margin="none"
-                        placeholder="Purchase No"
+                        placeholder="Purchase No Autogenrated"
                         fullWidth
                       />
                     </Box>
@@ -1026,13 +1066,11 @@ const PurchaseEntry = () => {
                         size="small"
 
                         value={selectedId
-                          ? options.find(({ Id }) => String(Id) === selectedId)?.AccountName || ""
-                          : options.map((option) => option.AccountName)}
+                          ? options.find(({ Id }) => String(Id) === selectedId)?.AccountName || options.map((option) => option.AccountName)
+                          : ''}
                         placeholder="Select Customer"
-                        onClick={() => setShowDropdown(true)
-                          
-                        }
-
+                        onClick={() => setShowDropdown(true)}
+                       
                       />
 
                       {showDropdown && (
@@ -1088,17 +1126,6 @@ const PurchaseEntry = () => {
                         </Paper>
                       )}
                     </Box>
-
-
-
-
-
-
-
-
-
-
-
 
                     <Box>
                       <Typography>Bill No</Typography>
@@ -1178,42 +1205,51 @@ const PurchaseEntry = () => {
                   <Box >
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, m: 1 }}>
                       <Box flex={1}>
-                        {/* <Box>
+                        <Box>
                           <Typography>Item</Typography>
 
                           <Select
                             fullWidth
                             size="small"
                             value={selectedProduct || ""}
+                            // onChange={(event) => {
+                            //   const selectedValue = event.target.value;
+                            //   setSelectedProduct(selectedValue);
+
+                            //   const selectedItem = productOptions.find(option => option.value.toString() === selectedValue);
+                            //   console.log("selected Items", selectedItem)
+                            //   setMaterialName(selectedItem.label)
+                            //   setRate(selectedItem.purchaseRate);
+                            //   console.log("Purchase rate:", selectedItem.purchaseRate);
+
+                            //   if (selectedItem) {
+
+                            //     let gstfromCompanyInfo = gstNoComp?.substring(0, 2) || "";
+                            //     let gstfromAccount = selectedGSTNo?.substring(0, 2) || "";
+
+                            //     setSelectedCGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.cgstpercent : "0");
+                            //     setSelectedSGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.sgstpercent : "0");
+                            //     setSelectedIGST(gstfromCompanyInfo !== gstfromAccount ? selectedItem.igstpercent : "0");
+
+
+                            //     // Recalculate the amount with the existing quantity
+                            //     calculateAmount(quantity, selectedItem.purchaseRate);
+                            //   } else {
+                            //     setSelectedCGST("0");
+                            //     setSelectedSGST("0");
+                            //     setSelectedIGST("0");
+
+                            //   }
+                            // }}
+                            // onChange={(event) => handleItemChange(event)}
                             onChange={(event) => {
-                              const selectedValue = event.target.value;
-                              setSelectedProduct(selectedValue);
-
-                              const selectedItem = productOptions.find(option => option.value.toString() === selectedValue);
-                              console.log("selected Items", selectedItem)
-                              setMaterialName(selectedItem.label)
-                              setRate(selectedItem.purchaseRate);
-                              console.log("Purchase rate:", selectedItem.purchaseRate);
-
-                              if (selectedItem) {
-
-                                let gstfromCompanyInfo = gstNoComp?.substring(0, 2) || "";
-                                let gstfromAccount = selectedGSTNo?.substring(0, 2) || "";
-
-                                setSelectedCGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.cgstpercent : "0");
-                                setSelectedSGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.sgstpercent : "0");
-                                setSelectedIGST(gstfromCompanyInfo !== gstfromAccount ? selectedItem.igstpercent : "0");
-
-
-                                // Recalculate the amount with the existing quantity
-                                calculateAmount(quantity, selectedItem.purchaseRate);
-                              } else {
-                                setSelectedCGST("0");
-                                setSelectedSGST("0");
-                                setSelectedIGST("0");
-
+                              if (!selectedId) {
+                                alert("Please select a party before selecting an item."); // Alert if party is not selected
+                                return;
                               }
+                              handleItemChange(event);
                             }}
+            
                           >
 
                             {productOptions.map((option) => (
@@ -1222,45 +1258,8 @@ const PurchaseEntry = () => {
                               </MenuItem>
                             ))}
                           </Select>
-                        </Box> */}
-                        <Box>
-                          <Typography>Item</Typography>
-
-                          <Autocomplete
-                            fullWidth
-                            size="small"
-                            options={productOptions}
-                            getOptionLabel={(option) => option.label}
-                            value={productOptions.find(option => option.value.toString() === selectedProduct) || null}
-                            onChange={(event, newValue) => {
-                              if (newValue) {
-                                setSelectedProduct(newValue.value.toString());
-                                setMaterialName(newValue.label);
-                                setRate(newValue.purchaseRate);
-                               //  console.log("selected Items", newValue);
-                               //  console.log("Purchase rate:", newValue.purchaseRate);
-
-                                let gstfromCompanyInfo = gstNoComp?.substring(0, 2) || "";
-                                let gstfromAccount = selectedGSTNo?.substring(0, 2) || "";
-
-                                setSelectedCGST(gstfromCompanyInfo === gstfromAccount ? newValue.cgstpercent : "0");
-                                setSelectedSGST(gstfromCompanyInfo === gstfromAccount ? newValue.sgstpercent : "0");
-                                setSelectedIGST(gstfromCompanyInfo !== gstfromAccount ? newValue.igstpercent : "0");
-
-                                // Recalculate the amount with the existing quantity
-                                calculateAmount(quantity, newValue.purchaseRate);
-                              } else {
-                                setSelectedProduct("");
-                                setMaterialName("");
-                                setRate("");
-                                setSelectedCGST("0");
-                                setSelectedSGST("0");
-                                setSelectedIGST("0");
-                              }
-                            }}
-                            renderInput={(params) => <TextField {...params}  variant="outlined" />}
-                          />
                         </Box>
+
                       </Box>
 
 
@@ -1610,13 +1609,13 @@ const PurchaseEntry = () => {
                     <Typography>Bill Date:</Typography>
                     <b>{BillDate}</b>
                   </Grid>
-
+                  {/* 
                   <Grid item sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>Party:</Typography>
                     <Typography variant="body1">
                       {options.find((option) => option.Id === selectedId)?.AccountName}
                     </Typography>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
 
 

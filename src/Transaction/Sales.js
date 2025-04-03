@@ -122,6 +122,7 @@ const SalesEntry = () => {
 
         handleDrawerClose();
         fetchInvoiceHeader();
+        handleMenuClose()
         toast.success(
           "Sales Entry Deleted successfully!"
         );
@@ -425,7 +426,7 @@ const SalesEntry = () => {
     setIGSTAmount("");
     setPaymentMode("");
     setTransport("");
-
+    setAccountOptions([])
     setRows([]);
   };
 
@@ -671,7 +672,9 @@ const SalesEntry = () => {
     const row = rows[index];
     setEditingRow(index);
     setSelectedProductId(row.ProductId);
+     
     console.log('row.ProductId', row.ProductId)
+    setProductName(row.ProductName);
     setQuantity(row.Quantity || "");
     setRate(row.Rate || "");
     SetAmount(row.Amount || "");
@@ -691,6 +694,11 @@ const SalesEntry = () => {
   };
 
   const handleSaveOrAddRow = () => {
+    if (!selectedProductID !== isEditing) {
+      alert("Please select an item before adding or saving the row.");
+      return;
+    }
+
     if (editingRow !== null) {
       // Update the existing row
       const updatedRows = [...rows];
@@ -710,18 +718,20 @@ const SalesEntry = () => {
       };
       setRows(updatedRows);
       setEditingRow(null);
+     
     } else {
       // Add a new row
       handleAddRow();
     }
 
-    if (editingRow === null) {
-      resetFields(); // Clear fields only when adding a new row
-    }
+    // if (editingRow === null) {
+    //   resetFields(); 
+    // }
+    resetFields(); 
   };
 
   const resetFields = () => {
-    // setSelectedProductName("");
+     setSelectedProductName("");
     setSelectedProductId("");
     setQuantity("");
     setRate("");
@@ -738,23 +748,23 @@ const SalesEntry = () => {
   //get company master
   const [gstNo, setGstNO] = useState("");
 
-    const fetchCompanyMaster = async () => {
-      try {
-        const response = await axios.get(
-          'https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=companymaster',
-          { maxBodyLength: Infinity }
-        );
-        ////  console.log(response.data);
-        setGstNO(response.data[0].GSTNo);
-  
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  const fetchCompanyMaster = async () => {
+    try {
+      const response = await axios.get(
+        'https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=companymaster',
+        { maxBodyLength: Infinity }
+      );
+      ////  console.log(response.data);
+      setGstNO(response.data[0].GSTNo);
 
-    useEffect(() => {
-      fetchCompanyMaster();
-    }, []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanyMaster();
+  }, []);
 
   //for serchApi
   const [showDropdown, setShowDropdown] = useState(false);
@@ -790,7 +800,7 @@ const SalesEntry = () => {
   const Namevalidation = () => {
     let temp = accountName.split(" ")
     let surname = temp[1]
-    if (surname && surname.length > 1) {
+    if (surname && surname.length >=1) {
       return true;
     } else {
       toast.error("Need to Insert First and last Name ");
@@ -831,7 +841,7 @@ const SalesEntry = () => {
         if (result && result.Id) {
           console.log(result.Id)
           toast.success('user created')
-        
+
 
 
           // Now set the address and GSTNo for this customer
@@ -852,7 +862,11 @@ const SalesEntry = () => {
         }
       })
       .then((response) => response.json())
-      .then((addressResult) => console.log("Address Added:", addressResult))
+      .then((addressResult) => {
+        console.log("Address Added:", addressResult);
+        // Clear the input field after successful creation
+        setAccountName("");
+      })
       .catch((error) => console.error("Error:", error));
   };
 
@@ -898,6 +912,31 @@ const SalesEntry = () => {
       .catch((error) => console.error(error));
   };
 
+//
+
+const handleItemChange = (newValue) => {
+
+  if (newValue) {
+    setSelectedProductId(newValue.value);
+    setProductName(newValue.label);
+    setRate(newValue.purchaseRate);
+    setSelectedProductName(newValue.label);
+    setCGST(gstNo?.substring(0, 2) === acctGSTNo?.substring(0, 2) ? newValue.cgst : "0");
+    setSGST(gstNo?.substring(0, 2) === acctGSTNo?.substring(0, 2) ? newValue.sgst : "0");
+    setIGST(gstNo?.substring(0, 2) !== acctGSTNo?.substring(0, 2) ? newValue.igst : "0");
+
+    // Recalculate the amount with the existing quantity
+    calculateAmount(quantity, newValue.purchaseRate);
+  } else {
+    setSelectedProductId("");
+    setProductName("");
+    setRate("");
+    setSelectedProductName("");
+    setCGST("0");
+    setSGST("0");
+    setIGST("0");
+  }
+}
 
 
   return (
@@ -981,7 +1020,7 @@ const SalesEntry = () => {
                   value={invoiceNo}
                   size="small"
                   margin="none"
-                  placeholder="Invoice No"
+                  placeholder="Invoice No Autogerated"
                   fullWidth
                 />
               </Box>
@@ -1036,8 +1075,8 @@ const SalesEntry = () => {
                     ? accountOptions.find(({ Id }) => String(Id) === selectedAccount)?.AccountName || ""
                     : accountOptions.map((option) => option.AccountName)}
                   placeholder="Select Customer"
-                  onClick={() => 
-                  
+                  onClick={() =>
+
                     setShowDropdown(true)}
 
                 />
@@ -1186,28 +1225,37 @@ const SalesEntry = () => {
                   options={productOptions}
                   getOptionLabel={(option) => option.label}
                   value={productOptions.find((option) => option.value === selectedProductID) || null}
-                  onChange={(event, newValue) => {
-                    if (newValue) {
-                      setSelectedProductId(newValue.value);
-                      setProductName(newValue.label);
-                      setRate(newValue.purchaseRate);
-                      setSelectedProductName(newValue.label);
-                      setCGST(gstNo?.substring(0, 2) === acctGSTNo?.substring(0, 2) ? newValue.cgst : "0");
-                      setSGST(gstNo?.substring(0, 2) === acctGSTNo?.substring(0, 2) ? newValue.sgst : "0");
-                      setIGST(gstNo?.substring(0, 2) !== acctGSTNo?.substring(0, 2) ? newValue.igst : "0");
+                  // onChange={(event, newValue) => {
+                  //   if (newValue) {
+                  //     setSelectedProductId(newValue.value);
+                  //     setProductName(newValue.label);
+                  //     setRate(newValue.purchaseRate);
+                  //     setSelectedProductName(newValue.label);
+                  //     setCGST(gstNo?.substring(0, 2) === acctGSTNo?.substring(0, 2) ? newValue.cgst : "0");
+                  //     setSGST(gstNo?.substring(0, 2) === acctGSTNo?.substring(0, 2) ? newValue.sgst : "0");
+                  //     setIGST(gstNo?.substring(0, 2) !== acctGSTNo?.substring(0, 2) ? newValue.igst : "0");
 
-                      // Recalculate the amount with the existing quantity
-                      calculateAmount(quantity, newValue.purchaseRate);
-                    } else {
-                      setSelectedProductId("");
-                      setProductName("");
-                      setRate("");
-                      setSelectedProductName("");
-                      setCGST("0");
-                      setSGST("0");
-                      setIGST("0");
+                  //     // Recalculate the amount with the existing quantity
+                  //     calculateAmount(quantity, newValue.purchaseRate);
+                  //   } else {
+                  //     setSelectedProductId("");
+                  //     setProductName("");
+                  //     setRate("");
+                  //     setSelectedProductName("");
+                  //     setCGST("0");
+                  //     setSGST("0");
+                  //     setIGST("0");
+                  //   }
+                  // }}
+
+                  onChange={(event,newValue ) => {
+                    if (!selectedAccount ) {
+                      alert("Please select a Customer before selecting an item."); // Alert if party is not selected
+                      return;
                     }
+                    handleItemChange(event,newValue );
                   }}
+
                   renderInput={(params) => <TextField {...params} variant="outlined" />}
                 />
 

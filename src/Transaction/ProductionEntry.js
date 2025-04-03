@@ -900,8 +900,9 @@ const ProductionEntry = () => {
                                         <Typography variant="body2">Production No</Typography>
                                         <TextField
                                             value={productNo}
-                                            disabled
-                                            onChange={(e) => setProductNo(e.target.value)}
+                                            placeholder='Production Number'
+                                            // disabled
+                                            // onChange={(e) => setProductNo(e.target.value)}
                                             size="small"
                                             fullWidth
                                         />
@@ -1306,11 +1307,11 @@ const ProductionEntry = () => {
                                             <Typography variant="body2">Production No</Typography>
                                             <TextField
                                                 value={updateproductNo}
-                                                onChange={(e) => setUpdateProductNo(e.target.value)}
+                                                // onChange={(e) => setUpdateProductNo(e.target.value)}
                                                 size="small"
                                                 placeholder="Enter Product No"
                                                 fullWidth
-                                                disabled
+                                                // disabled
                                             />
                                         </Grid>
 

@@ -358,6 +358,10 @@ const PurchaseOtherEntry = () => {
   };
 
   const handleSaveOrAddRow = () => {
+    if (!selectedProduct !== isEditing) {
+      alert("Please select an item before adding or saving the row.");
+      return;
+    }
 
     if (editingRow !== null) {
       // Update the existing row
@@ -381,12 +385,28 @@ const PurchaseOtherEntry = () => {
       setRows(updatedRows);
       setEditingRow(null);
 
+
     } else {
       // Add a new row
       handleAddRow();
     }
+    resetFields()
   };
 
+
+  const resetFields = () => {
+    setSelectedProduct("");
+    setProductName("");
+    setQuantity("");
+    setRate("");
+    SetAmount("");
+    setSelectedCGST("");
+    setCGSTAmount("");
+    setSelectedSGST("");
+    setSGSTAmount("");
+    setSelectedIGST("");
+    setIGSTAmount("");
+  };
 
 
   //for  Update Purchase Entry
@@ -409,7 +429,7 @@ const PurchaseOtherEntry = () => {
     setSelectedLocation(rowData.StorelocId)
 
 
-    //
+
     fetchAccounts(rowData.SupplierId)
     fetchAccountName(rowData.SupplierId)
     setCustomerName(rowData.SupplierId)
@@ -580,6 +600,7 @@ const PurchaseOtherEntry = () => {
     setOther("");
     setTransport("");
     setSelectedLocation("");
+    setOptions([]);
     setRows([]);
 
   };
@@ -657,6 +678,7 @@ const PurchaseOtherEntry = () => {
     setSelectedIGST(row.IGSTPercentage || "0");
     setIGSTAmount(row.IGSTAmount || "0");
     setSelectedProduct(row.ProductId);
+    setProductName(row.ProductName);
   };
 
 
@@ -764,7 +786,7 @@ const PurchaseOtherEntry = () => {
   const Namevalidation = () => {
     let temp = accountName.split(" ")
     let surname = temp[1]
-    if (surname && surname.length > 1) {
+    if (surname && surname.length >= 1) {
       return true;
     } else {
       toast.error("Need to Insert First and last Name ");
@@ -825,7 +847,11 @@ const PurchaseOtherEntry = () => {
         }
       })
       .then((response) => response.json())
-      .then((addressResult) => console.log("Address Added:", addressResult))
+      .then((addressResult) => {
+        console.log("Address Added:", addressResult);
+        // Clear the input field after successful creation
+        setAccountName("");
+      })
       .catch((error) => console.error("Error:", error));
   };
 
@@ -871,6 +897,35 @@ const PurchaseOtherEntry = () => {
 
 
 
+  //
+  const handleItemChange = (event) => {
+
+    const selectedValue = event.target.value;
+    setSelectedProduct(selectedValue);
+
+    const selectedItem = productOptions.find(option => option.value.toString() === selectedValue);
+    console.log("selected Items", selectedItem)
+    setProductName(selectedItem.label)
+
+    setRate(selectedItem.purchaseRate);
+    console.log("Purchase rate:", selectedItem.purchaseRate);
+
+    if (selectedItem) {
+      let gstfromCompanyInfo = gstNoComp?.substring(0, 2) || "";
+      let gstfromAccount = selectedGSTNo?.substring(0, 2) || "";
+      setSelectedCGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.cgstpercent : "0");
+      setSelectedSGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.sgstpercent : "0");
+      setSelectedIGST(gstfromCompanyInfo !== gstfromAccount ? selectedItem.igstpercent : "0");
+
+
+      // Recalculate the amount with the existing quantity
+      calculateAmount(quantity, selectedItem.purchaseRate);
+    } else {
+      setSelectedCGST("0");
+      setSelectedSGST("0");
+      setSelectedIGST("0");
+    }
+  }
 
 
 
@@ -954,11 +1009,11 @@ const PurchaseOtherEntry = () => {
                       <Typography>Purchase No</Typography>
                       <TextField
                         value={PurchaseNo}
-                        disabled
-                        onChange={(e) => setPurchaseNo(e.target.value)}
+                        // disabled
+                        // onChange={(e) => setPurchaseNo(e.target.value)}
                         size="small"
                         margin="none"
-                        placeholder="Purchase No"
+                        placeholder="Purchase No Autogenrated"
                         fullWidth
                       />
                     </Box>
@@ -970,8 +1025,8 @@ const PurchaseOtherEntry = () => {
                         size="small"
 
                         value={selectedId
-                          ? options.find(({ Id }) => String(Id) === selectedId)?.AccountName || ""
-                          : options.map((option) => option.AccountName)}
+                          ? options.find(({ Id }) => String(Id) === selectedId)?.AccountName || options.map((option) => option.AccountName)
+                          : ''}
                         placeholder="Select Customer"
                         onClick={() => setShowDropdown(true)}
 
@@ -1115,34 +1170,40 @@ const PurchaseOtherEntry = () => {
                             fullWidth
                             size="small"
                             value={selectedProduct || ""}
+                            // onChange={(event) => {
+                            //   const selectedValue = event.target.value;
+                            //   setSelectedProduct(selectedValue);
+
+                            //   const selectedItem = productOptions.find(option => option.value.toString() === selectedValue);
+                            //   console.log("selected Items", selectedItem)
+                            //   setProductName(selectedItem.label)
+
+                            //   setRate(selectedItem.purchaseRate);
+                            //   console.log("Purchase rate:", selectedItem.purchaseRate);
+
+                            //   if (selectedItem) {
+                            //     let gstfromCompanyInfo = gstNoComp?.substring(0, 2) || "";
+                            //     let gstfromAccount = selectedGSTNo?.substring(0, 2) || "";
+                            //     setSelectedCGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.cgstpercent : "0");
+                            //     setSelectedSGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.sgstpercent : "0");
+                            //     setSelectedIGST(gstfromCompanyInfo !== gstfromAccount ? selectedItem.igstpercent : "0");
+
+
+                            //     // Recalculate the amount with the existing quantity
+                            //     calculateAmount(quantity, selectedItem.purchaseRate);
+                            //   } else {
+                            //     setSelectedCGST("0");
+                            //     setSelectedSGST("0");
+                            //     setSelectedIGST("0");
+                            //   }
+                            // }}
                             onChange={(event) => {
-                              const selectedValue = event.target.value;
-                              setSelectedProduct(selectedValue);
-
-                              const selectedItem = productOptions.find(option => option.value.toString() === selectedValue);
-                              console.log("selected Items", selectedItem)
-                              setProductName(selectedItem.label)
-
-                              setRate(selectedItem.purchaseRate);
-                              console.log("Purchase rate:", selectedItem.purchaseRate);
-
-                              if (selectedItem) {
-                                let gstfromCompanyInfo = gstNoComp?.substring(0, 2) || "";
-                                let gstfromAccount = selectedGSTNo?.substring(0, 2) || "";
-                                setSelectedCGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.cgstpercent : "0");
-                                setSelectedSGST(gstfromCompanyInfo === gstfromAccount ? selectedItem.sgstpercent : "0");
-                                setSelectedIGST(gstfromCompanyInfo !== gstfromAccount ? selectedItem.igstpercent : "0");
-
-
-                                // Recalculate the amount with the existing quantity
-                                calculateAmount(quantity, selectedItem.purchaseRate);
-                              } else {
-                                setSelectedCGST("0");
-                                setSelectedSGST("0");
-                                setSelectedIGST("0");
+                              if (!selectedId) {
+                                alert("Please select a party before selecting an item."); // Alert if party is not selected
+                                return;
                               }
+                              handleItemChange(event);
                             }}
-
 
                           >
                             {productOptions.map((option) => (
@@ -1517,24 +1578,7 @@ const PurchaseOtherEntry = () => {
                 <Grid item xs={12}>
                   <Divider />
                 </Grid>
-                {/* <Grid container spacing={2} sx={{ display: "flex", alignItems: "center", gap: 25, p: 2, mt: 1 }}>
-                  <Grid item sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography>Bill No:</Typography>
-                    <b>{billNo}</b>
-                  </Grid>
 
-                  <Grid item sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography>Bill Date:</Typography>
-                    <b>{BillDate}</b>
-                  </Grid>
-
-                  <Grid item sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>Party:</Typography>
-                    <Typography variant="body1">
-                      {options.find((option) => option.Id === selectedId)?.AccountName}
-                    </Typography>
-                  </Grid>
-                </Grid> */}
 
                 <Grid container spacing={2} sx={{ display: "flex", alignItems: "center", gap: 15, p: 2, mt: 1 }}>
                   <Grid item sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -1547,12 +1591,12 @@ const PurchaseOtherEntry = () => {
                     <b>{BillDate}</b>
                   </Grid>
 
-                  <Grid item sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  {/* <Grid item sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>Party:</Typography>
                     <Typography variant="body1">
                       {options.find((option) => option.Id === selectedId)?.AccountName}
                     </Typography>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
 
 
