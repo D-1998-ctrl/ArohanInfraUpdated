@@ -157,12 +157,12 @@ const SalesEntry = () => {
     console.log("header", invheader);
     console.log("detail", invdetail);
 
-
+    
     //
     fetchAccounts(invheader.AccountId)
     fetchAccountName(invheader.AccountId)
     setCustomerName(invheader.AccountId)
-    //setSelectedAccount(invheader.AccountId)
+    setSelectedAccount(invheader.AccountId)
 
 
     // Convert date strings to DD-MM-YYYY format
@@ -514,9 +514,7 @@ const SalesEntry = () => {
           console.error("Error:", error);
         }
 
-        if (isEditing && row.Id) {
-          handleSaveOrAddRow();
-        }
+  
       }
 
       setIsDrawerOpen(false);
@@ -694,8 +692,8 @@ const SalesEntry = () => {
   };
 
   const handleSaveOrAddRow = () => {
-    if (!selectedProductID !== isEditing) {
-      alert("Please select an item before adding or saving the row.");
+    if (!selectedProductID ) {
+      alert("Please select an product before adding or saving the row.");
       return;
     }
 
@@ -1072,8 +1070,8 @@ const handleItemChange = (newValue) => {
                   size="small"
                   //value={selectedAccount || ""} 
                   value={selectedAccount
-                    ? accountOptions.find(({ Id }) => String(Id) === selectedAccount)?.AccountName || ""
-                    : accountOptions.map((option) => option.AccountName)}
+                    ? accountOptions.find(({ Id }) => String(Id) === selectedAccount)?.AccountName ||accountOptions.map((option) => option.AccountName)
+                    :" " }
                   placeholder="Select Customer"
                   onClick={() =>
 
@@ -1253,7 +1251,7 @@ const handleItemChange = (newValue) => {
                       alert("Please select a Customer before selecting an item."); // Alert if party is not selected
                       return;
                     }
-                    handleItemChange(event,newValue );
+                    handleItemChange(newValue );
                   }}
 
                   renderInput={(params) => <TextField {...params} variant="outlined" />}

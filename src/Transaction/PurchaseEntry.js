@@ -312,7 +312,7 @@ const PurchaseEntry = () => {
 
   //productOptions.find(option => option.value.toString() === selectedValue
   const handleSaveOrAddRow = () => {
-    if (!selectedProduct !== isEditing  ) {
+    if (!selectedProduct) {
       alert("Please select an item before adding or saving the row.");
       return;
     }
@@ -585,9 +585,7 @@ const PurchaseEntry = () => {
           console.error("Error:", error);
         }
 
-        if (isEditing && row.Id) {
-          handleSaveOrAddRow();
-        }
+       
       }
 
       setIsDrawerOpen(false);

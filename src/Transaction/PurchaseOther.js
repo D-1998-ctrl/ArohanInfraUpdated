@@ -358,7 +358,7 @@ const PurchaseOtherEntry = () => {
   };
 
   const handleSaveOrAddRow = () => {
-    if (!selectedProduct !== isEditing) {
+    if (!selectedProduct) {
       alert("Please select an item before adding or saving the row.");
       return;
     }
@@ -559,9 +559,7 @@ const PurchaseOtherEntry = () => {
           console.error("Error:", error);
         }
 
-        if (isEditing && row.Id) {
-          handleSaveOrAddRow();
-        }
+      
       }
 
       setIsDrawerOpen(false);
