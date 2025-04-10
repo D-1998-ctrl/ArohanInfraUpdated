@@ -1,7 +1,7 @@
 
 
 import React, { useMemo, useState, useEffect } from 'react'
-import { Dialog, InputAdornment, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Grid, Menu, Table, Autocomplete, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Alert, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
+import { Dialog,FormHelperText, InputAdornment, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Grid, Menu, Table, Autocomplete, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Alert, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   MaterialReactTable,
@@ -22,6 +22,10 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SearchIcon from '@mui/icons-material/Search';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
 
 const PurchaseEntry = () => {
   const theme = useTheme();
@@ -153,6 +157,7 @@ const PurchaseEntry = () => {
     resetForm();
     setIsEditing(false);
     setShowEntry(1)
+
   };
 
   //
@@ -502,6 +507,9 @@ const PurchaseEntry = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!validateForm()) {
+      return;
+    }
     const formattedPurchasedate = moment(PurchaseDate).format("YYYY-MM-DD");
     const formattedBillDate = moment(BillDate).format("YYYY-MM-DD");
 
@@ -585,7 +593,7 @@ const PurchaseEntry = () => {
           console.error("Error:", error);
         }
 
-       
+
       }
 
       setIsDrawerOpen(false);
@@ -624,7 +632,8 @@ const PurchaseEntry = () => {
     setIGSTAmount("");
     setOther("");
     setTransport("");
-    setSelectedLocation('')
+    setSelectedLocation('');
+    setErrors("");
     setOptions([])
     setRows([]);
   };
@@ -778,7 +787,7 @@ const PurchaseEntry = () => {
   };
 
   //serchapi for Party
-  const [text, setText] = useState("a");
+  const [text, setText] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
   const serchParty = () => {
@@ -943,6 +952,49 @@ const PurchaseEntry = () => {
 
     }
   }
+  //validation
+  const [errors, setErrors] = useState({
+    selectedId: '',
+    PurchaseDate: '',
+    billDate: '',
+    selectedLocation: ''
+  })
+
+
+  const validateForm = () => {
+    const newErrors = {
+      selectedId: '',
+      PurchaseDate: '',
+      BillDate: '',
+      selectedLocation: '',
+      // rows: ''
+    };
+
+    let isValid = true;
+
+    if (!selectedId) {
+      newErrors.selectedId = 'Party is required';
+      isValid = false;
+    }
+
+    if (!PurchaseDate) {
+      newErrors.PurchaseDate = 'PurchaseDate is required';
+      isValid = false;
+    }
+
+    if (!BillDate) {
+      newErrors.BillDate = 'BillDate is required';
+      isValid = false;
+    }
+
+    if (!selectedLocation) {
+      newErrors.selectedLocation = 'Storelocation is required';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   return (
 
@@ -1067,8 +1119,14 @@ const PurchaseEntry = () => {
                           ? options.find(({ Id }) => String(Id) === selectedId)?.AccountName || options.map((option) => option.AccountName)
                           : ''}
                         placeholder="Select Customer"
-                        onClick={() => setShowDropdown(true)}
-                       
+                        // onClick={() => setShowDropdown(true)}
+                        onClick={() =>
+
+                          setShowDropdown(true)}
+
+                        error={!!errors.selectedId}
+                        helperText={errors.selectedId}
+
                       />
 
                       {showDropdown && (
@@ -1086,23 +1144,26 @@ const PurchaseEntry = () => {
                                 </InputAdornment>
                               ),
                             }}
-                            placeholder="Enter Customer Name"
+                            placeholder="Search Customer Name"
                             fullWidth
                           />
                           <Box display="flex" gap={1} mt={1}>
                             <TextField
                               value={accountName}
                               onChange={(e) => setAccountName(e.target.value)}
-                              size="small" placeholder="New Customer" fullWidth />
+                              size="small" placeholder="Create New Customer" fullWidth />
 
                             <Button
+                              sx={{
+                                background: 'var(--primary-color)',
+                              }}
                               onClick={CreateSupplierMaster}
 
                               variant="contained"
                               startIcon={<AddCircleIcon sx={{ fontSize: '20px' }} />}
                             >
 
-                              Party
+                              Add
                             </Button>
                           </Box>
                           <Box mt={1}>
@@ -1146,9 +1207,9 @@ const PurchaseEntry = () => {
                         <DatePicker
                           value={PurchaseDate ? new Date(PurchaseDate) : null}
                           format="dd-MM-yyyy"
-                          onChange={(newValue) => setPurchaseDate(newValue)}
+                          onChange={(newValue) => {setPurchaseDate(newValue);setErrors({...errors, PurchaseDate: undefined})}}
                           slotProps={{
-                            textField: { size: "small", fullWidth: true },
+                            textField: { size: "small", fullWidth: true, error: !!errors.PurchaseDate, helperText: errors.PurchaseDate },
                           }}
                         />
                       </LocalizationProvider>
@@ -1172,9 +1233,9 @@ const PurchaseEntry = () => {
                         <DatePicker
                           value={BillDate ? new Date(BillDate) : null}
                           format="dd-MM-yyyy"
-                          onChange={(newValue) => setBillDate(newValue)}
+                          onChange={(newValue) => {setBillDate(newValue);setErrors({...errors, BillDate: undefined})}}
                           slotProps={{
-                            textField: { size: "small", fullWidth: true },
+                            textField: { size: "small", fullWidth: true, error: !!errors.BillDate, helperText: errors.BillDate },
                           }}
                         />
                       </LocalizationProvider>
@@ -1185,10 +1246,14 @@ const PurchaseEntry = () => {
 
                 <Box m={1} >
                   <Typography variant="body2">Store Location</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  error={!!errors.selectedLocation}>
                     <Select
                       value={selectedLocation || ""}
-                      onChange={(event) => setSelectedLocation(event.target.value)}
+                      // onChange={(event) => setSelectedLocation(event.target.value)}
+                      onChange={(event) => {setSelectedLocation(event.target.value);if (errors.selectedLocation) {
+                        setErrors({...errors, selectedLocation: undefined});
+                      }}
+                    }
                     >
                       {storeoptions.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -1196,6 +1261,9 @@ const PurchaseEntry = () => {
                         </MenuItem>
                       ))}
                     </Select>
+                    {errors.selectedLocation && (
+                      <FormHelperText>{errors.selectedLocation}</FormHelperText>
+                    )}
                   </FormControl>
                 </Box>
 
@@ -1247,7 +1315,7 @@ const PurchaseEntry = () => {
                               }
                               handleItemChange(event);
                             }}
-            
+
                           >
 
                             {productOptions.map((option) => (

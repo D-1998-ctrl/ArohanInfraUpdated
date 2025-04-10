@@ -1,11 +1,16 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import { Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem,  } from '@mui/material';
+import { Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
 import { useTheme } from "@mui/material/styles";
 import { toast } from "react-toastify";
 import axios from 'axios';
 import { useMaterialReactTable, } from "material-react-table";
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+
 
 const UserMaster = () => {
     const theme = useTheme();
@@ -32,30 +37,34 @@ const UserMaster = () => {
 
         try {
 
-            const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=User", requestOptions);
+
+            // const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=User", requestOptions);
+            const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=User&PageNo=${pageNo}`, requestOptions);
             const result = await response.json();
             // console.log("Fetched result:", result);
-            setData(result);
+            setData(result.data);
+            setTotalPages(result.total_pages)
         } catch (error) {
             console.error(error);
         }
     };
 
     useEffect(() => {
-        fetchData();
+        // fetchData();
         fetchLevel();
         fetchBranch()
     }, []);
 
 
 
+    const [pageNo, setPageNo] = useState(1)
     const columns = useMemo(() => {
         return [
             {
                 accessorKey: 'srNo',
                 header: 'Sr No',
                 size: 100,
-                Cell: ({ row }) => row.index + 1,
+                Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
             },
 
             {
@@ -76,31 +85,36 @@ const UserMaster = () => {
                 Cell: ({ row }) => (row.original.LoginStatus === 1 ? 'True' : 'False'),
             },
 
-           
+
         ];
-    }, []);
+    }, [pageNo]);
+
+    useEffect(() => {
+        fetchData();
+    }, [pageNo]);
 
     const [idwiseData, setIdwiseData] = useState('')
     const [data, setData] = useState([]);
-    const table = useMaterialReactTable({
-        columns,
-        data: data,
-        muiTableHeadCellProps: {
-            style: {
-                backgroundColor: "#E9ECEF",
-                color: "black",
-                fontSize: "16px",
-            },
-        },
-        muiTableBodyRowProps: ({ row }) => ({
-            onClick: () => handleSubmit(row.original),
-            style: { cursor: "pointer" },
-        }),
-    });
+    
+    // const table = useMaterialReactTable({
+    //     columns,
+    //     data: data,
+    //     muiTableHeadCellProps: {
+    //         style: {
+    //             backgroundColor: "#E9ECEF",
+    //             color: "black",
+    //             fontSize: "16px",
+    //         },
+    //     },
+    //     muiTableBodyRowProps: ({ row }) => ({
+    //         onClick: () => handleSubmit(row.original),
+    //         style: { cursor: "pointer" },
+    //     }),
+    // });
 
     const handleSubmit = (rowData) => {
         // console.log("This row has been clicked:", rowData);
-       
+
         // console.log("rowData.Id:", rowData.Id);
         setIsDrawerOpen(true);
         setIsEditing(!!rowData.Id);
@@ -121,8 +135,8 @@ const UserMaster = () => {
         const value = e.target.value;
         setPassword(value);
 
-         // Validate: Exactly 6 letters, digits, or a mix of both
-         if (/^[A-Za-z0-9]{6}$/.test(value) || value === "") {
+        // Validate: Exactly 6 letters, digits, or a mix of both
+        if (/^[A-Za-z0-9]{6}$/.test(value) || value === "") {
             setError(false);
         } else {
             setError(true);
@@ -201,7 +215,7 @@ const UserMaster = () => {
                 requestOptions
             )
             .then((response) => {
-                 console.log("API Response:", response.data);
+                console.log("API Response:", response.data);
 
                 toast.success("User Master created successfully");
                 handleClearTemplate();
@@ -261,7 +275,8 @@ const UserMaster = () => {
     }
 
 
-
+    ///Pagination
+    const [totalPages, setTotalPages] = useState(1);
 
 
     return (
@@ -282,14 +297,95 @@ const UserMaster = () => {
                     <Button sx={{ background: 'var(--complementary-color)', }} variant="contained" onClick={handleDrawerOpen}>Create User Master </Button>
                 </Box>
 
-                <Box mt={4}>
-                    <MaterialReactTable table={table}
-                        enableColumnResizing
+                {/* <Box mt={4}>
+                    <MaterialReactTable 
+                     table={table}
+                    enablePagination={false}
                         muiTableHeadCellProps={{
-                            sx: { color: 'var(--primary-color)', },
+                            sx: {
+                                backgroundColor: '#E9ECEF',
+                                color: "black",
+                                fontSize: "16px",
+                            },
                         }}
+
+                        renderBottomToolbarCustomActions={() => (
+                            <Box mt={2} alignItems={'center'} display={'flex'} justifyContent="flex-end"
+                                width="100%" >
+                                <FirstPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(1)} />
+                                <KeyboardArrowLeftIcon sx={{ cursor: "pointer" }} onClick={() =>
+                                    setPageNo((prev) => Math.max(Number(prev) - 1, 1))
+                                } />
+                                <Box > Page No </Box>
+                                <TextField
+                                    sx={{ width: "4.5%", ml: 1 }}
+                                    value={pageNo}
+                                    onChange={(e) => setPageNo(e.target.value)}
+                                    size="small" />
+                                <KeyboardArrowRightIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo((prev) => Number(prev) + 1)} />
+                                <LastPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(totalPages)} />
+                                Total Pages : {totalPages}
+                            </Box>
+
+                        )}
+
+                    />
+                </Box> */}
+
+                <Box mt={4}>
+                    <MaterialReactTable
+                        columns={columns}
+                        data={data}
+                        enablePagination={false}
+                        muiTableHeadCellProps={{
+                            sx: {
+                                backgroundColor: '#E9ECEF',
+                                color: 'black',
+                                fontSize: '16px',
+                            },
+                        }}
+                        muiTableBodyRowProps={({ row }) => ({
+                            onClick: () => handleSubmit(row.original),
+                            style: { cursor: 'pointer' },
+                        })}
+                        renderBottomToolbarCustomActions={() => (
+                            <Box
+                                mt={2}
+                                alignItems="center"
+                                display="flex"
+                                justifyContent="flex-end"
+                                width="100%"
+                            >
+                                <FirstPageIcon sx={{ cursor: 'pointer' }} onClick={() => setPageNo(1)} />
+                                <KeyboardArrowLeftIcon
+                                    sx={{ cursor: 'pointer' }}
+                                    onClick={() => setPageNo((prev) => Math.max(Number(prev) - 1, 1))}
+                                />
+                                <Box> Page No </Box>
+                                <TextField
+                                    sx={{ width: '4.5%', ml: 1,
+                                        '@media (max-width: 768px)': {
+                                            width: '10%',
+                                        },
+                                     }}
+                                    value={pageNo}
+                                    onChange={(e) => setPageNo(e.target.value)}
+                                    size="small"
+                                />
+                                <KeyboardArrowRightIcon
+                                    sx={{ cursor: 'pointer' }}
+                                    onClick={() => setPageNo((prev) => Number(prev) + 1)}
+                                />
+                                <LastPageIcon
+                                    sx={{ cursor: 'pointer' }}
+                                    onClick={() => setPageNo(totalPages)}
+                                />
+                                Total Pages : {totalPages}
+                            </Box>
+                        )}
                     />
                 </Box>
+
 
                 <Drawer
                     anchor="right"

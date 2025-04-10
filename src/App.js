@@ -22,6 +22,7 @@ import DeliveryChallan from './Transaction/DeliveryChallan';
 import PurchaseOther from './Transaction/PurchaseOther';
 import UserMaster from './Masters/UserMaster';
 import Receipt from './Transaction/Receipt';
+import CoverPage from './LogIn-SignUp/coverpage';
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
       <Routes>
         <Route index element={<Navigate to="/login" />} />
         <Route path='/login' element={<LoginPage />} />
-        {/* <Route path='/coverpage' element={<Coverpage/>}/> */}
+        <Route path='/coverpage' element={<CoverPage/>}/> 
         <Route path="/" element={<Sidebar />}>          
           <Route path="/customermaster" element={<CustomerMaster />} />
           <Route path="/suppliermaster" element={<SupplierMaster />} />

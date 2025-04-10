@@ -8,7 +8,10 @@ import axios from 'axios';
 import { toast } from "react-toastify";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import '../Components/common.css'
-
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
 
 const ProductMaster = () => {
   const theme = useTheme();
@@ -90,6 +93,7 @@ const ProductMaster = () => {
   // console.log('idwiseData', idwiseData)
 
   const [data, setData] = useState([]);
+  const [pageNo, setPageNo] = useState(1)
   const columns = useMemo(() => {
     return [
 
@@ -97,6 +101,7 @@ const ProductMaster = () => {
         accessorKey: 'ProductCode',
         header: 'Product Code',
         size: 150,
+        Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
       },
       // {
       //   accessorKey: 'ProductGroupId',
@@ -187,7 +192,7 @@ const ProductMaster = () => {
 
       },
     ];
-  }, []);
+  }, [pageNo]);
 
   //integration
   const [productCode, setProductCode] = useState('');
@@ -303,7 +308,7 @@ const ProductMaster = () => {
   }, []);
 
   //tble data
-  const [Id, setID] = useState('')
+  const [totalPages, setTotalPages] = useState(1);
   const fetchData = async () => {
     const requestOptions = {
       method: "GET",
@@ -311,12 +316,15 @@ const ProductMaster = () => {
     };
 
     try {
-      const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=productmaster", requestOptions);
+      const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=productmaster&PageNo=${pageNo}`, requestOptions);
+      // const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=productmaster", requestOptions);
       const result = await response.json();
 
       // console.log("Fetched result:", result);  // Log the fetched data before setting it
 
-      setData(result);
+      setData(result.data);
+      setTotalPages(result.total_pages)
+
       // setID(result.map(item => item.Id));
       // console.log('id', setID)
 
@@ -470,13 +478,39 @@ const ProductMaster = () => {
           <MaterialReactTable
             columns={columns}
             data={data}
+            enablePagination={false}
             muiTableHeadCellProps={{
               sx: {
 
-                color: 'var(--primary-color)',
-
+                backgroundColor: '#E9ECEF',
+                color: "black",
+                fontSize: "16px",
               },
             }}
+
+            renderBottomToolbarCustomActions={() => (
+              <Box mt={2} alignItems={'center'} display={'flex'} justifyContent="flex-end"
+                width="100%" >
+                <FirstPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(1)} />
+                <KeyboardArrowLeftIcon sx={{ cursor: "pointer" }} onClick={() =>
+                  setPageNo((prev) => Math.max(Number(prev) - 1, 1))
+                } />
+                <Box > Page No </Box>
+                <TextField
+                  sx={{ width: "4.5%", ml: 1 ,
+                    '@media (max-width: 768px)': {
+                      width: '10%',
+                  },
+                  }}
+                  value={pageNo}
+                  onChange={(e) => setPageNo(e.target.value)}
+                  size="small" />
+                <KeyboardArrowRightIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo((prev) => Number(prev) + 1)} />
+                <LastPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(totalPages)} />
+                Total Pages : {totalPages}
+              </Box>
+
+            )}
 
           />
           <Menu
@@ -1000,7 +1034,7 @@ const ProductMaster = () => {
             </Box>
           </Box>
 
-{/* 
+          {/* 
           <Box>
             <Box display="flex" alignItems="center" m={1} gap={1} >
               <Box flex={1} >
@@ -1117,123 +1151,123 @@ const ProductMaster = () => {
 
 
           </Box> */}
-<Box>
-  <Box display="flex" alignItems="center" m={1} gap={1}>
-    <Box flex={1}>
-      <Box>
-        <Typography>Sales Price</Typography>
-        <TextField
-          value={updatesalesPrice}
-          onChange={(e) => setUpdateSalesPrice(e.target.value)}
-          size="small"
-        
-          placeholder="Enter Sales Price"
-          fullWidth
-        />
-      </Box>
+          <Box>
+            <Box display="flex" alignItems="center" m={1} gap={1}>
+              <Box flex={1}>
+                <Box>
+                  <Typography>Sales Price</Typography>
+                  <TextField
+                    value={updatesalesPrice}
+                    onChange={(e) => setUpdateSalesPrice(e.target.value)}
+                    size="small"
 
-      <Box mt={2}>
-        <Typography>Opening Value</Typography>
-        <TextField
-          value={updateopeningValue}
-          onChange={(e) => setUpdateOpeningValue(e.target.value)}
-          size="small"
-        
-          placeholder="Enter Op.Value"
-          fullWidth
-        />
-      </Box>
+                    placeholder="Enter Sales Price"
+                    fullWidth
+                  />
+                </Box>
 
-      <Box mt={2}>
-        <Typography>CGST%</Typography>
-        <TextField
-          value={updateCGST}
-          onChange={(e) => setUpdateCGST(e.target.value)}
-          size="small"
-          
-          placeholder="Enter CGST%"
-          fullWidth
-        />
-      </Box>
-    </Box>
+                <Box mt={2}>
+                  <Typography>Opening Value</Typography>
+                  <TextField
+                    value={updateopeningValue}
+                    onChange={(e) => setUpdateOpeningValue(e.target.value)}
+                    size="small"
 
-    <Box flex={1}>
-      <Box>
-        <Typography>Purchase Price</Typography>
-        <TextField
-          value={updatepurchasePrice}
-          onChange={(e) => setUpdatePurchasePrice(e.target.value)}
-          size="small"
-          
-          placeholder="Enter Purchase Price"
-          fullWidth
-        />
-      </Box>
+                    placeholder="Enter Op.Value"
+                    fullWidth
+                  />
+                </Box>
 
-      <Box mt={2}>
-        <Typography>Reorder Level</Typography>
-        <TextField
-          value={updatereorderLevel}
-          onChange={(e) => setUpdateReorderLevel(e.target.value)}
-          size="small"
-          
-          placeholder="Enter Reorder Level"
-          fullWidth
-        />
-      </Box>
+                <Box mt={2}>
+                  <Typography>CGST%</Typography>
+                  <TextField
+                    value={updateCGST}
+                    onChange={(e) => setUpdateCGST(e.target.value)}
+                    size="small"
 
-      <Box  mt={2}>
-        <Typography>SGST%</Typography>
-        <TextField
-          value={updateSGST}
-          onChange={(e) => setUpdateSGST(e.target.value)}
-          size="small"
-         
-          placeholder="Enter SGST"
-          fullWidth
-        />
-      </Box>
-    </Box>
+                    placeholder="Enter CGST%"
+                    fullWidth
+                  />
+                </Box>
+              </Box>
 
-    <Box flex={1}> {/* Previously flex={2}, changed to flex={1} to match other columns */}
-      <Box>
-        <Typography>Location</Typography>
-        <TextField
-          value={updatelocation}
-          onChange={(e) => setUpdateLocation(e.target.value)}
-          size="small"
-         
-          placeholder="Enter Location"
-          fullWidth
-        />
-      </Box>
+              <Box flex={1}>
+                <Box>
+                  <Typography>Purchase Price</Typography>
+                  <TextField
+                    value={updatepurchasePrice}
+                    onChange={(e) => setUpdatePurchasePrice(e.target.value)}
+                    size="small"
 
-      <Box mt={2}>
-        <Typography>Min Balance</Typography>
-        <TextField
-          value={updateminbal}
-          onChange={(e) => setUpdateMinBal(e.target.value)}
-          size="small"
-          
-          placeholder="Enter Min Balance"
-          fullWidth
-        />
-      </Box>
+                    placeholder="Enter Purchase Price"
+                    fullWidth
+                  />
+                </Box>
 
-      <Box mt={2}>
-        <Typography>IGST%</Typography>
-        <TextField
-          value={updateIGST}
-          onChange={(e) => setUpdateIGST(e.target.value)}
-          size="small"
-          
-          placeholder="Enter IGST"
-          fullWidth
-        />
-      </Box>
-    </Box>
-  </Box>
-</Box>
+                <Box mt={2}>
+                  <Typography>Reorder Level</Typography>
+                  <TextField
+                    value={updatereorderLevel}
+                    onChange={(e) => setUpdateReorderLevel(e.target.value)}
+                    size="small"
+
+                    placeholder="Enter Reorder Level"
+                    fullWidth
+                  />
+                </Box>
+
+                <Box mt={2}>
+                  <Typography>SGST%</Typography>
+                  <TextField
+                    value={updateSGST}
+                    onChange={(e) => setUpdateSGST(e.target.value)}
+                    size="small"
+
+                    placeholder="Enter SGST"
+                    fullWidth
+                  />
+                </Box>
+              </Box>
+
+              <Box flex={1}> {/* Previously flex={2}, changed to flex={1} to match other columns */}
+                <Box>
+                  <Typography>Location</Typography>
+                  <TextField
+                    value={updatelocation}
+                    onChange={(e) => setUpdateLocation(e.target.value)}
+                    size="small"
+
+                    placeholder="Enter Location"
+                    fullWidth
+                  />
+                </Box>
+
+                <Box mt={2}>
+                  <Typography>Min Balance</Typography>
+                  <TextField
+                    value={updateminbal}
+                    onChange={(e) => setUpdateMinBal(e.target.value)}
+                    size="small"
+
+                    placeholder="Enter Min Balance"
+                    fullWidth
+                  />
+                </Box>
+
+                <Box mt={2}>
+                  <Typography>IGST%</Typography>
+                  <TextField
+                    value={updateIGST}
+                    onChange={(e) => setUpdateIGST(e.target.value)}
+                    size="small"
+
+                    placeholder="Enter IGST"
+                    fullWidth
+                  />
+                </Box>
+              </Box>
+            </Box>
+          </Box>
 
 
           <Box>
@@ -1255,7 +1289,7 @@ const ProductMaster = () => {
                   <TextField
                     value={updatehsnCode}
                     onChange={(e) => setUpdateHsnCode(e.target.value)}
-                    size="small"  placeholder="Enter HSN Code" fullWidth />
+                    size="small" placeholder="Enter HSN Code" fullWidth />
 
                 </Box>
               </Box>

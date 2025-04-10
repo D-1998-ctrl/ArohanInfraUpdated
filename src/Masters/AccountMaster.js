@@ -355,8 +355,9 @@ const AccountMaster = () => {
             muiTableHeadCellProps={{
               sx: {
 
-                color: 'var(--primary-color)',
-
+                backgroundColor: '#E9ECEF',
+                color: "black",
+                fontSize: "16px",
               },
 
 
@@ -370,7 +371,11 @@ const AccountMaster = () => {
                 } />
                 <Box > Page No </Box>
                 <TextField
-                  sx={{ width: "4.5%" ,ml: 1}}
+                  sx={{ width: "4.5%" ,ml: 1,
+                    '@media (max-width: 768px)': {
+                      width: '10%',
+                  },
+                  }}
                   value={pageNo}
                   onChange={(e) => setPageNo(e.target.value)}
                   size="small" />

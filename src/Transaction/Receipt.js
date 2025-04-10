@@ -1,6 +1,6 @@
 
 import React, { useMemo, useState, useEffect } from 'react'
-import { Alert, IconButton, Menu, FormLabel, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, RadioGroup, Radio } from '@mui/material';
+import { Alert, IconButton, Menu, FormLabel, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, Autocomplete, FormControl, Select, MenuItem, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
 import { useTheme } from "@mui/material/styles";
@@ -11,6 +11,8 @@ import { useMaterialReactTable, } from "material-react-table";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import Cookies from 'js-cookie';
+
 
 const Receipt = () => {
     const theme = useTheme();
@@ -28,8 +30,86 @@ const Receipt = () => {
         setIsDrawerOpen(false);
     };
 
+    //yearId and userId
+    const [userId, setUserId] = useState('')
+    const [yearid, setYearId] = useState('');
 
-    
+    useEffect(() => {
+        const storedUserId = sessionStorage.getItem("UserId");
+        const storedYearId = Cookies.get("YearId");
+
+        if (storedUserId) {
+            setUserId(storedUserId);
+            console.log('storedUserId', storedUserId);
+        } else {
+            toast.error("User is not logged in.");
+        }
+
+        if (storedYearId) {
+            setYearId(storedYearId);
+            console.log('storedYearId', storedYearId);
+        } else {
+            toast.error("Year is not set.");
+        }
+        // fetchVouchers();
+    }, [userId, yearid]);
+
+
+
+    //fetch Party
+    const [branchOption, setBranchOption] = useState([]);
+    const [selectedBranchOption, setSelectedBranchOption] = useState('');
+
+    const fetchBranch = async () => {
+        try {
+            const response = await fetch(
+                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Account"
+            );
+            const result = await response.json();
+
+            console.log("Branch info:", result);
+
+            const options = result.map((branch) => ({
+                value: branch.Id,
+                label: branch.AccountName,
+            }));
+
+            setBranchOption(options);
+        } catch (error) {
+            console.error("Error fetching accounts:", error);
+        }
+    };
+
+
+    //fetch Bank
+    const [bankOptions, setBankOptions] = useState([]);
+    const [selectedBankOption, setSelectedBankOption] = useState("");
+
+    useEffect(() => {
+        const fetchOptions = async () => {
+            try {
+                const urls = [
+                    "https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=7",
+                    "https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=8"
+                ];
+
+                const responses = await Promise.all(urls.map(url => axios.get(url)));
+                const combinedData = responses.flatMap(response => response.data || []);
+
+                const options = combinedData.map(item => ({
+                    label: item.GroupName, // update this field based on your API response
+                    value: item.GroupCode  // update this field based on your API response
+                }));
+
+                setBankOptions(options);
+            } catch (error) {
+                console.error("Failed to fetch bank options", error);
+            }
+        };
+
+        fetchOptions();
+    }, []);
+
     //table
     const fetchData = async () => {
         const requestOptions = {
@@ -122,29 +202,11 @@ const Receipt = () => {
     };
 
 
-    //fetch Branch
-    const [branchOption, setBranchOption] = useState([]);
-    const [selectedBranchOption, setSelectedBranchOption] = useState('');
 
-    const fetchBranch = async () => {
-        try {
-            const response = await fetch(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Branch"
-            );
-            const result = await response.json();
 
-            console.log("Branch info:", result);
 
-            const options = result.map((branch) => ({
-                value: branch.Id,
-                label: branch.Storelocation,
-            }));
 
-            setBranchOption(options);
-        } catch (error) {
-            console.error("Error fetching accounts:", error);
-        }
-    };
+
 
     return (
 
@@ -239,6 +301,23 @@ const Receipt = () => {
                             <Box display={'flex'} gap={2} alignItems={'center'} mt={2}>
                                 <Box flex={1}>
                                     <Typography variant="body2">Party Name</Typography>
+                                    <Autocomplete
+                                        size="small"
+                                        options={branchOption}
+                                        value={branchOption.find(option => option.value === selectedBranchOption) || null}
+                                        onChange={(event, newValue) => setSelectedBranchOption(newValue ? newValue.value : "")}
+                                        getOptionLabel={(option) => option.label}
+                                        renderOption={(props, option) => (
+                                            <li {...props} key={option.value}>
+                                                {option.label}
+                                            </li>
+                                        )}
+                                        renderInput={(params) => (
+                                            <TextField {...params} fullWidth />
+                                        )}
+                                    />
+
+                                    {/* 
                                     <FormControl fullWidth size="small">
                                         <Select
                                             value={selectedBranchOption || ""}
@@ -250,7 +329,7 @@ const Receipt = () => {
                                                 </MenuItem>
                                             ))}
                                         </Select>
-                                    </FormControl>
+                                    </FormControl> */}
                                 </Box>
 
 
@@ -258,10 +337,10 @@ const Receipt = () => {
                                     <Typography variant="body2">Bank Name</Typography>
                                     <FormControl fullWidth size="small">
                                         <Select
-                                            value={selectedBranchOption || ""}
-                                            onChange={(event) => setSelectedBranchOption(event.target.value)}
+                                            value={selectedBankOption}
+                                            onChange={(event) => setSelectedBankOption(event.target.value)}
                                         >
-                                            {branchOption.map((option) => (
+                                            {bankOptions.map((option) => (
                                                 <MenuItem key={option.value} value={option.value}>
                                                     {option.label}
                                                 </MenuItem>
@@ -353,7 +432,7 @@ const Receipt = () => {
                             </Box>
                             <Divider sx={{ mt: 2 }} />
 
-                         
+
                         </LocalizationProvider>
                     </Box>
                     <Box display={'flex'} alignItems={'center'} justifyContent={'center'} gap={2} mt={5}>
