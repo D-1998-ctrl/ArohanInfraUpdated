@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import {  Grid, Autocomplete, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, Select, MenuItem, Menu } from '@mui/material';
+import { Grid, Autocomplete,FormControl, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, Select, MenuItem, Menu } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
 import { DatePicker } from "@mui/x-date-pickers";
@@ -11,7 +11,7 @@ import { toast } from "react-toastify";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import moment from 'moment';
 import dayjs from "dayjs";
-
+import Cookies from 'js-cookie';
 
 const ProductionEntry = () => {
     const theme = useTheme();
@@ -95,7 +95,7 @@ const ProductionEntry = () => {
             // console.log("productionDateObject", formattedupdatedProductionDate)
             setSelectedOperator(currentRow.original.OperatorId);
             setSelectedMachine(currentRow.original.MachineId);
-           // setSelectedOillSeed(currentRow.original.MaterialId);
+            // setSelectedOillSeed(currentRow.original.MaterialId);
             setSelectedOillSeed(currentRow.original.MaterialId);
 
             setupdateStorage(currentRow.original.Storage);
@@ -213,7 +213,7 @@ const ProductionEntry = () => {
     const [updateproductNo, setUpdateProductNo] = useState('');
     const [productiondate, setProductionDate] = useState(null);
     const [updateProductiondate, setUpdateProductionDate] = useState(null);
-    
+
     const [machinestarttime, SetMachineStartTime] = useState(null)
     const [updatemachinestarttime, setupdateMachineStartTime] = useState('')
     const [machineEndtime, SetMachineEndTime] = useState(null)
@@ -337,7 +337,7 @@ const ProductionEntry = () => {
 
     const fetchOilseed = async () => {
         try {
-            
+
             const response = await axios.get("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=materialmaster");
             //console.log(response.data)
             const oil = response.data.map((oilseed) => ({
@@ -369,20 +369,27 @@ const ProductionEntry = () => {
         setBrandName('');
         setBatchNo('');
         setWeight('');
-        setOilProduced('')
-        setPercentage('')
-        setOilInLit('')
+        setOilProduced('');
+        setPercentage('');
+        setOilInLit('');
+        setErrors('')
     }
 
 
     const CreateProductionEntry = () => {
+
+        if (!validateForm()) {
+            return;
+          }
+
+
         // const formattedProductionDate = moment(productiondate).format("YYYY-MM-DD");
         let productionDate = productiondate || null;
-       // console.log('productionDate', productionDate)
+        // console.log('productionDate', productionDate)
         const productionDateObject = productionDate
             ? dayjs(productionDate).format("YYYY-MM-DD")
             : null;
-       // console.log('productionDateObject', productionDateObject)
+        // console.log('productionDateObject', productionDateObject)
 
         const urlencoded = new URLSearchParams();
         urlencoded.append("ProductionNo", productNo);
@@ -408,10 +415,10 @@ const ProductionEntry = () => {
         };
 
         axios.post(
-                "https://arohanagroapi.microtechsolutions.co.in/php/postproduction.php",
-                urlencoded,
-                requestOptions
-            )
+            "https://arohanagroapi.microtechsolutions.co.in/php/postproduction.php",
+            urlencoded,
+            requestOptions
+        )
             .then((response) => {
                 console.log("API Response:", response.data);
                 toast.success("Production Entry created successfully");
@@ -598,6 +605,178 @@ const ProductionEntry = () => {
     const [updateendTimeInHour, setUpdateEndTimeInHour] = useState('')
     const [updateendTimeInMin, setUpdateEndTimeMin] = useState('')
 
+
+    //validation
+    const [errors, setErrors] = useState({
+        productiondate: '',
+        selectedOperator: '',
+        selectedMachine: '',
+        startTimeInHour: '',
+        startTimeInMin: '',
+        selectedOillSeed: '',
+        brandName: "",
+        weight: '',
+        Percentage: '',
+        endTimeInHour: '',
+        endTimeInMin: '',
+        storage: '',
+        batchno: '',
+        oilProduced: '',
+        oilInLit: ''
+    })
+
+
+    const validateForm = () => {
+        const newErrors = {
+            productiondate: '',
+            selectedMachine: '',
+            startTimeInHour: '',
+            startTimeInMin: '',
+            selectedOillSeed: '',
+            brandName: "",
+            weight: '',
+            percentage: '',
+            endTimeInHour: '',
+            endTimeInMin: '',
+            storage: '',
+            batchno: '',
+            oilProduced: '',
+            oilInLit: ''
+        };
+
+        let isValid = true;
+
+        if (!productiondate) {
+            newErrors.productiondate = 'productiondate  is required';
+            isValid = false;
+        } else {
+            // Convert dates to Date objects for comparison
+            const productiondateObj = new Date(productiondate);
+            const fromDateObj = new Date(fromdate);
+            const toDateObj = new Date(todate);
+
+            // Check if invoice date is before from date
+            if (productiondateObj < fromDateObj) {
+                newErrors.productiondate = `productiondate  cannot be before ${new Date(fromdate).toLocaleDateString()}`;
+                isValid = false;
+            }
+            // Check if invoice date is after to date
+            else if (productiondateObj > toDateObj) {
+                newErrors.productiondate = `productiondate cannot be after ${new Date(todate).toLocaleDateString()}`;
+                isValid = false;
+            }
+        };
+
+        if (!selectedOperator) {
+            newErrors.selectedOperator = 'Operator is required';
+            isValid = false;
+        }
+
+        if (!selectedMachine) {
+            newErrors.selectedMachine = 'selectedMachine is required';
+            isValid = false;
+        }
+
+        if (!startTimeInHour) {
+            newErrors.startTimeInHour = 'startTimeInHour is required';
+            isValid = false;
+        }
+
+        if (!startTimeInMin) {
+            newErrors.startTimeInMin = 'startTimeInMin is required';
+            isValid = false;
+        }
+
+        if (!selectedOillSeed) {
+            newErrors.selectedOillSeed = 'Product is required';
+            isValid = false;
+        }
+
+        if (!brandName) {
+            newErrors.brandName = 'brandName is required';
+            isValid = false;
+        }
+
+        if (!weight) {
+            newErrors.weight = 'weight is required';
+            isValid = false;
+        }
+
+        //
+        if (!percentage) {
+            newErrors.percentage = 'Percentage is required';
+            isValid = false;
+        }
+
+        if (!endTimeInHour) {
+            newErrors.endTimeInHour = 'endTimeInHour is required';
+            isValid = false;
+        }
+
+        if (!endTimeInMin) {
+            newErrors.endTimeInMin = 'endTimeInMin is required';
+            isValid = false;
+        }
+
+        if (!storage) {
+            newErrors.storage = 'storage is required';
+            isValid = false;
+        }
+
+        if (!batchno) {
+            newErrors.batchno = 'batchno is required';
+            isValid = false;
+        }
+
+
+        if (!oilProduced) {
+            newErrors.oilProduced = 'oilProduced is required';
+            isValid = false;
+        }
+
+        if (!oilInLit) {
+            newErrors.oilInLit = 'oilInLit is required';
+            isValid = false;
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
+
+
+    // for yearId
+    const [yearid, setYearId] = useState('');
+    const [fromdate, setFromDate] = useState('');
+    const [todate, setToDate] = useState('');
+
+    useEffect(() => {
+        const storedYearId = Cookies.get("YearId");
+        const storedfromdate = Cookies.get("FromDate");
+        const storedtodate = Cookies.get("ToDate");
+
+        if (storedYearId) {
+            setYearId(storedYearId);
+            console.log('storedYearId', storedYearId);
+        } else {
+            toast.error("Year is not set.");
+        };
+        if (storedfromdate) {
+            setFromDate(storedfromdate);
+            console.log('storedfromdate', storedfromdate);
+        } else {
+            toast.error("FromDate is not set.");
+        }
+
+        if (storedtodate) {
+            setToDate(storedtodate);
+            console.log('storedTodate', storedtodate);
+        } else {
+            toast.error("ToDate is not set.");
+        }
+
+    }, [yearid, fromdate, todate]);
+
+
     return (
         <Box>
             <Box textAlign={'center'}>
@@ -662,236 +841,6 @@ const ProductionEntry = () => {
                         <Divider />
 
 
-                        {/* <Box>
-                            <Box display="flex" alignItems="center" justifyContent="space-between" gap={2}>
-
-                                <Box flex={1} mt={2} m={2} >
-                                    <Box mb={2}>
-                                        <Typography variant="body2">Production No</Typography>
-                                        <TextField
-                                            value={productNo}
-                                            disabled
-                                            onChange={(e) => setProductNo(e.target.value)}
-                                            size="small" fullWidth />
-                                    </Box>
-
-                                    <Box flex={1}>
-                                        <Typography variant="body2">Operator</Typography>
-                                        <Select
-                                            fullWidth
-                                            size='small'
-                                            value={selectedOperator || ""}
-                                            onChange={(event) => setSelectedOperator(event.target.value)}
-
-                                        >
-                                            {operatorOptions.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </Box>
-
-
-
-                                   
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Machine Start Time</Typography>
-                                        <Grid container spacing={2} alignItems="center">
-                                            <Grid item xs={4}>
-                                                <TextField
-                                                    value={startTimeInHour}
-                                                    onChange={(e) => setStartTimeInHour(e.target.value)}
-                                                    fullWidth
-                                                    size="small"
-                                                    placeholder="Hours"
-                                                />
-                                            </Grid>
-
-                                            <Grid item xs={1} sx={{ textAlign: "center" }}>
-                                                <Typography variant="body2"><b>:</b></Typography>
-                                            </Grid>
-
-                                            <Grid item xs={4}>
-                                                <TextField
-                                                    value={startTimeInMin}
-                                                    onChange={(e) => setStartTimeMin(e.target.value)}
-                                                    fullWidth
-                                                    size="small"
-                                                    placeholder="Minutes"
-                                                />
-                                            </Grid>
-
-                                            <Grid item xs={3}>
-                                                <Select
-                                                    fullWidth
-                                                    size="small"
-                                                    value={period}
-                                                    onChange={handlePeriodChange}
-                                                >
-                                                    <MenuItem value="AM">AM</MenuItem>
-                                                    <MenuItem value="PM">PM</MenuItem>
-                                                </Select>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Oil Seed</Typography>
-                                        <Select
-                                            fullWidth
-                                            size='small'
-                                            value={selectedOillSeed || ""}
-                                            onChange={(event) => setSelectedOillSeed(event.target.value)}
-
-                                        >
-                                            {oilseedOptions.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </Box>
-
-                                    <Box mt={2} >
-                                        <Typography variant="body2">Brand Name</Typography>
-                                        <TextField
-                                            value={brandName}
-                                            onChange={(e) => setBrandName(e.target.value)}
-                                            size="small" placeholder="Enter Brand Name" fullWidth />
-                                    </Box>
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Weight</Typography>
-                                        <TextField
-                                            value={weight}
-                                            onChange={(e) => setWeight(e.target.value)}
-                                            size="small" placeholder="Enter Weight" fullWidth />
-                                    </Box>
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2"> Percentage</Typography>
-                                        <TextField
-                                            value={percentage}
-                                            onChange={(e) => setPercentage(e.target.value)}
-                                            size="small" placeholder="Enter Percentage " fullWidth />
-                                    </Box>
-                                </Box>
-
-
-                                <Box flex={1} mt={2} m={2}>
-
-                                    <Box flex={1}>
-                                        <Typography variant="body2">Production Date</Typography>
-                                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                            <DatePicker
-                                                value={productiondate ? new Date(productiondate) : null} // Convert to Date object
-                                                onChange={(newValue) => setProductionDate(newValue)}
-                                                slotProps={{
-                                                    textField: { size: "small", fullWidth: true },
-                                                }}
-                                                renderInput={(params) => <TextField />}
-                                            />
-                                        </LocalizationProvider>
-                                    </Box>
-
-                                    <Box>
-                                        <Typography variant="body2">Machine</Typography>
-                                        <Select
-                                            fullWidth
-                                            size='small'
-                                            value={selectedMachine || ""}
-                                            onChange={(event) => setSelectedMachine(event.target.value)}
-
-                                        >
-                                            {machineOptions.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </Box>
-
-
-                                   
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Machine End  Time</Typography>
-                                        <Grid container spacing={2} alignItems="center">
-                                            <Grid item xs={4}>
-                                                <TextField
-                                                    value={endTimeInHour}
-                                                    onChange={(e) => setEndTimeInHour(e.target.value)}
-                                                    fullWidth
-                                                    size="small"
-                                                    placeholder="Hours"
-                                                />
-                                            </Grid>
-
-                                            <Grid item xs={1} sx={{ textAlign: "center" }}>
-                                                <Typography variant="body2"><b>:</b></Typography>
-                                            </Grid>
-
-                                            <Grid item xs={4}>
-                                                <TextField
-                                                    value={endTimeInMin}
-                                                    onChange={(e) => setEndTimeMin(e.target.value)}
-                                                    fullWidth
-                                                    size="small"
-                                                    placeholder="Minutes"
-                                                />
-                                            </Grid>
-
-                                            <Grid item xs={3}>
-                                                <Select
-                                                    fullWidth
-                                                    size="small"
-                                                    value={endperiod}
-                                                    onChange={handleEndPeriodChange}
-                                                >
-                                                    <MenuItem value="AM">AM</MenuItem>
-                                                    <MenuItem value="PM">PM</MenuItem>
-                                                </Select>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Storage</Typography>
-                                        <TextField
-                                            value={storage}
-                                            onChange={(e) => setStorage(e.target.value)}
-                                            size="small" placeholder="Enter Storage " fullWidth />
-                                    </Box>
-
-                                    <Box mt={2} >
-                                        <Typography variant="body2">Batch No</Typography>
-                                        <TextField
-                                            value={batchno}
-                                            onChange={(e) => setBatchNo(e.target.value)}
-                                            size="small" placeholder="Enter Batch No" fullWidth />
-                                    </Box>
-
-                                    <Box mt={2} >
-                                        <Typography variant="body2">Oil Produced (kg)</Typography>
-                                        <TextField
-                                            value={oilProduced}
-                                            onChange={(e) => setOilProduced(e.target.value)}
-                                            size="small" placeholder="Enter Oil Produced " fullWidth />
-                                    </Box>
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2"> Oil (Lit)</Typography>
-                                        <TextField
-                                            value={oilInLit}
-                                            onChange={(e) => setOilInLit(e.target.value)}
-                                            size="small" placeholder="Enter Oil (Lit) " fullWidth />
-                                    </Box>
-                                </Box>
-                            </Box>
-                        </Box> */}
-
                         <Box m={1.5}>
                             <Grid container spacing={2} alignItems="start">
                                 {/* Left Column */}
@@ -910,7 +859,11 @@ const ProductionEntry = () => {
 
                                     <Box mt={2}>
                                         <Typography variant="body2">Operator</Typography>
-                                        <Select fullWidth size="small" value={selectedOperator || ""} onChange={(e) => setSelectedOperator(e.target.value)}>
+                                        
+                                        <Select fullWidth size="small" value={selectedOperator || ""}
+                                         onChange={(e) => setSelectedOperator(e.target.value)}>
+                                       
+                                        
                                             {operatorOptions.map((option) => (
                                                 <MenuItem key={option.value} value={option.value}>
                                                     {option.label}
@@ -977,9 +930,11 @@ const ProductionEntry = () => {
                                             <DatePicker
                                                 value={productiondate ? new Date(productiondate) : null}
                                                 format="dd-MM-yyyy"
-                                                onChange={(newValue) => setProductionDate(newValue)}
+                                                onChange={(newValue) =>{setProductionDate(newValue);
+                                                    setErrors({...errors, productiondate: undefined})
+                                                } }
                                                 slotProps={{
-                                                    textField: { size: "small", fullWidth: true },
+                                                    textField: { size: "small", fullWidth: true ,error: !!errors.productiondate, helperText: errors.productiondate},
                                                 }}
                                             />
                                         </LocalizationProvider>
@@ -1076,228 +1031,7 @@ const ProductionEntry = () => {
                         </Box>
                         <Divider />
 
-                        {/* <Box>
-
-                            <Box display="flex" alignItems="center" justifyContent="space-between" gap={2}>
-
-                                <Box flex={1} mt={2} m={2} >
-                                    <Box mb={2}>
-                                        <Typography variant="body2">Production No</Typography>
-                                        <TextField
-                                            value={updateproductNo}
-                                            onChange={(e) => setUpdateProductNo(e.target.value)}
-                                            size="small" placeholder="Enter Product No" fullWidth disabled />
-                                    </Box>
-
-                                    <Box flex={1}>
-                                        <Typography variant="body2">Operator</Typography>
-                                        <Select
-                                            fullWidth
-                                            size='small'
-                                            value={selectedOperator || ""}
-                                            onChange={(event) => setSelectedOperator(event.target.value)}
-
-                                        >
-                                            {operatorOptions.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </Box>
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Machine Start Time </Typography>
-                                        <Grid container spacing={2} alignItems="center">
-                                            <Grid item xs={3}>
-                                                <TextField value={updatestartTimeInHour}
-                                                    onChange={(e) => setUpdateStartTimeInHour(e.target.value)}
-                                                    fullWidth
-                                                    size="small"
-                                                    placeholder="Hours"
-                                                />
-                                            </Grid>
-
-                                            <Grid item xs={1} sx={{ textAlign: "center" }}>
-                                                <Typography variant="body2"><b>:</b></Typography>
-
-                                            </Grid>
-
-                                            <Grid item xs={3}>
-                                                <TextField
-                                                    value={updatestartTimeInMin}
-                                                    onChange={(e) => setUpdateStartTimeMin(e.target.value)}
-                                                    fullWidth size="small"
-                                                    placeholder="Minutes"
-                                                />
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <Select
-                                                    fullWidth
-                                                    size="small"
-                                                    value={updatestartperiod}
-                                                    onChange={handleUpadatStartPeriodChange}
-                                                >
-                                                    <MenuItem value="AM">AM</MenuItem>
-                                                    <MenuItem value="PM">PM</MenuItem>
-                                                </Select>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Oil Seed</Typography>
-                                        <Select
-                                            fullWidth
-                                            size='small'
-                                            value={selectedOillSeed || ""}
-                                            onChange={(event) => setSelectedOillSeed(event.target.value)}
-
-                                        >
-                                            {oilseedOptions.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </Box>
-
-                                    <Box mt={2} >
-                                        <Typography variant="body2">Brand Name</Typography>
-                                        <TextField
-                                            value={updatebrandName}
-                                            onChange={(e) => setupdateBrandName(e.target.value)}
-                                            size="small" placeholder="Enter Brand Name" fullWidth />
-                                    </Box>
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Weight</Typography>
-                                        <TextField
-                                            value={updateweight}
-                                            onChange={(e) => setupdateWeight(e.target.value)}
-                                            size="small" placeholder="Enter Weight" fullWidth />
-                                    </Box>
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2"> Percentage</Typography>
-                                        <TextField
-                                            value={updatepercentage}
-                                            onChange={(e) => setUpdatePercentage(e.target.value)}
-                                            size="small" placeholder="Enter Percentage " fullWidth />
-                                    </Box>
-                                </Box>
-
-
-                                <Box flex={1} mt={2} m={2}>
-                                    
-
-                                    <Box flex={1}>
-                                        <Typography variant="body2">Production Date</Typography>
-                                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                            <DatePicker
-                                                value={updateProductiondate ? new Date(updateProductiondate) : null} // Convert to Date object
-                                                onChange={(newValue) => setUpdateProductionDate(newValue)}
-                                                slotProps={{
-                                                    textField: { size: "small", fullWidth: true },
-                                                }}
-                                                renderInput={(params) => <TextField />}
-                                            />
-                                        </LocalizationProvider>
-                                    </Box>
-
-
-
-                                    <Box>
-                                        <Typography variant="body2">Machine</Typography>
-                                        <Autocomplete
-                                            fullWidth
-                                            size="small"
-                                            options={machineOptions}
-                                            getOptionLabel={(option) => option.label}
-                                            value={machineOptions.find((option) => option.value === selectedMachine) || null}
-                                            onChange={(_, newValue) => setSelectedMachine(newValue ? newValue.value : "")}
-                                            renderInput={(params) => <TextField {...params} variant="outlined" />}
-                                        />
-                                    </Box>
-
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Machine End Time </Typography>
-                                        <Grid container spacing={2} alignItems="center">
-                                            <Grid item xs={3}>
-                                                <TextField value={updateendTimeInHour}
-                                                    onChange={(e) => setUpdateEndTimeInHour(e.target.value)}
-                                                    fullWidth
-                                                    size="small"
-                                                    placeholder="Hours"
-                                                />
-                                            </Grid>
-
-                                            <Grid item xs={1} sx={{ textAlign: "center" }}>
-                                                <Typography variant="body2"><b>:</b></Typography>
-
-                                            </Grid>
-
-                                            <Grid item xs={3}>
-                                                <TextField
-                                                    value={updateendTimeInMin}
-                                                    onChange={(e) => setUpdateEndTimeMin(e.target.value)}
-                                                    fullWidth size="small"
-                                                    placeholder="Minutes"
-                                                />
-                                            </Grid>
-                                            <Grid item xs={4}>
-                                                <Select
-                                                    fullWidth
-                                                    size="small"
-                                                    value={updateendperiod}
-                                                    onChange={handleUpadateEndPeriodChange}
-                                                >
-                                                    <MenuItem value="AM">AM</MenuItem>
-                                                    <MenuItem value="PM">PM</MenuItem>
-                                                </Select>
-                                            </Grid>
-                                        </Grid>
-                                    </Box>
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Storage</Typography>
-                                        <TextField
-                                            value={updatestorage}
-                                            onChange={(e) => setupdateStorage(e.target.value)}
-                                            size="small" placeholder="Enter Storage " fullWidth />
-                                    </Box>
-
-                                    <Box mt={2} >
-                                        <Typography variant="body2">Batch No</Typography>
-                                        <TextField
-                                            value={updatebatchno}
-                                            onChange={(e) => setupdateBatchNo(e.target.value)}
-                                            size="small" placeholder="Enter Batch No" fullWidth />
-                                    </Box>
-
-                                    <Box mt={2} >
-                                        <Typography variant="body2">Oil Produced (kg)</Typography>
-                                        <TextField
-                                            value={updateoilProduced}
-                                            onChange={(e) => setupdateOilProduced(e.target.value)}
-                                            size="small" placeholder="Enter Oil Produced " fullWidth />
-                                    </Box>
-
-                                    <Box mt={2}>
-                                        <Typography variant="body2">Oil (Lit)</Typography>
-                                        <TextField
-                                            value={updateoilInLit}
-                                            onChange={(e) => setupdateOilInLit(e.target.value)}
-                                            size="small" placeholder="Enter Oil (Lit) " fullWidth />
-                                    </Box>
-                                </Box>
-                            </Box>
-                        </Box> */}
-
-
-
+                       
                         <Box m={1.5}>
                             <Grid container spacing={2}>
                                 {/* Left Column */}
@@ -1311,7 +1045,7 @@ const ProductionEntry = () => {
                                                 size="small"
                                                 placeholder="Enter Product No"
                                                 fullWidth
-                                                // disabled
+                                            // disabled
                                             />
                                         </Grid>
 

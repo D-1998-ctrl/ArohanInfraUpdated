@@ -19,6 +19,7 @@ import {
 
     useMaterialReactTable,
 } from "material-react-table";
+import Cookies from 'js-cookie';
 
 const InwordAtStore = () => {
     const theme = useTheme();
@@ -49,6 +50,7 @@ const InwordAtStore = () => {
         setRate('');
         setAmount('');
         setVehicleNo('');
+        setErrors('')
         setSelectedLocation('')
         setRows([]);
     };
@@ -172,7 +174,7 @@ const InwordAtStore = () => {
             Amount: parseFloat(detail.Amount) || 0,
         }));
 
-        // console.log('mappedRows', mappedRows)
+     console.log('mappedRows', mappedRows)
         setRows(mappedRows);
     };
 
@@ -385,6 +387,10 @@ const InwordAtStore = () => {
     //create and update Inword At Store
     const handleSubmitInWord = async (e) => {
         e.preventDefault();
+        if (!validateForm()) {
+            return;
+          }
+
         const formattedInwardDate = moment(inwordDate).format("YYYY-MM-DD");
         const formattedChallanDate = moment(challanDate).format("YYYY-MM-DD");
 
@@ -524,6 +530,84 @@ const InwordAtStore = () => {
     };
 
 
+    //validation
+      const [errors, setErrors] = useState({
+        
+        inwordDate: '',
+      
+      })
+    
+    
+      const validateForm = () => {
+        const newErrors = {
+          
+          inwordDate: '',
+        
+        };
+    
+        let isValid = true;
+    
+      
+    
+        if (!inwordDate) {
+          newErrors.inwordDate = 'inwordDate  is required';
+          isValid = false;
+        } else {
+          // Convert dates to Date objects for comparison
+          const inwordDateObj = new Date(inwordDate);
+          const fromDateObj = new Date(fromdate);
+          const toDateObj = new Date(todate);
+      
+          // Check if invoice date is before from date
+          if (inwordDateObj < fromDateObj) {
+            newErrors.inwordDate = `inwordDate  cannot be before ${new Date(fromdate).toLocaleDateString()}`;
+            isValid = false;
+          }
+          // Check if invoice date is after to date
+          else if (inwordDateObj > toDateObj) {
+            newErrors.inwordDate = `inwordDate cannot be after ${new Date(todate).toLocaleDateString()}`;
+            isValid = false;
+          }
+        };
+    
+        setErrors(newErrors);
+        return isValid;
+      };
+    
+      //for yearId
+      const [yearid, setYearId] = useState('');
+      const[fromdate,setFromDate]= useState('');
+      const[todate,setToDate]= useState('');
+      
+       useEffect(() => {
+              const storedYearId = Cookies.get("YearId");
+              const storedfromdate = Cookies.get("FromDate");
+              const storedtodate = Cookies.get("ToDate");
+      
+              if (storedYearId) {
+                  setYearId(storedYearId);
+                  console.log('storedYearId', storedYearId);
+              } else {
+                  toast.error("Year is not set.");
+              };
+              if (storedfromdate) {
+                setFromDate(storedfromdate);
+                console.log('storedfromdate', storedfromdate);
+            } else {
+                toast.error("FromDate is not set.");
+            }
+      
+            if (storedtodate) {
+              setToDate(storedtodate);
+              console.log('storedTodate', storedtodate);
+          } else {
+              toast.error("ToDate is not set.");
+          }
+           
+          }, [yearid,fromdate,todate]);
+    
+
+
     return (
         <Box>
             <Box textAlign={'center'}>
@@ -593,9 +677,11 @@ const InwordAtStore = () => {
                                             <DatePicker
                                                 value={inwordDate ? new Date(inwordDate) : null}
                                                 format="dd-MM-yyyy"
-                                                onChange={(newValue) => setInwordDate(newValue)}
+                                                onChange={(newValue) => {setInwordDate(newValue);setErrors({...errors, inwordDate: undefined})
+
+                                                }}
                                                 slotProps={{
-                                                    textField: { size: "small", fullWidth: true },
+                                                    textField: { size: "small", fullWidth: true,error: !!errors.inwordDate, helperText: errors.inwordDate },
                                                 }}
                                                 renderInput={(params) => <TextField />}
                                             />

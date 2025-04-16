@@ -20,6 +20,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import BorderColorIcon from '@mui/icons-material/BorderColor';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SearchIcon from '@mui/icons-material/Search';
+import Cookies from 'js-cookie';
+
 
 const PurchaseOtherEntry = () => {
   const theme = useTheme();
@@ -958,9 +960,25 @@ const PurchaseOtherEntry = () => {
     }
 
     if (!PurchaseDate) {
-      newErrors.PurchaseDate = 'PurchaseDate is required';
+      newErrors.PurchaseDate = 'PurchaseDate  is required';
       isValid = false;
-    }
+    } else {
+      // Convert dates to Date objects for comparison
+      const purchaseDateObj = new Date(PurchaseDate);
+      const fromDateObj = new Date(fromdate);
+      const toDateObj = new Date(todate);
+  
+      // Check if invoice date is before from date
+      if (purchaseDateObj < fromDateObj) {
+        newErrors.PurchaseDate = `PurchaseDate  cannot be before ${new Date(fromdate).toLocaleDateString()}`;
+        isValid = false;
+      }
+      // Check if invoice date is after to date
+      else if (purchaseDateObj > toDateObj) {
+        newErrors.PurchaseDate = `PurchaseDate cannot be after ${new Date(todate).toLocaleDateString()}`;
+        isValid = false;
+      }
+    };
 
     if (!BillDate) {
       newErrors.BillDate = 'BillDate is required';
@@ -976,6 +994,37 @@ const PurchaseOtherEntry = () => {
     return isValid;
   };
 
+  //for yearId
+  const [yearid, setYearId] = useState('');
+  const[fromdate,setFromDate]= useState('');
+  const[todate,setToDate]= useState('');
+  
+   useEffect(() => {
+          const storedYearId = Cookies.get("YearId");
+          const storedfromdate = Cookies.get("FromDate");
+          const storedtodate = Cookies.get("ToDate");
+  
+          if (storedYearId) {
+              setYearId(storedYearId);
+              console.log('storedYearId', storedYearId);
+          } else {
+              toast.error("Year is not set.");
+          };
+          if (storedfromdate) {
+            setFromDate(storedfromdate);
+            console.log('storedfromdate', storedfromdate);
+        } else {
+            toast.error("FromDate is not set.");
+        }
+  
+        if (storedtodate) {
+          setToDate(storedtodate);
+          console.log('storedTodate', storedtodate);
+      } else {
+          toast.error("ToDate is not set.");
+      }
+       
+      }, [yearid,fromdate,todate]);
 
 
   return (

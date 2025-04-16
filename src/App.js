@@ -23,6 +23,8 @@ import PurchaseOther from './Transaction/PurchaseOther';
 import UserMaster from './Masters/UserMaster';
 import Receipt from './Transaction/Receipt';
 import CoverPage from './LogIn-SignUp/coverpage';
+import Payment from './Transaction/Payment';
+import PackingEntry from './Transaction/PackingEntry';
 
 function App() {
   return (
@@ -48,6 +50,11 @@ function App() {
           <Route path='/deliverychallan' element={<DeliveryChallan/>}/>
           <Route path='/Purchaseother' element={<PurchaseOther/>}/>
           <Route path='/receipts' element={<Receipt/>}/>
+          <Route path='/payments' element={<Payment/>}/>
+          <Route path='/packingEntry' element={<PackingEntry/>}/>
+          
+
+
           <Route path="/commonpage" element={<Commonpage/>} />
         </Route>
       </Routes>

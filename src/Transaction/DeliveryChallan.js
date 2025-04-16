@@ -19,6 +19,8 @@ import {
 
     useMaterialReactTable,
 } from "material-react-table";
+import Cookies from 'js-cookie';
+
 
 const DeliveryChallan = () => {
     const theme = useTheme();
@@ -362,7 +364,7 @@ const DeliveryChallan = () => {
         setQuantity("");
         setRate("");
         setAmount("");
-
+        setErrors('')
     };
 
 
@@ -370,6 +372,12 @@ const DeliveryChallan = () => {
 
     //create and update Inword At Store
     const handleSubmitInWord = async (e) => {
+        if (!validateForm()) {
+            return;
+          }
+       
+
+
         e.preventDefault();
         const formattedChallanDate = moment(challanDate).format("YYYY-MM-DD");
         console.log(rowId)
@@ -507,6 +515,82 @@ const DeliveryChallan = () => {
     };
 
 
+   //validation
+    const [errors, setErrors] = useState({
+      challanDate: '',
+
+    })
+  
+  
+    const validateForm = () => {
+      const newErrors = {
+        challanDate: '',
+       
+      };
+  
+      let isValid = true;
+  
+      
+  
+      if (!challanDate) {
+        newErrors.challanDate = 'challanDate  is required';
+        isValid = false;
+      } else {
+        // Convert dates to Date objects for comparison
+        const challanDateObj = new Date(challanDate);
+        const fromDateObj = new Date(fromdate);
+        const toDateObj = new Date(todate);
+    
+        // Check if invoice date is before from date
+        if (challanDateObj < fromDateObj) {
+          newErrors.challanDate = `challanDate  cannot be before ${new Date(fromdate).toLocaleDateString()}`;
+          isValid = false;
+        }
+        // Check if invoice date is after to date
+        else if (challanDateObj > toDateObj) {
+          newErrors.challanDate = `challanDate cannot be after ${new Date(todate).toLocaleDateString()}`;
+          isValid = false;
+        }
+      };
+  
+      setErrors(newErrors);
+      return isValid;
+    };
+
+
+ //for yearId
+  const [yearid, setYearId] = useState('');
+  const[fromdate,setFromDate]= useState('');
+  const[todate,setToDate]= useState('');
+  
+   useEffect(() => {
+          const storedYearId = Cookies.get("YearId");
+          const storedfromdate = Cookies.get("FromDate");
+          const storedtodate = Cookies.get("ToDate");
+  
+          if (storedYearId) {
+              setYearId(storedYearId);
+              console.log('storedYearId', storedYearId);
+          } else {
+              toast.error("Year is not set.");
+          };
+          if (storedfromdate) {
+            setFromDate(storedfromdate);
+            console.log('storedfromdate', storedfromdate);
+        } else {
+            toast.error("FromDate is not set.");
+        }
+  
+        if (storedtodate) {
+          setToDate(storedtodate);
+          console.log('storedTodate', storedtodate);
+      } else {
+          toast.error("ToDate is not set.");
+      }
+       
+      }, [yearid,fromdate,todate]);
+
+
     return (
         <Box>
             <Box textAlign={'center'}>
@@ -577,9 +661,12 @@ const DeliveryChallan = () => {
                                             <DatePicker
                                                 value={challanDate ? new Date(challanDate) : null}
                                                 format="dd-MM-yyyy"
-                                                onChange={(newValue) => setChallanDate(newValue)}
+                                                onChange={(newValue) => {setChallanDate(newValue);
+                                                    setErrors({...errors, challanDate: undefined})
+
+                                                }}
                                                 slotProps={{
-                                                    textField: { size: "small", fullWidth: true },
+                                                    textField: { size: "small", fullWidth: true,error: !!errors.challanDate, helperText: errors.challanDate  },
                                                 }}
                                                 renderInput={(params) => <TextField />}
                                             />

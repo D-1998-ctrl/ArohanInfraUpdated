@@ -105,9 +105,16 @@ export const menuItems = [
       },
       {
         title: "Payments",
-        path: "commonpage",
+        path: "payments",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
+
+      {
+        title: "Packing Entry",
+        path: "packingEntry",
+        icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
+      },
+      
     ],
   },
 
