@@ -15,6 +15,13 @@ import dayjs from "dayjs";
 import qs from "qs";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import DeleteIcon from '@mui/icons-material/Delete';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+
+
+
 import {
 
     useMaterialReactTable,
@@ -57,25 +64,51 @@ const InwordAtStore = () => {
 
 
     const handleDrawerOpen = () => {
+        setRowId('')
         setIsDrawerOpen(true);
         setIsEditing(false);
     };
 
     const handleDrawerClose = () => {
+        setRowId('')
         setIsDrawerOpen(false);
         resetForm();
     };
 
     //api to call fetchInwardHeader
+    const [totalPages, setTotalPages] = useState(1);
+    const [pageNo, setPageNo] = useState(1)
     const fetchInwardHeader = async () => {
+        const requestOptions = {
+          method: "GET",
+          redirect: "follow"
+        };
+    
         try {
-            const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=InwardHeader"
-            );
-            setInwardheaders(response.data);
-            // console.log('header', response.data)
-        } catch (error) { }
-    };
+          const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=InwardHeader&PageNo=${pageNo}`, requestOptions);
+          const result = await response.json();
+    
+           console.log("Fetched result:", result.data);
+    
+           setInwardheaders(result.data);
+          setTotalPages(result.total_pages)
+    
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      useEffect(() => {
+          fetchInwardHeader();
+        }, [pageNo]);
+    // const fetchInwardHeader = async () => {
+    //     try {
+    //         const response = await axios.get(
+    //             "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=InwardHeader"
+    //         );
+    //         setInwardheaders(response.data);
+    //         // console.log('header', response.data)
+    //     } catch (error) { }
+    // };
 
 
     //  api to call fetchInwarddetails
@@ -90,7 +123,7 @@ const InwordAtStore = () => {
     };
 
     useEffect(() => {
-        fetchInwardHeader();
+        // fetchInwardHeader();
         fetchInwarddetails();
         fetchLocation();
         fetchProduct();
@@ -101,7 +134,13 @@ const InwordAtStore = () => {
     //main table
     const columns = useMemo(() => {
         return [
-
+           
+            {
+                accessorKey: 'SrNo',
+                header: 'Sr No',
+                size: 150,
+                Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
+              },
             {
                 accessorKey: 'InwardNo',
                 header: 'Inward No',
@@ -181,6 +220,7 @@ const InwordAtStore = () => {
     const table = useMaterialReactTable({
         columns,
         data: inwardheaders,
+        enablePagination:false,
         muiTableHeadCellProps: {
             style: {
                 backgroundColor: "#E9ECEF",
@@ -192,6 +232,47 @@ const InwordAtStore = () => {
             onClick: () => handleSubmit(row.original),
             style: { cursor: "pointer" },
         }),
+
+        renderBottomToolbarCustomActions: () => (
+            <Box 
+              mt={2} 
+              alignItems="center" 
+              display="flex"  
+              justifyContent="flex-end" 
+              width="100%"
+            >
+              <FirstPageIcon 
+                sx={{ cursor: "pointer" }} 
+                onClick={() => setPageNo(1)} 
+              />
+              <KeyboardArrowLeftIcon 
+                sx={{ cursor: "pointer" }} 
+                onClick={() => setPageNo((prev) => Math.max(Number(prev) - 1, 1))} 
+              />
+              <Box>Page No</Box>
+              <TextField
+                sx={{ 
+                  width: "4.5%",
+                  ml: 1,
+                  '@media (max-width: 768px)': {
+                    width: '10%',
+                  },
+                }}
+                value={pageNo}
+                onChange={(e) => setPageNo(e.target.value)}
+                size="small" 
+              />
+              <KeyboardArrowRightIcon 
+                sx={{ cursor: "pointer" }} 
+                onClick={() => setPageNo((prev) => Number(prev) + 1)} 
+              />
+              <LastPageIcon 
+                sx={{ cursor: "pointer" }} 
+                onClick={() => setPageNo(totalPages)} 
+              />
+              <Box>Total Pages: {totalPages}</Box>
+            </Box>
+          ),
     });
 
     //for drawer table row btn
@@ -364,9 +445,12 @@ const InwordAtStore = () => {
             handleAddRow();
         }
 
-        if (editingRow === null) {
-            resetFields(); // Clear fields only when adding a new row
-        }
+        // if (editingRow === null) {
+        //     resetFields(); // Clear fields only when adding a new row
+        // }
+
+
+        resetFields();
     };
 
 
@@ -380,9 +464,6 @@ const InwordAtStore = () => {
         setAmount("");
 
     };
-
-
-
 
     //create and update Inword At Store
     const handleSubmitInWord = async (e) => {
@@ -661,9 +742,18 @@ const InwordAtStore = () => {
                                     <Box >
                                         <Typography variant="body2">Inword No</Typography>
                                         <TextField
+                                         variant="standard"
+                                         sx={{
+                                           '& .MuiInput-underline:after': {
+                                             borderBottomWidth: 1.5,
+                                             borderBottomColor: '#44ad74',
+                                           }, mt: 1
+                                         }}
+                                         focused
                                             value={inwordNo}
-                                            disabled
-                                            onChange={(e) => setInwordNo(e.target.value)}
+                                            placeholder="Inword No Autogenrated"
+                                            // disabled
+                                            // onChange={(e) => setInwordNo(e.target.value)}
                                             size="small"
                                             fullWidth />
                                     </Box>
@@ -693,6 +783,14 @@ const InwordAtStore = () => {
                                 <Box flex={1} >
                                     <Typography variant="body2">VehicalNo</Typography>
                                     <TextField
+                                     variant="standard"
+                                     sx={{
+                                       '& .MuiInput-underline:after': {
+                                         borderBottomWidth: 1.5,
+                                         borderBottomColor: '#44ad74',
+                                       }, mt: 1
+                                     }}
+                                     focused
                                         value={vehicleNo}
                                         onChange={(e) => setVehicleNo(e.target.value)}
                                         size="small" fullWidth placeholder='VehicalNo' />
@@ -704,7 +802,17 @@ const InwordAtStore = () => {
 
                             <Box m={2} >
                                 <Typography variant="body2">Store Location</Typography>
-                                <FormControl fullWidth size="small">
+                                <FormControl 
+                                 variant="standard"
+                                 sx={{
+                                   '& .MuiInput-underline:after': {
+                                     borderBottomWidth: 1.5,
+                                     borderBottomColor: '#44ad74',
+                                   }, mt: 1
+                                 }}
+                                 focused
+                                 fullWidth
+                                  size="small">
                                     <Select
                                         value={selectedLocation || ""}
                                         onChange={(event) => setSelectedLocation(event.target.value)}
@@ -723,6 +831,14 @@ const InwordAtStore = () => {
                                     <Box >
                                         <Typography variant="body2">Challan No</Typography>
                                         <TextField
+                                         variant="standard"
+                                         sx={{
+                                           '& .MuiInput-underline:after': {
+                                             borderBottomWidth: 1.5,
+                                             borderBottomColor: '#44ad74',
+                                           }, mt: 1
+                                         }}
+                                         focused
                                             value={challanNo}
                                             onChange={(e) => setChallanNo(e.target.value)}
                                             size="small" fullWidth />
@@ -757,7 +873,7 @@ const InwordAtStore = () => {
                                 <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                                     <Box sx={{ flex: 1 }}>
                                         <Typography>Product</Typography>
-                                        <FormControl fullWidth size="small">
+                                        <FormControl fullWidth size="small" >
                                             <Autocomplete
                                                 fullWidth
                                                 size="small"
@@ -782,7 +898,14 @@ const InwordAtStore = () => {
                                                     <TextField
                                                         {...params}
 
-                                                        variant="outlined"
+                                                        variant="standard"
+                                                        sx={{
+                                                          '& .MuiInput-underline:after': {
+                                                            borderBottomWidth: 1.5,
+                                                            borderBottomColor: '#44ad74',
+                                                          }, mt: 1
+                                                        }}
+                                                        focused
                                                     />
                                                 )}
                                             />
@@ -817,6 +940,14 @@ const InwordAtStore = () => {
                                     <Box sx={{ flex: 1 }}>
                                         <Typography variant="body2">Batch No</Typography>
                                         <TextField
+                                         variant="standard"
+                                         sx={{
+                                           '& .MuiInput-underline:after': {
+                                             borderBottomWidth: 1.5,
+                                             borderBottomColor: '#44ad74',
+                                           }, mt: 1
+                                         }}
+                                         focused
                                             value={batchNo}
                                             onChange={(e) => setBatchNo(e.target.value)}
                                             size="small"
@@ -843,6 +974,14 @@ const InwordAtStore = () => {
                                     <Box sx={{ flex: 1 }}>
                                         <Typography variant="body2">Quantity</Typography>
                                         <TextField
+                                         variant="standard"
+                                         sx={{
+                                           '& .MuiInput-underline:after': {
+                                             borderBottomWidth: 1.5,
+                                             borderBottomColor: '#44ad74',
+                                           }, mt: 1
+                                         }}
+                                         focused
                                             value={quentity}
                                             onChange={handleQuantityChange}
                                             size="small"
@@ -854,6 +993,14 @@ const InwordAtStore = () => {
                                     <Box sx={{ flex: 1 }}>
                                         <Typography variant="body2">Rate</Typography>
                                         <TextField
+                                         variant="standard"
+                                         sx={{
+                                           '& .MuiInput-underline:after': {
+                                             borderBottomWidth: 1.5,
+                                             borderBottomColor: '#44ad74',
+                                           }, mt: 1
+                                         }}
+                                         focused
                                             value={rate}
                                             onChange={handleRateChange}
                                             size="small"
@@ -865,6 +1012,14 @@ const InwordAtStore = () => {
                                     <Box sx={{ flex: 1 }}>
                                         <Typography variant="body2">Amount</Typography>
                                         <TextField
+                                         variant="standard"
+                                         sx={{
+                                           '& .MuiInput-underline:after': {
+                                             borderBottomWidth: 1.5,
+                                             borderBottomColor: '#44ad74',
+                                           }, mt: 1
+                                         }}
+                                         focused
                                             value={amount}
                                             size="small"
                                             fullWidth

@@ -524,6 +524,14 @@ const MaterialMaster = () => {
               <Box flex={1} >
                 <Typography>Material Code</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={materialCode}
                   onChange={(e) => setMaterialCode(e.target.value)}
 
@@ -534,7 +542,14 @@ const MaterialMaster = () => {
 
               <Box flex={1}>
                 <Typography>Material Group</Typography>
-                <FormControl fullWidth size="small">
+                <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                   <Select
                     value={selectedGroupOption}
                     onChange={(event) => setSelectedGroupOption(event.target.value)}
@@ -560,7 +575,14 @@ const MaterialMaster = () => {
             <Box flex={1}  mt={2} >
               <Typography>Material Name</Typography>
               <TextField
-
+ variant="standard"
+ sx={{
+   '& .MuiInput-underline:after': {
+     borderBottomWidth: 1.5,
+     borderBottomColor: '#44ad74',
+   }, mt: 1
+ }}
+ focused
                 value={materialName}
                 onChange={(e) => setMaterialName(e.target.value)}
 
@@ -571,6 +593,14 @@ const MaterialMaster = () => {
             <Box flex={1}  mt={2} >
               <Typography>Brand Name</Typography>
               <TextField
+               variant="standard"
+               sx={{
+                 '& .MuiInput-underline:after': {
+                   borderBottomWidth: 1.5,
+                   borderBottomColor: '#44ad74',
+                 }, mt: 1
+               }}
+               focused
                 value={brandName}
                 onChange={(e) => setBrandName(e.target.value)}
 
@@ -582,6 +612,14 @@ const MaterialMaster = () => {
               <Box flex={1}  >
                 <Typography>Purchase Rate</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={purchaseRate}
                   onChange={(e) => setPurchaseRate(e.target.value)}
 
@@ -592,6 +630,14 @@ const MaterialMaster = () => {
               <Box flex={1} >
                 <Typography>Reorder level</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={reorderLevel}
                   onChange={(e) => setReorderLevel(e.target.value)}
 
@@ -602,6 +648,14 @@ const MaterialMaster = () => {
               <Box flex={1}  >
                 <Typography>Min.Balance</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={minBal}
                   onChange={(e) => setMinBal(e.target.value)}
 
@@ -614,6 +668,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2} >
                 <Typography>Max.Balance</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={maxBal}
                   onChange={(e) => setMaxBal(e.target.value)}
 
@@ -626,6 +688,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2}  >
                 <Typography>HSN Code</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={HSNCode}
                   onChange={(e) => setHSNCode(e.target.value)}
 
@@ -638,6 +708,14 @@ const MaterialMaster = () => {
               <Box flex={1} margin="normal" mt={2}>
                 <Typography>CGST%</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={CGST}
                   onChange={(e) => setCGST(e.target.value)}
 
@@ -648,6 +726,14 @@ const MaterialMaster = () => {
               <Box flex={1} margin="normal" mt={2} >
                 <Typography>SGST%</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={SGST}
                   onChange={(e) => setSGST(e.target.value)}
 
@@ -658,6 +744,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2} >
                 <Typography>IGST%</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={IGST}
                   onChange={(e) => setIGST(e.target.value)}
 
@@ -708,6 +802,14 @@ const MaterialMaster = () => {
               <Box flex={1} >
                 <Typography>Material Code</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={updatematerialCode}
                   onChange={(e) => setUpdateMaterialCode(e.target.value)}
 
@@ -722,7 +824,14 @@ const MaterialMaster = () => {
 
               <Box flex={1} >
                 <Typography>Material Group</Typography>
-                <FormControl fullWidth size="small">
+                <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                   <Select
                     value={selectedGroupOption}
                     onChange={(event) => setSelectedGroupOption(event.target.value)}
@@ -750,7 +859,14 @@ const MaterialMaster = () => {
             <Box flex={1} mt={2}  >
               <Typography>Material Name</Typography>
               <TextField
-
+ variant="standard"
+ sx={{
+   '& .MuiInput-underline:after': {
+     borderBottomWidth: 1.5,
+     borderBottomColor: '#44ad74',
+   }, mt: 1
+ }}
+ focused
                 value={updatematerialName}
                 onChange={(e) => setUpdateMaterialName(e.target.value)}
 
@@ -761,6 +877,14 @@ const MaterialMaster = () => {
             <Box flex={1} mt={2} >
               <Typography>Brand Name</Typography>
               <TextField
+               variant="standard"
+               sx={{
+                 '& .MuiInput-underline:after': {
+                   borderBottomWidth: 1.5,
+                   borderBottomColor: '#44ad74',
+                 }, mt: 1
+               }}
+               focused
                 value={updatebrandName}
                 onChange={(e) => setUpdateBrandName(e.target.value)}
 
@@ -772,6 +896,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2} >
                 <Typography>Purchase Rate</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={updatepurchaseRate}
                   onChange={(e) => setUpdatePurchaseRate(e.target.value)}
 
@@ -782,6 +914,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2}>
                 <Typography>Reorder level</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={updatereorderLevel}
                   onChange={(e) => setUpdateReorderLevel(e.target.value)}
 
@@ -792,6 +932,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2} >
                 <Typography>Min.Balance</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={updateminBal}
                   onChange={(e) => setUpdateMinBal(e.target.value)}
 
@@ -804,6 +952,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2} >
                 <Typography>Max.Balance</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={updatemaxBal}
                   onChange={(e) => setUpdateMaxBal(e.target.value)}
 
@@ -816,6 +972,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2}  >
                 <Typography>HSN Code</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={updateHSNCode}
                   onChange={(e) => setUpdateHSNCode(e.target.value)}
 
@@ -828,6 +992,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2}>
                 <Typography>CGST%</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={updateCGST}
                   onChange={(e) => setUpdateCGST(e.target.value)}
 
@@ -838,6 +1010,14 @@ const MaterialMaster = () => {
               <Box flex={1} mt={2} >
                 <Typography>SGST%</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={updateSGST}
                   onChange={(e) => setUpdateSGST(e.target.value)}
 
@@ -848,6 +1028,14 @@ const MaterialMaster = () => {
               <Box flex={1}  mt={2}>
                 <Typography>IGST%</Typography>
                 <TextField
+                 variant="standard"
+                 sx={{
+                   '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
+                 }}
+                 focused
                   value={updateIGST}
                   onChange={(e) => setUpdateIGST(e.target.value)}
 

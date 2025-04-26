@@ -435,6 +435,14 @@ const AccountMaster = () => {
             <Box>
               <Typography>Account Name</Typography>
               <TextField
+               variant="standard"
+               sx={{
+                 '& .MuiInput-underline:after': {
+                   borderBottomWidth: 1.5,
+                   borderBottomColor: '#44ad74',
+                 }, mt: 1
+               }}
+               focused
                 value={AccountName}
                 onChange={(e) => setAccountName(e.target.value)}
                 size="small" placeholder="Enter Account Name" fullWidth />
@@ -443,7 +451,14 @@ const AccountMaster = () => {
             <Box display={'flex'} gap={2} alignItems={'center'}>
               <Box flex={1} mt={2}>
                 <Typography>Group</Typography>
-                <FormControl fullWidth size="small">
+                <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                   <Select
                     value={selectedGroupOption}
                     onChange={(event) => setSelectedGroupOption(event.target.value)}
@@ -464,7 +479,14 @@ const AccountMaster = () => {
               <Box flex={1} mt={2}  >
                 <Typography>Sub Group</Typography>
                 <FormControl
-                  fullWidth size="small" >
+                  fullWidth size="small"  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused>
                   <Select
                     value={selectedSubGroupOption}
                     onChange={(event) => setSelectedSubGroupOption(event.target.value)}
@@ -487,7 +509,14 @@ const AccountMaster = () => {
             <Box flex={1} mt={2}  >
               <Typography>Type Code</Typography>
               <FormControl
-                fullWidth size="small" >
+                fullWidth size="small"  variant="standard"
+                sx={{
+                  '& .MuiInput-underline:after': {
+                    borderBottomWidth: 1.5,
+                    borderBottomColor: '#44ad74',
+                  }, mt: 1
+                }}
+                focused >
                 <Select
                   value={typecode}
 
@@ -504,6 +533,14 @@ const AccountMaster = () => {
               <Box flex={1} mt={2}>
                 <Typography>Opening Balance</Typography>
                 <TextField
+                 variant="standard"
+                //  sx={{
+                  //  '& .MuiInput-underline:after': {
+                  //    borderBottomWidth: 1.5,
+                  //    borderBottomColor: '#44ad74',
+                  //  }, mt: 1
+                //  }}
+                 focused
                   value={currentBal}
                   onChange={(e) => setCurrentBal(e.target.value)}
                   type="number"
@@ -527,6 +564,10 @@ const AccountMaster = () => {
                       WebkitAppearance: "none",
                       margin: 0,
                     },
+                    '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   }, mt: 1
                   }}
                 />
               </Box>
@@ -535,7 +576,14 @@ const AccountMaster = () => {
               <Box flex={1} mt={2}  >
                 <Typography>Debit or Credit</Typography>
                 <FormControl
-                  fullWidth size="small">
+                  fullWidth size="small"  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused>
 
 
                   <Select
@@ -595,6 +643,14 @@ const AccountMaster = () => {
             <Box>
               <Typography>Account Name</Typography>
               <TextField
+               variant="standard"
+               sx={{
+                 '& .MuiInput-underline:after': {
+                   borderBottomWidth: 1.5,
+                   borderBottomColor: '#44ad74',
+                 }, mt: 1
+               }}
+               focused
                 value={updatedAccountName}
                 onChange={(e) => setUpdatedAccountName(e.target.value)}
                 size="small" placeholder="Enter Account Name" fullWidth />
@@ -603,7 +659,14 @@ const AccountMaster = () => {
             <Box display={'flex'} gap={2} alignItems={'center'}>
               <Box flex={1} mt={2}>
                 <Typography>Group</Typography>
-                <FormControl fullWidth size="small">
+                <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                   <Select
                     value={selectedGroupOption}
                     onChange={(event) => setSelectedGroupOption(event.target.value)}
@@ -623,8 +686,15 @@ const AccountMaster = () => {
 
               <Box flex={1} mt={2}  >
                 <Typography>Sub Group</Typography>
-                <FormControl
-                  fullWidth size="small" >
+                <FormControl 
+                  fullWidth size="small"  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused >
                   <Select
                     value={selectedSubGroupOption}
                     onChange={(event) => setSelectedSubGroupOption(event.target.value)}
@@ -647,7 +717,14 @@ const AccountMaster = () => {
             <Box flex={1} mt={2} >
               <Typography>Type Code</Typography>
               <FormControl
-                fullWidth size="small" >
+                fullWidth size="small"  variant="standard"
+                sx={{
+                  '& .MuiInput-underline:after': {
+                    borderBottomWidth: 1.5,
+                    borderBottomColor: '#44ad74',
+                  }, mt: 1
+                }}
+                focused >
                 <Select
                   value={typecode}
 
@@ -664,6 +741,14 @@ const AccountMaster = () => {
               <Box flex={1} mt={2}>
                 <Typography>Opening Balance</Typography>
                 <TextField
+                 variant="standard"
+                //  sx={{
+                //    '& .MuiInput-underline:after': {
+                //      borderBottomWidth: 1.5,
+                //      borderBottomColor: '#44ad74',
+                //    }, mt: 1
+                //  }}
+                 focused
                   value={updatedcurrentBal}
                   onChange={(e) => setUpdatedCurrentBal(e.target.value)}
                   type="number"
@@ -687,6 +772,10 @@ const AccountMaster = () => {
                       WebkitAppearance: "none",
                       margin: 0,
                     },
+                    '& .MuiInput-underline:after': {
+                     borderBottomWidth: 1.5,
+                     borderBottomColor: '#44ad74',
+                   },mt:1
                   }}
                 />
               </Box>
@@ -695,7 +784,14 @@ const AccountMaster = () => {
               <Box flex={1} mt={2}  >
                 <Typography>Debit or Credit</Typography>
                 <FormControl
-                  fullWidth size="small" >
+                  fullWidth size="small"  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused >
                   <Select
                     value={debitCredit}
                     onChange={(event) => setDebitCredit(event.target.value)}

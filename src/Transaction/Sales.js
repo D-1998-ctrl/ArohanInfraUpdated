@@ -766,12 +766,10 @@ const SalesEntry = () => {
       };
       setRows(updatedRows);
       setEditingRow(null);
-
     } else {
       // Add a new row
       handleAddRow();
     }
-
     // if (editingRow === null) {
     //   resetFields(); 
     // }
@@ -779,8 +777,9 @@ const SalesEntry = () => {
   };
 
   const resetFields = () => {
+    setSelectedProductId("");  
+    setProductName("");       
     setSelectedProductName("");
-    setSelectedProductId("");
     setQuantity("");
     setRate("");
     SetAmount("");
@@ -1017,7 +1016,7 @@ const SalesEntry = () => {
       const invoiceDateObj = new Date(invoiceDate);
       const fromDateObj = new Date(fromdate);
       const toDateObj = new Date(todate);
-  
+
       // Check if invoice date is before from date
       if (invoiceDateObj < fromDateObj) {
         newErrors.invoiceDate = `Invoice date cannot be before ${new Date(fromdate).toLocaleDateString()}`;
@@ -1059,39 +1058,39 @@ const SalesEntry = () => {
     return isValid;
   };
 
-//for yearId
-const [yearid, setYearId] = useState('');
-const[fromdate,setFromDate]= useState('');
-const[todate,setToDate]= useState('');
+  //for yearId
+  const [yearid, setYearId] = useState('');
+  const [fromdate, setFromDate] = useState('');
+  const [todate, setToDate] = useState('');
 
- useEffect(() => {
-        const storedYearId = Cookies.get("YearId");
-        const storedfromdate = Cookies.get("FromDate");
-        const storedtodate = Cookies.get("ToDate");
+  useEffect(() => {
+    const storedYearId = Cookies.get("YearId");
+    const storedfromdate = Cookies.get("FromDate");
+    const storedtodate = Cookies.get("ToDate");
 
-        if (storedYearId) {
-            setYearId(storedYearId);
-            console.log('storedYearId', storedYearId);
-        } else {
-            toast.error("Year is not set.");
-        };
-        if (storedfromdate) {
-          setFromDate(storedfromdate);
-          console.log('storedfromdate', storedfromdate);
-      } else {
-          toast.error("FromDate is not set.");
-      }
-
-      if (storedtodate) {
-        setToDate(storedtodate);
-        console.log('storedTodate', storedtodate);
+    if (storedYearId) {
+      setYearId(storedYearId);
+      console.log('storedYearId', storedYearId);
     } else {
-        toast.error("ToDate is not set.");
+      toast.error("Year is not set.");
+    };
+    if (storedfromdate) {
+      setFromDate(storedfromdate);
+      console.log('storedfromdate', storedfromdate);
+    } else {
+      toast.error("FromDate is not set.");
     }
-     
-    }, [yearid,fromdate,todate]);
 
-    
+    if (storedtodate) {
+      setToDate(storedtodate);
+      console.log('storedTodate', storedtodate);
+    } else {
+      toast.error("ToDate is not set.");
+    }
+
+  }, [yearid, fromdate, todate]);
+
+
 
   return (
     <Box>
@@ -1207,6 +1206,14 @@ const[todate,setToDate]= useState('');
               <Box flex={1}>
                 <Typography variant="body2">Invoice No</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={invoiceNo}
                   size="small"
                   margin="none"
@@ -1219,10 +1226,11 @@ const[todate,setToDate]= useState('');
                 <Typography variant="body2">Invoice Date</Typography>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DatePicker
+
                     value={invoiceDate ? new Date(invoiceDate) : null}
 
                     format="dd-MM-yyyy"
-                    onChange={(newValue) => {setInvoiceDate(newValue);setErrors({...errors, invoiceDate: undefined})}}
+                    onChange={(newValue) => { setInvoiceDate(newValue); setErrors({ ...errors, invoiceDate: undefined }) }}
                     slotProps={{
                       textField: {
                         size: "small", fullWidth: true, error: !!errors.invoiceDate,
@@ -1236,32 +1244,20 @@ const[todate,setToDate]= useState('');
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              {/* <Box flex={1}>
-                <Typography variant="body2">Customer </Typography>
-                <Select
-                  fullWidth
-                  size="small"
-                  value={selectedAccount || ""}
-                  onChange={(event) => {
-                    const selectedValue = event.target.value;
-                    setSelectedAccount(selectedValue);
-
-                    const selectedItem = accountOptions.find(option => option.Id.toString() === selectedValue);
-                    setacctGSTNo(selectedItem ? selectedItem.GSTNo : "")
-
-                  }}
-                >
-                  {accountOptions.map((option) => (
-                    <MenuItem key={option.Id} value={option.Id.toString()}>
-                      {option.AccountName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Box> */}
+            
               <Box flex={1} position="relative">
                 <Typography variant="body2">Customer</Typography>
                 <TextField
+
                   fullWidth
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:before': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                      opacity: 1,
+                    }, mt: 1
+                  }}
                   size="small"
                   //value={selectedAccount || ""} 
                   value={selectedAccount
@@ -1337,6 +1333,7 @@ const[todate,setToDate]= useState('');
               <Box flex={1}>
                 <Typography variant="body2">Contact Number</Typography>
                 <PhoneInput
+
                   country={"in"}
                   value={phone}
                   onChange={(phone) => setPhone(phone)}
@@ -1348,6 +1345,7 @@ const[todate,setToDate]= useState('');
                     borderRadius: "5px",
                   }}
                   buttonStyle={{ borderRadius: "5px" }}
+                  
                 />
               </Box>
             </Box>
@@ -1356,8 +1354,16 @@ const[todate,setToDate]= useState('');
               <Box flex={1}>
                 <Typography variant="body2">Order No</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={orderNo}
-                  onChange={(e) => {setOrderNo(e.target.value);setErrors({...errors, orderNo: undefined})}}
+                  onChange={(e) => { setOrderNo(e.target.value); setErrors({ ...errors, orderNo: undefined }) }}
                   size="small"
                   margin="none"
                   placeholder="Order No"
@@ -1373,10 +1379,12 @@ const[todate,setToDate]= useState('');
                   <DatePicker
                     value={orderDate ? new Date(orderDate) : null} // Convert to Date object
                     format="dd-MM-yyyy"
-                    onChange={(newValue) => {setOrderDate(newValue);setErrors({...errors, orderDate: undefined})}}
+                    onChange={(newValue) => { setOrderDate(newValue); setErrors({ ...errors, orderDate: undefined }) }}
                     slotProps={{
-                      textField: { size: "small", fullWidth: true,error: !!errors.orderDate,
-                        helperText: errors.orderDate },
+                      textField: {
+                        size: "small", fullWidth: true, error: !!errors.orderDate,
+                        helperText: errors.orderDate
+                      },
                     }}
                     renderInput={(params) => <TextField />}
                   />
@@ -1423,6 +1431,7 @@ const[todate,setToDate]= useState('');
 
                 <Autocomplete
                   fullWidth
+
                   size="small"
                   options={productOptions}
                   getOptionLabel={(option) => option.label}
@@ -1458,7 +1467,12 @@ const[todate,setToDate]= useState('');
                     handleItemChange(newValue);
                   }}
 
-                  renderInput={(params) => <TextField {...params} variant="outlined" />}
+                  renderInput={(params) => <TextField {...params} variant="standard" sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }} focused />}
                 />
 
 
@@ -1467,6 +1481,14 @@ const[todate,setToDate]= useState('');
               <Box flex={1}>
                 <Typography variant="body2">Quantity</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={quantity}
                   onChange={handleQuantityChange}
                   size="small"
@@ -1478,6 +1500,14 @@ const[todate,setToDate]= useState('');
               <Box flex={1}>
                 <Typography variant="body2">Rate</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={rate}
                   onChange={handleRateChange}
                   size="small"
@@ -1489,11 +1519,21 @@ const[todate,setToDate]= useState('');
               <Box flex={1}>
                 <Typography variant="body2">Amount</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={amount}
                   size="small"
-                  margin="none"
-                  placeholder="Amount"
+
+                  // placeholder="Amount"
                   fullWidth
+
+
                 />
               </Box>
             </Box>
@@ -1502,66 +1542,114 @@ const[todate,setToDate]= useState('');
               <Box flex={1}>
                 <Typography variant="body2">CGST%</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={cgst}
                   onChange={(e) => setCGST(e.target.value)}
                   // onChange={handleCgstChange}
                   size="small"
                   margin="none"
-                  placeholder="CGST"
+                  //  placeholder="CGST"
                   fullWidth
                 />
               </Box>
               <Box flex={1}>
                 <Typography variant="body2">CGST Amount</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={cgstAmount}
                   size="small"
                   margin="none"
-                  placeholder="CGST Amount"
+                  // placeholder="CGST Amount"
                   fullWidth
                 />
               </Box>
               <Box flex={1}>
                 <Typography variant="body2">SGST%</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={sgst}
                   // onChange={handleSgstChange}
                   onChange={(e) => setSGST(e.target.value)}
                   size="small"
                   margin="none"
-                  placeholder="SGST"
+                  //  placeholder="SGST"
                   fullWidth
                 />
               </Box>
               <Box flex={1}>
                 <Typography variant="body2">SGST Amount</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={sgstAmount}
                   size="small"
                   margin="none"
-                  placeholder="SGST Amount"
+                  // placeholder="SGST Amount"
                   fullWidth
                 />
               </Box>
               <Box flex={1}>
                 <Typography variant="body2">IGST %</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={igst}
                   // onChange={handleIgstChange}
                   onChange={(e) => setIGST(e.target.value)}
                   size="small"
                   margin="none"
-                  placeholder="IGST%"
+                  // placeholder="IGST%"
                   fullWidth
                 />
               </Box>
               <Box flex={1}>
                 <Typography variant="body2">IGST Amount</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={igstAmount}
                   size="small"
                   margin="none"
-                  placeholder=" IGST Amount"
+                  // placeholder=" IGST Amount"
                   fullWidth
                 />
               </Box>
@@ -1688,8 +1776,16 @@ const[todate,setToDate]= useState('');
               <Box>
                 <Typography variant="body2">Payment Mode</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={paymentMode}
-                  onChange={(e) => {setPaymentMode(e.target.value);setErrors({...errors, paymentMode: undefined})}}
+                  onChange={(e) => { setPaymentMode(e.target.value); setErrors({ ...errors, paymentMode: undefined }) }}
                   size="small"
                   placeholder="Payment Mode"
                   error={!!errors.paymentMode}
@@ -1700,6 +1796,14 @@ const[todate,setToDate]= useState('');
               <Box>
                 <Typography variant="body2">Transport</Typography>
                 <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    }, mt: 1
+                  }}
+                  focused
                   value={transport}
                   onChange={(e) => setTransport(e.target.value)}
                   size="small"
@@ -4236,7 +4340,7 @@ export default SalesEntry;
 //     }
 
 //     // if (editingRow === null) {
-//     //   resetFields(); 
+//     //   resetFields();
 //     // }
 //     resetFields();
 //   };
@@ -4462,7 +4566,7 @@ export default SalesEntry;
 //       </Box>
 //       <Box
 //         sx={{
-//           //  background: 'rgb(236, 253, 230)', 
+//           //  background: 'rgb(236, 253, 230)',
 //           p: 5, height: 'auto'
 //         }}
 //       >
@@ -4625,7 +4729,7 @@ export default SalesEntry;
 //                 <TextField
 //                   fullWidth
 //                   size="small"
-//                   //value={selectedAccount || ""} 
+//                   //value={selectedAccount || ""}
 //                   value={selectedAccount
 //                     ? accountOptions.find(({ Id }) => String(Id) === selectedAccount)?.AccountName || accountOptions.map((option) => option.AccountName)
 //                     : " "}
@@ -4805,7 +4909,7 @@ export default SalesEntry;
 
 //                   onChange={(event, newValue) => {
 //                     if (!selectedAccount) {
-//                       alert("Please select a Customer before selecting an item."); 
+//                       alert("Please select a Customer before selecting an item.");
 //                       return;
 //                     }
 //                     handleItemChange(newValue);

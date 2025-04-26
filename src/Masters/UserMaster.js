@@ -297,40 +297,7 @@ const UserMaster = () => {
                     <Button sx={{ background: 'var(--complementary-color)', }} variant="contained" onClick={handleDrawerOpen}>Create User Master </Button>
                 </Box>
 
-                {/* <Box mt={4}>
-                    <MaterialReactTable 
-                     table={table}
-                    enablePagination={false}
-                        muiTableHeadCellProps={{
-                            sx: {
-                                backgroundColor: '#E9ECEF',
-                                color: "black",
-                                fontSize: "16px",
-                            },
-                        }}
 
-                        renderBottomToolbarCustomActions={() => (
-                            <Box mt={2} alignItems={'center'} display={'flex'} justifyContent="flex-end"
-                                width="100%" >
-                                <FirstPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(1)} />
-                                <KeyboardArrowLeftIcon sx={{ cursor: "pointer" }} onClick={() =>
-                                    setPageNo((prev) => Math.max(Number(prev) - 1, 1))
-                                } />
-                                <Box > Page No </Box>
-                                <TextField
-                                    sx={{ width: "4.5%", ml: 1 }}
-                                    value={pageNo}
-                                    onChange={(e) => setPageNo(e.target.value)}
-                                    size="small" />
-                                <KeyboardArrowRightIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo((prev) => Number(prev) + 1)} />
-                                <LastPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(totalPages)} />
-                                Total Pages : {totalPages}
-                            </Box>
-
-                        )}
-
-                    />
-                </Box> */}
 
                 <Box mt={4}>
                     <MaterialReactTable
@@ -412,6 +379,15 @@ const UserMaster = () => {
                         <Box>
                             <Typography>Full Name</Typography>
                             <TextField
+                  variant="standard"
+                  sx={{
+                    '& .MuiInput-underline:after': {
+                      borderBottomWidth: 1.5,
+                      borderBottomColor: '#44ad74',
+                    },mt:1
+                  }}
+                  focused
+
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 size="small" placeholder="Enter Account Name" fullWidth />
@@ -420,6 +396,15 @@ const UserMaster = () => {
                         <Box mt={2}>
                             <Typography>User Name</Typography>
                             <TextField
+                            variant="standard"
+                            sx={{
+                              '& .MuiInput-underline:after': {
+                                borderBottomWidth: 1.5,
+                                borderBottomColor: '#44ad74',
+                              },mt:1
+                            }}
+                            focused
+
                                 value={user}
                                 onChange={(e) => setUser(e.target.value)}
                                 size="small" placeholder="Enter User" fullWidth />
@@ -428,6 +413,15 @@ const UserMaster = () => {
                         <Box mt={2}>
                             <Typography>Password</Typography>
                             <TextField
+                            variant="standard"
+                            sx={{
+                              '& .MuiInput-underline:after': {
+                                borderBottomWidth: 1.5,
+                                borderBottomColor: '#44ad74',
+                              },mt:1
+                            }}
+                            focused
+
                                 value={password}
                                 // onChange={(e) => setPassword(e.target.value)}
                                 onChange={handlePasswordChange}
@@ -440,7 +434,15 @@ const UserMaster = () => {
 
                             <Box flex={1}  >
                                 <Typography variant="body2">Level</Typography>
-                                <FormControl fullWidth size="small">
+                                <FormControl fullWidth size="small" variant="standard"
+                                                    sx={{
+                                                      '& .MuiInput-underline:after': {
+                                                        borderBottomWidth: 1.5,
+                                                        borderBottomColor: '#44ad74',
+                                                      },mt:1
+                                                    }}
+                                                    focused
+>
                                     <Select
                                         value={selectedLevelOption || ""}
                                         onChange={(event) => setSelectedLevelOption(event.target.value)}
@@ -456,7 +458,15 @@ const UserMaster = () => {
 
                             <Box flex={1}>
                                 <Typography variant="body2">Branch</Typography>
-                                <FormControl fullWidth size="small">
+                                <FormControl fullWidth size="small" variant="standard"
+                                                    sx={{
+                                                      '& .MuiInput-underline:after': {
+                                                        borderBottomWidth: 1.5,
+                                                        borderBottomColor: '#44ad74',
+                                                      },mt:1
+                                                    }}
+                                                    focused
+>
                                     <Select
                                         value={selectedBranchOption || ""}
                                         onChange={(event) => setSelectedBranchOption(event.target.value)}

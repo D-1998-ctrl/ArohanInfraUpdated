@@ -1,11 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import { Box,Dialog, DialogActions, DialogContent,DialogTitle, DialogContentText, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
 import { useTheme } from "@mui/material/styles";
 import { toast } from "react-toastify";
 import axios from 'axios';
-
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
@@ -23,7 +22,6 @@ const PackingEntry = () => {
 
     const handleDrawerOpen = () => {
         setIsDrawerOpen(true);
-
         resetForm();
         setIsEditing(false);
     };
@@ -46,7 +44,7 @@ const PackingEntry = () => {
             console.log("Fetched result:", result);
             setData(result.data);
             setTotalPages(result.total_pages)
-            
+
         } catch (error) {
             console.error(error);
         }
@@ -145,11 +143,9 @@ const PackingEntry = () => {
     };
 
 
-
     //to fetchProduct
     const [productOptions, setProductOptions] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
-
     const fetchProduct = async () => {
         try {
             const response = await axios.get(
@@ -177,7 +173,6 @@ const PackingEntry = () => {
     //fetchoprator
     const [opratorOptions, setOpratorOptions] = useState([]);
     const [selectedOprator, setSelectedOprator] = useState(null);
-
     const fetchOprator = async () => {
         try {
             const response = await axios.get(
@@ -208,12 +203,10 @@ const PackingEntry = () => {
         fetchOprator()
     }, []);
 
-
     //create Entry
     const createPackingEntry = () => {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-
         const formattedInwardDate = moment(packingDate).format("YYYY-MM-DD");
         const urlencoded = new URLSearchParams();
         urlencoded.append("PackingDate", formattedInwardDate);
@@ -246,8 +239,6 @@ const PackingEntry = () => {
             });
     }
 
-
-
     //setdata
     const handleEdit = (rowData) => {
         console.log("This row has been clicked:", rowData);
@@ -267,8 +258,7 @@ const PackingEntry = () => {
     };
 
     //update entry
-
-      const UpdatePackingEntry = () => {
+    const UpdatePackingEntry = () => {
         const formattedInwardDate = moment(packingDate).format("YYYY-MM-DD");
         const urlencoded = new URLSearchParams();
         urlencoded.append("PackingDate", formattedInwardDate);
@@ -279,65 +269,66 @@ const PackingEntry = () => {
         urlencoded.append("BatchNo", batchNo);
         urlencoded.append("ProductId", selectedProduct);
         urlencoded.append("Quantity", quantity);
-            urlencoded.append("Id", idwiseData);
-    
-            const requestOptions = {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            };
-    
-            axios
-                .post(
-                    "https://arohanagroapi.microtechsolutions.co.in/php/updatepackinggoods.php",
-                    urlencoded,
-                    requestOptions
-                )
-    
-                .then((response) => {
-                    console.log("API Response:", response.data);
-                    toast.success("Packing Entry Updated successfully");
-                  
-                    fetchData();
-                    handleDrawerClose()
-    
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                });
-        };
-    
+        urlencoded.append("Id", idwiseData);
 
-//foe delete entry
-const [open, setOpen] = useState(false);
+        const requestOptions = {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        };
+
+        axios
+            .post(
+                "https://arohanagroapi.microtechsolutions.co.in/php/updatepackinggoods.php",
+                urlencoded,
+                requestOptions
+            )
+
+            .then((response) => {
+                console.log("API Response:", response.data);
+                toast.success("Packing Entry Updated successfully");
+
+                fetchData();
+                handleDrawerClose()
+
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    };
+
+    //foe delete entry
+    const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
     };
+
     const handleClose = () => {
         setOpen(false);
     };
+
     const handleConfirmDelete = () => {
-            const requestOptions = {
-                method: "GET",
-                redirect: "follow"
-            };
-    
-            console.log("Deleted Id:", idwiseData);
-    
-            fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=PackingGoods&Id=${idwiseData}`, requestOptions)
-                .then((response) => response.text())
-                .then((result) => {
-                    console.log(result);
-                    setOpen(false);
-                    handleDrawerClose();
-                    fetchData();
-                    toast.success(
-                        "Packing Entry  Deleted successfully!"
-                    );
-                })
-                .catch((error) => console.error(error));
+        const requestOptions = {
+            method: "GET",
+            redirect: "follow"
         };
+
+        console.log("Deleted Id:", idwiseData);
+
+        fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=PackingGoods&Id=${idwiseData}`, requestOptions)
+            .then((response) => response.text())
+            .then((result) => {
+                console.log(result);
+                setOpen(false);
+                handleDrawerClose();
+                fetchData();
+                toast.success(
+                    "Packing Entry  Deleted successfully!"
+                );
+            })
+            .catch((error) => console.error(error));
+    };
 
     //reset form
     const resetForm = () => {
@@ -356,24 +347,15 @@ const [open, setOpen] = useState(false);
     const [totalPages, setTotalPages] = useState(1);
 
     return (
-
         <Box >
             <Box textAlign={'center'}>
                 <Typography sx={{ color: 'var(--complementary-color)', }} variant='h4'><b>Packing Entry</b></Typography>
             </Box>
 
-
-
-            <Box sx={{
-                //  background: 'rgb(236, 253, 230)', 
-                p: 5, height: 'auto'
-            }}>
-
+            <Box sx={{ p: 5, height: 'auto' }}>
                 <Box sx={{ display: 'flex', gap: 3 }}>
                     <Button sx={{ background: 'var(--complementary-color)', }} variant="contained" onClick={handleDrawerOpen}>Create Packing Entry </Button>
                 </Box>
-
-
 
                 <Box mt={4}>
                     <MaterialReactTable
@@ -459,10 +441,17 @@ const [open, setOpen] = useState(false);
                                 <Box flex={1} >
                                     <Typography variant="body2">Packing No</Typography>
                                     <TextField
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
                                         value={packingNo}
-                                        disabled
-                                        //  onChange={(e) => setInwordNo(e.target.value)}
                                         size="small"
+                                        placeholder='Packing No Autogenrated'
                                         fullWidth />
                                 </Box>
 
@@ -472,22 +461,25 @@ const [open, setOpen] = useState(false);
                                     <DatePicker
                                         value={packingDate ? new Date(packingDate) : null}
                                         format="dd-MM-yyyy"
-                                        onChange={(newValue) => {
-                                            setPackingDate(newValue);
-                                            // setErrors({ ...errors, inwordDate: undefined })
-                                        }}
+                                        onChange={(newValue) => { setPackingDate(newValue); }}
                                         slotProps={{
                                             textField: { size: "small", fullWidth: true, },
                                         }}
                                         renderInput={(params) => <TextField />}
                                     />
-
                                 </Box>
                             </Box>
 
                             <Box mt={2} >
                                 <Typography variant="body2">Operator</Typography>
-                                <FormControl fullWidth size="small">
+                                <FormControl fullWidth size="small" variant="standard"
+                                    sx={{
+                                        '& .MuiInput-underline:after': {
+                                            borderBottomWidth: 1.5,
+                                            borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                    }}
+                                    focused>
                                     <Select
                                         value={selectedOprator || ""}
                                         onChange={(event) => setSelectedOprator(event.target.value)}
@@ -504,7 +496,14 @@ const [open, setOpen] = useState(false);
                             <Box display={'flex'} gap={2} mt={2} >
                                 <Box flex={1} >
                                     <Typography variant="body2">Material</Typography>
-                                    <FormControl fullWidth size="small">
+                                    <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                                         <Select
                                             value={selectedMaterial || ""}
                                             onChange={(event) => setSelectedMaterial(event.target.value)}
@@ -521,6 +520,14 @@ const [open, setOpen] = useState(false);
                                 <Box flex={1}>
                                     <Typography variant="body2">Oil (Lit)</Typography>
                                     <TextField
+                                     variant="standard"
+                                     sx={{
+                                       '& .MuiInput-underline:after': {
+                                         borderBottomWidth: 1.5,
+                                         borderBottomColor: '#44ad74',
+                                       }, mt: 1
+                                     }}
+                                     focused
                                         value={oilInLit}
 
                                         onChange={(e) => setOilInLit(e.target.value)}
@@ -534,8 +541,15 @@ const [open, setOpen] = useState(false);
                                 <Box flex={1}>
                                     <Typography variant="body2">Brand Name</Typography>
                                     <TextField
+                                     variant="standard"
+                                     sx={{
+                                       '& .MuiInput-underline:after': {
+                                         borderBottomWidth: 1.5,
+                                         borderBottomColor: '#44ad74',
+                                       }, mt: 1
+                                     }}
+                                     focused
                                         value={brandName}
-
                                         onChange={(e) => setBrandName(e.target.value)}
                                         size="small"
                                         placeholder='Brand Name'
@@ -545,6 +559,14 @@ const [open, setOpen] = useState(false);
                                 <Box flex={1}>
                                     <Typography variant="body2">Batch No</Typography>
                                     <TextField
+                                     variant="standard"
+                                     sx={{
+                                       '& .MuiInput-underline:after': {
+                                         borderBottomWidth: 1.5,
+                                         borderBottomColor: '#44ad74',
+                                       }, mt: 1
+                                     }}
+                                     focused
                                         value={batchNo}
 
                                         onChange={(e) => setBatchNo(e.target.value)}
@@ -558,7 +580,14 @@ const [open, setOpen] = useState(false);
                             <Box display={'flex'} gap={2} mt={2} >
                                 <Box flex={1} >
                                     <Typography variant="body2">Product</Typography>
-                                    <FormControl fullWidth size="small">
+                                    <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                                         <Select
                                             value={selectedProduct || ""}
                                             onChange={(event) => setSelectedProduct(event.target.value)}
@@ -575,6 +604,14 @@ const [open, setOpen] = useState(false);
                                 <Box flex={1}>
                                     <Typography variant="body2">Quantity</Typography>
                                     <TextField
+                                     variant="standard"
+                                     sx={{
+                                       '& .MuiInput-underline:after': {
+                                         borderBottomWidth: 1.5,
+                                         borderBottomColor: '#44ad74',
+                                       }, mt: 1
+                                     }}
+                                     focused
                                         value={quantity}
 
                                         onChange={(e) => setQuantity(e.target.value)}
@@ -587,16 +624,14 @@ const [open, setOpen] = useState(false);
 
                         </Box>
 
-
-
                         <Box display={'flex'} alignItems={'center'} justifyContent={'center'} gap={2} mt={5}>
                             <Box>
                                 <Button
                                     sx={{
                                         background: 'var(--primary-color)',
                                     }}
-                                    // onClick={UpdatePackingEntry}
-                                     onClick={isEditing ? UpdatePackingEntry : createPackingEntry}
+
+                                    onClick={isEditing ? UpdatePackingEntry : createPackingEntry}
                                     variant="contained"
                                 >
                                     {isEditing ? "Update" : "Save"}

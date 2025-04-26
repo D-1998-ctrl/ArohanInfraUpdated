@@ -678,6 +678,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Account Name</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={AccountName}
                     onChange={(e) => setAccountName(e.target.value)}
                     size="small"
@@ -689,7 +697,14 @@ const SupplierMaster = () => {
 
                 <Box m={1.5}>
                   <Typography>Group</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={selectedGroupOption}
                       onChange={(event) => setSelectedGroupOption(event.target.value)}
@@ -712,15 +727,30 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Type Code</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={typecode}
-                    disabled
-                    onChange={(e) => setTypecode(e.target.value)}
+                    
                     size="small" placeholder="Enter Type Code" fullWidth />
                 </Box>
 
                 <Box m={1.5}>
                   <Typography>Address 1</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={address1}
                     onChange={(e) => setAddress1(e.target.value)}
                     size="small"
@@ -731,7 +761,14 @@ const SupplierMaster = () => {
 
                 <Box m={1.5}>
                   <Typography>City</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={selectedCity}
                       onChange={(event) => setSelectedCity(event.target.value)}
@@ -748,6 +785,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Pincode</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={pincode}
                     onChange={(e) => setPincode(e.target.value)}
                     size="small"
@@ -779,6 +824,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Opening Balance</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={currentBal}
                     onChange={(e) => setCurrentBal(e.target.value)}
                     size="small"
@@ -789,7 +842,14 @@ const SupplierMaster = () => {
 
                 <Box m={1.5}>
                   <Typography>Sub Group Id</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={selectedSubGroupOption}
                       onChange={(event) => setSelectedSubGroupOption(event.target.value)}
@@ -809,7 +869,14 @@ const SupplierMaster = () => {
 
                 <Box m={1.5}>
                   <Typography>Debit/Credit</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={debitCredit}
                       onChange={(event) => setDebitCredit(event.target.value)}
@@ -823,6 +890,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Address 2</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={address2}
                     onChange={(e) => setAddress2(e.target.value)}
                     size="small"
@@ -833,7 +908,14 @@ const SupplierMaster = () => {
 
                 <Box m={1.5}>
                   <Typography>State</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={selectedState || ""}
                       onChange={(event) => setSelectedState(event.target.value)}
@@ -850,6 +932,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Email</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     size="small"
@@ -872,6 +962,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>GST No</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={gstNo}
                     onChange={(e) => SetGSTNo(e.target.value)}
                     size="small"
@@ -976,6 +1074,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Account Name </Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatedAccountName}
                     onChange={(e) => setUpdatedAccountName(e.target.value)}
                     size="small"
@@ -986,8 +1092,15 @@ const SupplierMaster = () => {
 
 
                 <Box m={1.5}>
-                  <Typography>Group </Typography>
-                  <FormControl fullWidth size="small">
+                  <Typography>Group </Typography> 
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={selectedGroupOption}
                       onChange={(event) => setSelectedGroupOption(event.target.value)}
@@ -1010,15 +1123,30 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Type Code</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatedtypecode}
-                    disabled
-                    onChange={(e) => setUpdatedTypecode(e.target.value)}
+                
                     size="small" placeholder="Enter Type Code" fullWidth />
                 </Box>
 
                 <Box m={1.5}>
                   <Typography>Address 1</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatedaddress1}
                     onChange={(e) => setUpdatedAddress1(e.target.value)}
                     size="small"
@@ -1029,7 +1157,14 @@ const SupplierMaster = () => {
 
                 <Box m={1.5}>
                   <Typography>City</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={selectedCity || ""}
                       onChange={(event) => setSelectedCity(event.target.value)}
@@ -1046,6 +1181,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Pincode</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatedpincode}
                     onChange={(e) => setUpdatedPincode(e.target.value)}
                     size="small"
@@ -1077,6 +1220,14 @@ const SupplierMaster = () => {
               <Box m={1.5}>
                   <Typography>Opening Balance  </Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatedcurrentBal}
                     onChange={(e) => setUpdatedCurrentBal(e.target.value)}
                     size="small"
@@ -1087,7 +1238,14 @@ const SupplierMaster = () => {
 
                 <Box m={1.5}>
                   <Typography>Sub Group Id</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={selectedSubGroupOption}
                       onChange={(event) => setSelectedSubGroupOption(event.target.value)}
@@ -1107,7 +1265,14 @@ const SupplierMaster = () => {
 
                 <Box m={1.5}>
                   <Typography>Debit/Credit</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={debitCredit}
                       onChange={(event) => setDebitCredit(event.target.value)}
@@ -1121,6 +1286,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Address 2</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatedaddress2}
                     onChange={(e) => setUpdatedAddress2(e.target.value)}
                     size="small"
@@ -1131,7 +1304,14 @@ const SupplierMaster = () => {
 
                 <Box m={1.5}>
                   <Typography>State</Typography>
-                  <FormControl fullWidth size="small">
+                  <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                     <Select
                       value={selectedState || ""}
                       onChange={(event) => setSelectedState(event.target.value)}
@@ -1148,6 +1328,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>Email</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatedemail}
                     onChange={(e) => setUpdatedEmail(e.target.value)}
                     size="small"
@@ -1170,6 +1358,14 @@ const SupplierMaster = () => {
                 <Box m={1.5}>
                   <Typography>GST No</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatedgstNo}
                     onChange={(e) => SetupdatedGSTNo(e.target.value)}
                     size="small"

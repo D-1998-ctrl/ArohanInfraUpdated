@@ -14,9 +14,16 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import qs from "qs";
-
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+
+
+
+
 const Payment = () => {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -127,24 +134,48 @@ const Payment = () => {
     }, []);
 
     //table
+    const [pageNo, setPageNo] = useState(1)
+    const [totalPages, setTotalPages] = useState(1);
     const fetchData = async () => {
         const requestOptions = {
-            method: "GET",
-            redirect: "follow"
+          method: "GET",
+          redirect: "follow"
         };
-
+    
         try {
-            const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=VoucherHD&Colname=VoucherType&Colvalue=PY", requestOptions);
-            const result = await response.json();
-            console.log("Fetched result:", result);
-            setData(result);
+          const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/getvoucherbypage.php?VoucherType=PY&PageNo=${pageNo}`, requestOptions);
+          const result = await response.json();
+    
+           console.log("Fetched result:", result.data);
+    
+           setData(result.data);
+          setTotalPages(result.total_pages)
+    
         } catch (error) {
-            console.error(error);
+          console.error(error);
         }
-    };
+      };
+        useEffect(() => {
+              fetchData();
+              }, [pageNo]);
+    // const fetchData = async () => {
+    //     const requestOptions = {
+    //         method: "GET",
+    //         redirect: "follow"
+    //     };
+
+    //     try {
+    //         const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=VoucherHD&Colname=VoucherType&Colvalue=PY", requestOptions);
+    //         const result = await response.json();
+    //         console.log("Fetched result:", result);
+    //         setData(result);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     useEffect(() => {
-        fetchData();
+        // fetchData();
         fetchBranch();
         fetchReceiptdetails();
     }, []);
@@ -322,7 +353,7 @@ const Payment = () => {
     const table = useMaterialReactTable({
         columns,
         data: data,
-        enablePagination: true,
+        enablePagination: false,
         muiTableHeadCellProps: {
             style: {
                 backgroundColor: "#E9ECEF",
@@ -334,6 +365,46 @@ const Payment = () => {
             onClick: () => handleEdit(row.original),
             style: { cursor: "pointer" },
         }),
+        renderBottomToolbarCustomActions: () => (
+            <Box
+                mt={2}
+                alignItems="center"
+                display="flex"
+                justifyContent="flex-end"
+                width="100%"
+            >
+                <FirstPageIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo(1)}
+                />
+                <KeyboardArrowLeftIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo((prev) => Math.max(Number(prev) - 1, 1))}
+                />
+                <Box>Page No</Box>
+                <TextField
+                    sx={{
+                        width: "4.5%",
+                        ml: 1,
+                        '@media (max-width: 768px)': {
+                            width: '10%',
+                        },
+                    }}
+                    value={pageNo}
+                    onChange={(e) => setPageNo(e.target.value)}
+                    size="small"
+                />
+                <KeyboardArrowRightIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo((prev) => Number(prev) + 1)}
+                />
+                <LastPageIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo(totalPages)}
+                />
+                <Box>Total Pages: {totalPages}</Box>
+            </Box>
+        ),
     });
 
     const handleEdit = (rowData) => {
@@ -542,7 +613,7 @@ const Payment = () => {
 
                 <Box mt={4}>
                     <MaterialReactTable table={table}
-                       
+
                         muiTableHeadCellProps={{
                             sx: { color: 'var(--primary-color)', },
                         }}
@@ -576,6 +647,14 @@ const Payment = () => {
                                 <Box flex={1}>
                                     <Typography>Entry No</Typography>
                                     <TextField
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
                                         value={receiptNo}
                                         onChange={(e) => setReceiptNo(e.target.value)}
                                         size="small" placeholder="Payment No Autogenrated" fullWidth />
@@ -638,6 +717,15 @@ const Payment = () => {
                                                 size="small"
                                                 margin="none"
                                                 fullWidth
+
+                                                variant="standard"
+                                                sx={{
+                                                    '& .MuiInput-underline:after': {
+                                                        borderBottomWidth: 1.5,
+                                                        borderBottomColor: '#44ad74',
+                                                    }, mt: 1
+                                                }}
+                                                focused
                                             />
                                         )}
                                     />
@@ -668,7 +756,14 @@ const Payment = () => {
                                     <TextField
                                         // value={chequeNo}
                                         // onChange={(e) => setChequeNo(e.target.value)}
-
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
                                         value={rows[0]?.chequeNo || ""}
                                         onChange={(e) => handleInputChange(0, "chequeNo", e.target.value)}
                                         size="small" margin="none" placeholder='Cheque No' fullWidth
@@ -723,11 +818,19 @@ const Payment = () => {
                                 <Box flex={1}>
                                     <Typography variant="body2">Amount</Typography>
                                     <TextField
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
                                         value={rows[0]?.amount || ""}
                                         //value={rows.amount}
                                         onChange={(e) => {
                                             handleInputChange(0, "amount", e.target.value);
-                                            setTotalcredit(e.target.value);
+                                            // setTotalcredit(e.target.value);
                                             // If you still need this
                                             setAmount(e.target.value);
                                         }}
@@ -740,7 +843,14 @@ const Payment = () => {
                                 <Box flex={1}>
                                     <Typography variant="body2">Narration</Typography>
                                     <TextField
-
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
                                         value={narration}
                                         onChange={(e) => {
                                             setNarration(e.target.value);
@@ -949,20 +1059,20 @@ const Payment = () => {
                                                             />
                                                         </TableCell> */}
                                                         <TableCell>
-                                                            
-                                                                <DatePicker
-                                                                    value={row.ChequeDate ? new Date(row.ChequeDate) : null}
-                                                                    onChange={(newValue) =>
-                                                                        handleInputChange(index, "ChequeDate", newValue)
-                                                                    }
-                                                                    slotProps={{
-                                                                        textField: { 
-                                                                            size: "small",
-                                                                            sx: { width: '150px' }  // or style: { width: '500px' }
-                                                                        },
-                                                                    }}
-                                                                />
-                                                         
+
+                                                            <DatePicker
+                                                                value={row.ChequeDate ? new Date(row.ChequeDate) : null}
+                                                                onChange={(newValue) =>
+                                                                    handleInputChange(index, "ChequeDate", newValue)
+                                                                }
+                                                                slotProps={{
+                                                                    textField: {
+                                                                        size: "small",
+                                                                        sx: { width: '150px' }  // or style: { width: '500px' }
+                                                                    },
+                                                                }}
+                                                            />
+
                                                         </TableCell>
 
                                                         <TableCell>

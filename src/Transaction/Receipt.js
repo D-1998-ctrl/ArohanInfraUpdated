@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect } from 'react'
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, Autocomplete, FormControl, Select, MenuItem, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -6,7 +5,6 @@ import { MaterialReactTable, } from 'material-react-table';
 import { useTheme } from "@mui/material/styles";
 import { toast } from "react-toastify";
 import axios from 'axios';
-
 import { useMaterialReactTable, } from "material-react-table";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -14,11 +12,17 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import qs from "qs";
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+
 const Receipt = () => {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+
     const handleDrawerOpen = () => {
         setIsDrawerOpen(true);
         resetForm();
@@ -31,8 +35,8 @@ const Receipt = () => {
         setIsDrawerOpen(false);
         resetForm()
     };
-    const [rowId, setRowId] = useState('');
 
+    const [rowId, setRowId] = useState('');
     const [receiptNo, setReceiptNo] = useState();
     const [receiptDate, setReceiptDate] = useState(null);
     const [selectedCashorbank, setSelectedCashorbank] = useState("");
@@ -68,7 +72,6 @@ const Receipt = () => {
     }, [userId, yearid]);
 
 
-
     //fetch Party
     const [branchOption, setBranchOption] = useState([]);
     const [selectedBranchOption, setSelectedBranchOption] = useState('');
@@ -77,6 +80,7 @@ const Receipt = () => {
         try {
             const response = await fetch(
                 "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Account"
+
             );
             const result = await response.json();
 
@@ -88,6 +92,7 @@ const Receipt = () => {
             }));
 
             setBranchOption(options);
+
         } catch (error) {
             console.error("Error fetching accounts:", error);
         }
@@ -124,6 +129,25 @@ const Receipt = () => {
     }, []);
 
     //table
+
+    const [pageNo, setPageNo] = useState(1)
+    // const fetchData = async () => {
+    //     const requestOptions = {
+    //         method: "GET",
+    //         redirect: "follow"
+    //     };
+
+    //     try {
+    //         const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=VoucherHD&Colname=VoucherType&Colvalue=RE", requestOptions);
+    //         const result = await response.json();
+    //         console.log("Fetched result:", result);
+    //         setData(result);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
+
+    const [totalPages, setTotalPages] = useState(1);
     const fetchData = async () => {
         const requestOptions = {
             method: "GET",
@@ -131,39 +155,72 @@ const Receipt = () => {
         };
 
         try {
-            const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=VoucherHD&Colname=VoucherType&Colvalue=RE", requestOptions);
+            const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/getvoucherbypage.php?VoucherType=RE&PageNo=${pageNo}`, requestOptions);
             const result = await response.json();
-            console.log("Fetched result:", result);
-            setData(result);
+
+            console.log("Fetched result:", result.data);
+
+            setData(result.data);
+            setTotalPages(result.total_pages)
+
         } catch (error) {
             console.error(error);
         }
     };
-
     useEffect(() => {
         fetchData();
+    }, [pageNo]);
+
+    useEffect(() => {
+        // fetchData();
         fetchBranch();
-        fetchReceiptdetails();
+        // fetchReceiptdetails();
     }, []);
 
 
 
-    const [receiptdetails, setReceiptdetails] = useState([]);
+    const [detailId, setDetailId] = useState('')
+    const [detailId2, setDetailId2] = useState('')
+
     //  api to call fetchInwarddetails
-    const fetchReceiptdetails = async () => {
+    const fetchReceiptdetails = async (idwiseData) => {
         try {
             const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=VoucherDetail"
+                // "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=VoucherDetail"
+                `https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=VoucherDetail&Colname=VoucherId&Colvalue=${idwiseData}`
             );
-            setReceiptdetails(response.data);
-            console.log('detail', response.data)
+            // setReceiptdetails(response.data);
+            console.log('fetchReceiptdetails', response.data)
+            Receiptdetails(response.data);
+
         } catch (error) { }
     };
+
+    //map Receiptdetails
+
+    function Receiptdetails(data) {
+        let detail1 = data[0]
+        console.log('detail1', detail1)
+        setSelectedBranchOption(detail1.AccountId);
+        setAmount(detail1.Amount);
+        setChequeOrDd(detail1.DOrC)
+        setSelectedBankOption(detail1.BankName);
+        setDetailId(detail1.Id)
+
+        let detail2 = data[1]
+        console.log('detail2', detail2)
+        setBankName(detail2.BankName);
+        setDetailId2(detail2.Id)
+
+    }
+
+
+
+
 
     //create and update receipt voucher
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
         const formattedchequedate = moment(chequeDate).format("YYYY-MM-DD");
 
@@ -185,26 +242,21 @@ const Receipt = () => {
                 ? "https://arohanagroapi.microtechsolutions.co.in/php/updatevoucherhd.php"
                 : "https://arohanagroapi.microtechsolutions.co.in/php/postvoucherhd.php";
 
-            // Submit purchase header data
-            // const response = await axios.post(voucherurl, qs.stringify(headerData), {
+
             const response = await axios.post(voucherurl, headerData, {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
             });
 
             console.log(response.data, "receipt response");
-
-            // const voucherid = isEditing ? id : parseInt(response.data.Id, 10);
             const voucherId = isEditing ? rowId : parseInt(response.data.ID, 10);
 
-            const srn1Id = voucherId; // Same ID for SRN:1
-            const srn2Id = srn1Id + 1; // Generate a different ID for SRN:2 (You can modify this logic)
 
             const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
             const formattedchequedate = moment(chequeDate).format("YYYY-MM-DD");
 
             const detailsData = [
                 {
-                    Id: isEditing ? srn1Id : null,
+                    Id: isEditing ? detailId : null,
                     VoucherId: voucherId,
                     VoucherType: "RE",
                     SRN: 1,
@@ -213,20 +265,20 @@ const Receipt = () => {
                     AccountId: parseInt(selectedBranchOption, 10),
                     Amount: parseFloat(amount),
                     DOrC: "D",
-                    Narration: 'yes',
+                    Narration: null,
                     CostCenterId: 1,
                     ChequeNo: chequeNo,
                     ChequeDate: formattedchequedate,
-                    ChequeAmount: '',
-                    MICRCode: "",
+                    ChequeAmount: null,
+                    MICRCode: null,
                     BankName: selectedBankOption,
-                    BankBranch: '',
-
+                    BankBranch: null,
                     CreatedBy: !isEditing ? userId : undefined,
                     UpdatedBy: isEditing ? userId : undefined,
                 },
+
                 {
-                    Id: isEditing ? srn2Id : null,
+                    Id: isEditing ? detailId2 : null,
                     VoucherId: voucherId,
                     VoucherType: "RE",
                     SRN: 2,
@@ -235,24 +287,23 @@ const Receipt = () => {
                     AccountId: parseInt(selectedBranchOption, 10),
                     Amount: parseFloat(amount),
                     DOrC: "C",
-                    Narration: 'yes',
+                    Narration: null,
                     CostCenterId: 1,
                     ChequeNo: chequeNo,
                     ChequeDate: formattedchequedate,
-                    ChequeAmount: '',
-                    MICRCode: " ",
+                    ChequeAmount: null,
+                    MICRCode: null,
                     BankName: bankName,
-                    BankBranch: '',
+                    BankBranch: null,
 
                     CreatedBy: !isEditing ? userId : undefined,
                     UpdatedBy: isEditing ? userId : undefined,
                 },
             ];
 
-            const voucherdetailurl =
-                isEditing && voucherId
-                    ? "https://arohanagroapi.microtechsolutions.co.in/php/updatevoucherdetail.php"
-                    : "https://arohanagroapi.microtechsolutions.co.in/php/postvoucherdetail.php";
+            const voucherdetailurl = isEditing
+                ? "https://arohanagroapi.microtechsolutions.co.in/php/updatevoucherdetail.php"
+                : "https://arohanagroapi.microtechsolutions.co.in/php/postvoucherdetail.php";
 
             // Send the detailsData in two separate API requests
             await axios.post(voucherdetailurl, qs.stringify(detailsData[0]), {
@@ -271,7 +322,7 @@ const Receipt = () => {
             );
             resetForm();
             fetchData();
-            fetchReceiptdetails();
+
             setIsDrawerOpen(false);
         } catch (error) {
             console.error("Error saving record:", error);
@@ -287,7 +338,7 @@ const Receipt = () => {
                 accessorKey: 'srNo',
                 header: 'Sr No',
                 size: 100,
-                Cell: ({ row }) => row.index + 1,
+                Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
             },
 
             {
@@ -323,14 +374,14 @@ const Receipt = () => {
             },
 
         ];
-    }, []);
+    }, [pageNo]);
 
     const [idwiseData, setIdwiseData] = useState('')
     const [data, setData] = useState([]);
     const table = useMaterialReactTable({
         columns,
         data: data,
-        enablePagination: true,
+        enablePagination: false,
         muiTableHeadCellProps: {
             style: {
                 backgroundColor: "#E9ECEF",
@@ -342,6 +393,46 @@ const Receipt = () => {
             onClick: () => handleEdit(row.original),
             style: { cursor: "pointer" },
         }),
+        renderBottomToolbarCustomActions: () => (
+            <Box
+                mt={2}
+                alignItems="center"
+                display="flex"
+                justifyContent="flex-end"
+                width="100%"
+            >
+                <FirstPageIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo(1)}
+                />
+                <KeyboardArrowLeftIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo((prev) => Math.max(Number(prev) - 1, 1))}
+                />
+                <Box>Page No</Box>
+                <TextField
+                    sx={{
+                        width: "4.5%",
+                        ml: 1,
+                        '@media (max-width: 768px)': {
+                            width: '10%',
+                        },
+                    }}
+                    value={pageNo}
+                    onChange={(e) => setPageNo(e.target.value)}
+                    size="small"
+                />
+                <KeyboardArrowRightIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo((prev) => Number(prev) + 1)}
+                />
+                <LastPageIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo(totalPages)}
+                />
+                <Box>Total Pages: {totalPages}</Box>
+            </Box>
+        ),
     });
 
     const handleEdit = (rowData) => {
@@ -351,7 +442,7 @@ const Receipt = () => {
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
         setIsEditing(!!rowData.Id);
-        setIdwiseData(rowData.Id);
+        // setIdwiseData(rowData.Id);
 
         setReceiptNo(rowData.VoucherNo)
         //receipt date
@@ -365,20 +456,7 @@ const Receipt = () => {
         const [yearc, monthc, dayc] = dateStrc.split("-").map(Number); // Convert to numbers
         const formattedChequeDate = `${yearc}-${monthc}-${dayc}`;
         setChequeDate(formattedChequeDate);
-
-
-        const receiptetail = receiptdetails
-            .filter((detail) => detail.VoucherId === rowData.Id)
-        if (receiptetail) {
-            setSelectedBranchOption(receiptetail[0].AccountId);
-            setSelectedBankOption(receiptetail[0].BankName);
-            setBankName(receiptetail[1].BankName);
-
-            setAmount(receiptetail[0].Amount)
-            setChequeOrDd(receiptetail[0].DOrC)
-            console.log('DOrC', receiptetail[0].DOrC)
-        }
-        console.log('receiptetail', receiptetail)
+        fetchReceiptdetails(rowData.Id)
     };
 
     const resetForm = () => {
@@ -426,7 +504,7 @@ const Receipt = () => {
             })
             .catch((error) => console.error(error));
     };
- 
+
 
 
 
@@ -483,6 +561,14 @@ const Receipt = () => {
                                 <Box flex={1}>
                                     <Typography>Receipt No</Typography>
                                     <TextField
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
                                         value={receiptNo}
                                         onChange={(e) => setReceiptNo(e.target.value)}
                                         size="small" placeholder="Receipt No Autogenrated" fullWidth />
@@ -535,7 +621,14 @@ const Receipt = () => {
                                             </li>
                                         )}
                                         renderInput={(params) => (
-                                            <TextField {...params} fullWidth />
+                                            <TextField {...params} fullWidth variant="standard"
+                                                sx={{
+                                                    '& .MuiInput-underline:after': {
+                                                        borderBottomWidth: 1.5,
+                                                        borderBottomColor: '#44ad74',
+                                                    }, mt: 1
+                                                }}
+                                                focused />
                                         )}
                                     />
 
@@ -557,7 +650,14 @@ const Receipt = () => {
 
                                 <Box flex={1}>
                                     <Typography variant="body2">Bank Name</Typography>
-                                    <FormControl fullWidth size="small">
+                                    <FormControl fullWidth size="small" variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused>
                                         <Select
                                             value={selectedBankOption}
                                             onChange={(event) => setSelectedBankOption(event.target.value)}
@@ -574,6 +674,14 @@ const Receipt = () => {
                                 <Box flex={1}>
                                     <Typography variant="body2">Amount</Typography>
                                     <TextField
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
                                         size="small" margin="none" placeholder='Amount' fullWidth
@@ -601,6 +709,14 @@ const Receipt = () => {
                                 <Box flex={1}>
                                     <Typography variant="body2">Bank Name</Typography>
                                     <TextField
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
                                         value={bankName}
                                         onChange={(e) => setBankName(e.target.value)}
                                         size="small" margin="none" placeholder='Bank Name' fullWidth
@@ -610,6 +726,14 @@ const Receipt = () => {
                                 <Box flex={1}>
                                     <Typography variant="body2">Cheque No</Typography>
                                     <TextField
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
                                         value={chequeNo}
                                         onChange={(e) => setChequeNo(e.target.value)}
                                         size="small" margin="none" placeholder='Cheque No' fullWidth
@@ -687,6 +811,12 @@ const Receipt = () => {
     )
 }
 export default Receipt
+
+
+
+
+
+
 
 
 

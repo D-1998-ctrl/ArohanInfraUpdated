@@ -94,12 +94,10 @@ const ProductMaster = () => {
 
   const [data, setData] = useState([]);
   const [pageNo, setPageNo] = useState(1)
-  const columns = useMemo(() => {
-    return [
-
+  const columns = useMemo(() => [
       {
-        accessorKey: 'ProductCode',
-        header: 'Product Code',
+        accessorKey: 'srNo',
+        header: 'Sr No',
         size: 150,
         Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
       },
@@ -191,8 +189,8 @@ const ProductMaster = () => {
         ),
 
       },
-    ];
-  }, [pageNo]);
+    
+  ], [pageNo]);
 
   //integration
   const [productCode, setProductCode] = useState('');
@@ -335,7 +333,7 @@ const ProductMaster = () => {
   // console.log("result", data);
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [pageNo]);
 
   // edit drawer
   const [isEditDrawerOpen, setEditIsDrawerOpen] = useState(false);
@@ -489,15 +487,15 @@ const ProductMaster = () => {
             }}
 
             renderBottomToolbarCustomActions={() => (
-              <Box mt={2} alignItems={'center'} display={'flex'} justifyContent="flex-end"
-                width="100%" >
+              <Box mt={2} alignItems={'center'} display={'flex'}  justifyContent="flex-end" 
+              width="100%" >
                 <FirstPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(1)} />
                 <KeyboardArrowLeftIcon sx={{ cursor: "pointer" }} onClick={() =>
                   setPageNo((prev) => Math.max(Number(prev) - 1, 1))
                 } />
                 <Box > Page No </Box>
                 <TextField
-                  sx={{ width: "4.5%", ml: 1 ,
+                  sx={{ width: "4.5%" ,ml: 1,
                     '@media (max-width: 768px)': {
                       width: '10%',
                   },
@@ -511,8 +509,9 @@ const ProductMaster = () => {
               </Box>
 
             )}
+/>
 
-          />
+         
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
@@ -588,6 +587,14 @@ const ProductMaster = () => {
             <Box flex={1} display="flex" flexDirection="column" gap={1}>
               <Typography variant="body2">Product Code</Typography>
               <TextField
+               variant="standard"
+               sx={{
+                 '& .MuiInput-underline:after': {
+                   borderBottomWidth: 1.5,
+                   borderBottomColor: '#44ad74',
+                 }, mt: 1
+               }}
+               focused
                 value={productCode}
                 onChange={(e) => setProductCode(e.target.value)}
                 size="small"
@@ -599,7 +606,14 @@ const ProductMaster = () => {
             {/* Product Group */}
             <Box flex={1} display="flex" flexDirection="column" gap={1}>
               <Typography variant="body2">Product Group</Typography>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                 <Select
                   value={selectedGroupOption}
                   onChange={(event) => setSelectedGroupOption(event.target.value)}
@@ -622,6 +636,15 @@ const ProductMaster = () => {
             <Box flex={2}>
               <Typography>Product Name</Typography>
               <TextField
+
+variant="standard"
+sx={{
+  '& .MuiInput-underline:after': {
+    borderBottomWidth: 1.5,
+    borderBottomColor: '#44ad74',
+  }, mt: 1
+}}
+focused
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
 
@@ -633,7 +656,14 @@ const ProductMaster = () => {
 
             <Box flex={1}>
               <Typography>UOM</Typography>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                 <Select value={UOM} onChange={(event) => setUOM(event.target.value)} displayEmpty>
                   <MenuItem value="">Select UOM</MenuItem>
                   <MenuItem value="num">No</MenuItem>
@@ -643,129 +673,21 @@ const ProductMaster = () => {
             </Box>
           </Box>
 
-          {/*  */}
-          {/* <Box >
-          <Box display="flex" alignItems="center" gap={2} m={1}  >
-            <Box flex={1} >
-              <Box>
-                <Typography>Sales Price</Typography>
-                <TextField
-                  value={salesPrice}
-                  onChange={(e) => setSalesPrice(e.target.value)}
-
-                  size="small"  placeholder="Enter Sales Price" fullWidth />
-
-              </Box>
-
-              <Box mt={2}>
-                <Typography>Opening Value</Typography>
-
-                <TextField
-                  value={openingValue}
-                  onChange={(e) => setOpeningValue(e.target.value)}
-                  size="small"  placeholder="Enter Op.Value" fullWidth />
-
-              </Box>
-
-
-              <Box mt={2}>
-                <Typography>CGST%</Typography>
-                <TextField
-                  value={CGST}
-                  onChange={(e) => setCGST(e.target.value)}
-                  size="small"  placeholder="Enter CGST%" fullWidth />
-
-              </Box>
-
-
-
-
-
-            </Box>
-
-
-
-
-
-            <Box flex={1}  >
-
-
-              <Box >
-                <Typography>Purchase Price</Typography>
-                <TextField
-                  value={purchasePrice}
-                  onChange={(e) => setPurchasePrice(e.target.value)}
-                  size="small"  placeholder="Enter Purchase Price" fullWidth />
-
-              </Box>
-
-
-              <Box mt={2} >
-                <Typography>Reorder Level</Typography>
-                <TextField
-                  value={reorderLevel}
-                  onChange={(e) => setReorderLevel(e.target.value)}
-                  size="small"  placeholder="Enter Reorder Level" fullWidth />
-
-              </Box>
-
-              <Box mt={2}>
-                <Typography>SGST%</Typography>
-                <TextField
-
-                  value={SGST}
-                  onChange={(e) => setSGST(e.target.value)}
-                  size="small"  placeholder="Enter SGST" fullWidth />
-
-              </Box>
-
-
-            </Box>
-
-
-            <Box flex={2} >
-              <Box>
-                <Typography>Location</Typography>
-                <TextField
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  size="small"  placeholder="Enter Location" fullWidth />
-
-              </Box>
-
-              <Box mt={2}>
-                <Typography>Min Balance</Typography>
-                <TextField
-                  value={minbal}
-                  onChange={(e) => setMinBal(e.target.value)}
-                  size="small"  placeholder="Enter Min Balance" fullWidth />
-
-              </Box>
-
-
-              <Box mt={2}>
-                <Typography>IGST%</Typography>
-                <TextField
-                  value={IGST}
-                  onChange={(e) => setIGST(e.target.value)}
-                  size="small"  placeholder="Enter IGST" fullWidth />
-
-              </Box>
-
-            </Box>
-
-
-          </Box>
-
-
-
-        </Box> */}
+     
           <Box>
             <Box display="flex" alignItems="center" gap={2} m={1}>
               <Box flex={1}>
                 <Box>
                   <Typography>Sales Price</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={salesPrice}
                     onChange={(e) => setSalesPrice(e.target.value)}
                     size="small"
@@ -777,6 +699,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>Opening Value</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={openingValue}
                     onChange={(e) => setOpeningValue(e.target.value)}
                     size="small"
@@ -788,6 +718,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>CGST%</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={CGST}
                     onChange={(e) => setCGST(e.target.value)}
                     size="small"
@@ -801,6 +739,14 @@ const ProductMaster = () => {
                 <Box>
                   <Typography>Purchase Price</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={purchasePrice}
                     onChange={(e) => setPurchasePrice(e.target.value)}
                     size="small"
@@ -812,6 +758,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>Reorder Level</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={reorderLevel}
                     onChange={(e) => setReorderLevel(e.target.value)}
                     size="small"
@@ -823,6 +777,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>SGST%</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={SGST}
                     onChange={(e) => setSGST(e.target.value)}
                     size="small"
@@ -836,6 +798,14 @@ const ProductMaster = () => {
                 <Box>
                   <Typography>Location</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     size="small"
@@ -847,6 +817,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>Min Balance</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={minbal}
                     onChange={(e) => setMinBal(e.target.value)}
                     size="small"
@@ -858,6 +836,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>IGST%</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={IGST}
                     onChange={(e) => setIGST(e.target.value)}
                     size="small"
@@ -876,6 +862,14 @@ const ProductMaster = () => {
                 <Box>
                   <Typography>Max Balance</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={maxbal}
                     onChange={(e) => setMaxBal(e.target.value)}
                     size="small" placeholder="Enter Max Balance" fullWidth />
@@ -887,6 +881,14 @@ const ProductMaster = () => {
                 <Box>
                   <Typography>HSN Code</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={hsnCode}
                     onChange={(e) => setHsnCode(e.target.value)}
                     size="small" placeholder="Enter HSN Code" fullWidth />
@@ -934,52 +936,20 @@ const ProductMaster = () => {
           </Box>
           <Divider />
 
-          {/* <Box>
-          <Box display="flex" alignItems="center" gap={2}>
-            <Box flex={1} m={1}>
-              <Box>
-                <Typography>Product Code</Typography>
-                <TextField
-                  value={updateproductCode}
-                  onChange={(e) => setUpdateProductCode(e.target.value)}
-                  size="small" margin="normal" placeholder="Enter Product Code" fullWidth />
-              </Box>
-            </Box>
-
-            <Box flex={1} m={1}>
-
-
-
-              <Box flex={1}>
-                <Typography>Product Group</Typography>
-                <FormControl fullWidth size="small">
-                  <Select
-                    value={selectedGroupOption}
-                    onChange={(event) => setSelectedGroupOption(event.target.value)}
-                  >
-                    {groupOption.length > 0 ? (
-                      groupOption.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))
-                    ) : (
-                      <MenuItem disabled>No options available</MenuItem>
-                    )}
-                  </Select>
-                </FormControl>
-              </Box>
-
-            </Box>
-
-
-          </Box>
-        </Box> */}
+       
           <Box display="flex" alignItems="center" gap={2} m={1}>
             {/* Product Code */}
             <Box flex={1} display="flex" flexDirection="column" gap={1}>
               <Typography variant="body2">Product Code</Typography>
               <TextField
+               variant="standard"
+               sx={{
+                 '& .MuiInput-underline:after': {
+                   borderBottomWidth: 1.5,
+                   borderBottomColor: '#44ad74',
+                 }, mt: 1
+               }}
+               focused
                 value={updateproductCode}
                 onChange={(e) => setUpdateProductCode(e.target.value)}
                 size="small"
@@ -991,7 +961,14 @@ const ProductMaster = () => {
             {/* Product Group */}
             <Box flex={1} display="flex" flexDirection="column" gap={1}>
               <Typography variant="body2">Product Group</Typography>
-              <FormControl fullWidth size="small">
+              <FormControl fullWidth size="small"  variant="standard"
+                                      sx={{
+                                        '& .MuiInput-underline:after': {
+                                          borderBottomWidth: 1.5,
+                                          borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                      }}
+                                      focused>
                 <Select
                   value={selectedGroupOption}
                   onChange={(event) => setSelectedGroupOption(event.target.value)}
@@ -1014,6 +991,14 @@ const ProductMaster = () => {
             <Box flex={2}>
               <Typography>Product Name</Typography>
               <TextField
+               variant="standard"
+               sx={{
+                 '& .MuiInput-underline:after': {
+                   borderBottomWidth: 1.5,
+                   borderBottomColor: '#44ad74',
+                 }, mt: 1
+               }}
+               focused
                 value={updateproductName}
                 onChange={(e) => setUpdateProductName(e.target.value)}
 
@@ -1023,7 +1008,14 @@ const ProductMaster = () => {
             <Box flex={1} >
               <Typography>UOM</Typography>
               <FormControl
-                fullWidth size="small" >
+                fullWidth size="small"  variant="standard"
+                sx={{
+                  '& .MuiInput-underline:after': {
+                    borderBottomWidth: 1.5,
+                    borderBottomColor: '#44ad74',
+                  }, mt: 1
+                }}
+                focused >
 
                 <Select value={updateUOM} onChange={(e) => setUpdateUOM(e.target.value)}>
                   <MenuItem value="num">No</MenuItem>
@@ -1034,129 +1026,21 @@ const ProductMaster = () => {
             </Box>
           </Box>
 
-          {/* 
-          <Box>
-            <Box display="flex" alignItems="center" m={1} gap={1} >
-              <Box flex={1} >
-                <Box>
-                  <Typography>Sales Price</Typography>
-                  <TextField
-                    value={updatesalesPrice}
-                    onChange={(e) => setUpdateSalesPrice(e.target.value)}
-
-                    size="small" margin="normal" placeholder="Enter Sales Price" fullWidth />
-
-                </Box>
-
-                <Box>
-                  <Typography>Opening Value</Typography>
-
-                  <TextField
-                    value={updateopeningValue}
-                    onChange={(e) => setUpdateOpeningValue(e.target.value)}
-                    size="small" margin="normal" placeholder="Enter Op.Value" fullWidth />
-
-                </Box>
-
-
-                <Box>
-                  <Typography>CGST%</Typography>
-                  <TextField
-                    value={updateCGST}
-                    onChange={(e) => setUpdateCGST(e.target.value)}
-                    size="small" margin="normal" placeholder="Enter CGST%" fullWidth />
-
-                </Box>
-
-
-
-
-
-              </Box>
-
-
-
-
-
-              <Box flex={1} >
-
-
-                <Box >
-                  <Typography>Purchase Price</Typography>
-                  <TextField
-                    value={updatepurchasePrice}
-                    onChange={(e) => setUpdatePurchasePrice(e.target.value)}
-                    size="small" margin="normal" placeholder="Enter Purchase Price" fullWidth />
-
-                </Box>
-
-
-                <Box >
-                  <Typography>Reorder Level</Typography>
-                  <TextField
-                    value={updatereorderLevel}
-                    onChange={(e) => setUpdateReorderLevel(e.target.value)}
-                    size="small" margin="normal" placeholder="Enter Reorder Level" fullWidth />
-
-                </Box>
-
-                <Box >
-                  <Typography>SGST%</Typography>
-                  <TextField
-
-                    value={updateSGST}
-                    onChange={(e) => setUpdateSGST(e.target.value)}
-                    size="small" margin="normal" placeholder="Enter SGST" fullWidth />
-
-                </Box>
-
-
-              </Box>
-
-
-              <Box flex={1} >
-                <Box>
-                  <Typography>Location</Typography>
-                  <TextField
-                    value={updatelocation}
-                    onChange={(e) => setUpdateLocation(e.target.value)}
-                    size="small" margin="normal" placeholder="Enter Location" fullWidth />
-
-                </Box>
-
-                <Box>
-                  <Typography>Min Balance</Typography>
-                  <TextField
-                    value={updateminbal}
-                    onChange={(e) => setUpdateMinBal(e.target.value)}
-                    size="small" margin="normal" placeholder="Enter Min Balance" fullWidth />
-
-                </Box>
-
-
-                <Box>
-                  <Typography>IGST%</Typography>
-                  <TextField
-                    value={updateIGST}
-                    onChange={(e) => setUpdateIGST(e.target.value)}
-                    size="small" margin="normal" placeholder="Enter IGST" fullWidth />
-
-                </Box>
-
-              </Box>
-
-
-            </Box>
-
-
-
-          </Box> */}
+        
           <Box>
             <Box display="flex" alignItems="center" m={1} gap={1}>
               <Box flex={1}>
                 <Box>
                   <Typography>Sales Price</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatesalesPrice}
                     onChange={(e) => setUpdateSalesPrice(e.target.value)}
                     size="small"
@@ -1169,6 +1053,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>Opening Value</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updateopeningValue}
                     onChange={(e) => setUpdateOpeningValue(e.target.value)}
                     size="small"
@@ -1181,6 +1073,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>CGST%</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updateCGST}
                     onChange={(e) => setUpdateCGST(e.target.value)}
                     size="small"
@@ -1195,6 +1095,14 @@ const ProductMaster = () => {
                 <Box>
                   <Typography>Purchase Price</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatepurchasePrice}
                     onChange={(e) => setUpdatePurchasePrice(e.target.value)}
                     size="small"
@@ -1207,6 +1115,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>Reorder Level</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatereorderLevel}
                     onChange={(e) => setUpdateReorderLevel(e.target.value)}
                     size="small"
@@ -1219,6 +1135,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>SGST%</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updateSGST}
                     onChange={(e) => setUpdateSGST(e.target.value)}
                     size="small"
@@ -1233,6 +1157,14 @@ const ProductMaster = () => {
                 <Box>
                   <Typography>Location</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatelocation}
                     onChange={(e) => setUpdateLocation(e.target.value)}
                     size="small"
@@ -1245,6 +1177,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>Min Balance</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updateminbal}
                     onChange={(e) => setUpdateMinBal(e.target.value)}
                     size="small"
@@ -1257,6 +1197,14 @@ const ProductMaster = () => {
                 <Box mt={2}>
                   <Typography>IGST%</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updateIGST}
                     onChange={(e) => setUpdateIGST(e.target.value)}
                     size="small"
@@ -1276,6 +1224,14 @@ const ProductMaster = () => {
                 <Box>
                   <Typography>Max Balance</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatemaxbal}
                     onChange={(e) => setUpdateMaxBal(e.target.value)}
                     size="small" placeholder="Enter Max Balance" fullWidth />
@@ -1287,6 +1243,14 @@ const ProductMaster = () => {
                 <Box>
                   <Typography>HSN Code</Typography>
                   <TextField
+                   variant="standard"
+                   sx={{
+                     '& .MuiInput-underline:after': {
+                       borderBottomWidth: 1.5,
+                       borderBottomColor: '#44ad74',
+                     }, mt: 1
+                   }}
+                   focused
                     value={updatehsnCode}
                     onChange={(e) => setUpdateHsnCode(e.target.value)}
                     size="small" placeholder="Enter HSN Code" fullWidth />

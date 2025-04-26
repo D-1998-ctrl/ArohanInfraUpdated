@@ -1,7 +1,11 @@
-
-
 import React, { useMemo, useState, useEffect } from 'react'
-import { Dialog,FormHelperText, InputAdornment, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Grid, Menu, Table, Autocomplete, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Alert, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
+import {
+  Dialog, FormHelperText, InputAdornment, DialogActions, DialogContent, DialogContentText, Select,
+  DialogTitle, IconButton, Grid, Menu, Table, Autocomplete, TableBody, TableCell, TableContainer, TableHead, TableRow,
+  Paper, Alert, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, MenuItem, FormControlLabel, Checkbox
+}
+  from '@mui/material';
+import { Input } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   MaterialReactTable,
@@ -54,15 +58,43 @@ const PurchaseEntry = () => {
   /*
     api to call fetchpurchaseHeader
   */
-  const fetchpurchaseHeader = async () => {
+  // const fetchpurchaseHeader = async () => {
+   
+  //   try {
+  //     const response = await axios.get(
+  //       "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=purchaseheader"
+  //     );
+  //     setPurchaseheaders(response.data);
+  //     console.log('header', response.data)
+  //   } catch (error) { }
+  // };
+
+  
+  const [pageNo, setPageNo] = useState(1)
+  const [totalPages, setTotalPages] = useState(1);
+  const fetchpurchaseHeader  = async () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow"
+    };
+
     try {
-      const response = await axios.get(
-        "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=purchaseheader"
+      const response = await fetch(
+        `https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=purchaseheader&PageNo=${pageNo}`,
+        requestOptions
       );
-      setPurchaseheaders(response.data);
-      console.log('header', response.data)
-    } catch (error) { }
+      const result = await response.json();
+      setPurchaseheaders(result.data);
+      setTotalPages(result.total_pages);
+      console.log('purchase header', result.data);
+    } catch (error) {
+      console.error('Error fetching purchase headers:', error);
+    }
   };
+
+    useEffect(() => {
+      fetchpurchaseHeader();
+    }, [pageNo]);
 
 
   //fetchInvdetails
@@ -78,20 +110,21 @@ const PurchaseEntry = () => {
 
 
   useEffect(() => {
-    fetchpurchaseHeader();
+   
     fetchpurchasedetails();
     fetchLocation();
   }, []);
 
 
   //table
+
   const columns = useMemo(() => {
     return [
       {
         accessorKey: 'srNo',
         header: 'Sr No',
         size: 100,
-        Cell: ({ row }) => row.index + 1,
+        Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
       },
       {
         accessorKey: 'PurchaseNo',
@@ -169,9 +202,9 @@ const PurchaseEntry = () => {
   const [quantity, setQuantity] = useState(0);
   const [amount, SetAmount] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState("");
-  const [selectedCGST, setSelectedCGST] = useState("0");
-  const [selectedSGST, setSelectedSGST] = useState("0");
-  const [selectedIGST, setSelectedIGST] = useState("0");
+  const [selectedCGST, setSelectedCGST] = useState("");
+  const [selectedSGST, setSelectedSGST] = useState("");
+  const [selectedIGST, setSelectedIGST] = useState("");
   const [cgstAmount, setCGSTAmount] = useState(0);
   const [sgstAmount, setSGSTAmount] = useState(0);
   const [igstAmount, setIGSTAmount] = useState(0);
@@ -429,21 +462,60 @@ const PurchaseEntry = () => {
 
 
   const table = useMaterialReactTable({
-    columns,
-    data: purchaheaders,
-    muiTableHeadCellProps: {
-      style: {
-        backgroundColor: "#E9ECEF",
-        color: "black",
-        fontSize: "16px",
-      },
+  columns,
+  data: purchaheaders,
+  enablePagination: false, // if you're doing full manual pagination, set this to false
+  muiTableHeadCellProps: {
+    style: {
+      backgroundColor: "#E9ECEF",
+      color: "black",
+      fontSize: "16px",
     },
-    muiTableBodyRowProps: ({ row }) => ({
-      onClick: () => handleSubmit213(row.original),
-      style: { cursor: "pointer" },
-    }),
-  });
+  },
+  muiTableBodyRowProps: ({ row }) => ({
+    onClick: () => handleSubmit213(row.original),
+    style: { cursor: "pointer" },
+  }),
+  renderBottomToolbarCustomActions: () => (
+    <Box
+      mt={2}
+      alignItems="center"
+      display="flex"
+      justifyContent="flex-end"
+      width="100%"
+    >
+      <FirstPageIcon sx={{ cursor: 'pointer' }} onClick={() => setPageNo(1)} />
+      <KeyboardArrowLeftIcon
+        sx={{ cursor: 'pointer' }}
+        onClick={() => setPageNo((prev) => Math.max(Number(prev) - 1, 1))}
+      />
+      <Box ml={1}> Page No </Box>
+      <TextField
+        sx={{
+          width: '4.5%',
+          ml: 1,
+          '@media (max-width: 768px)': {
+            width: '10%',
+          },
+        }}
+        value={pageNo}
+        onChange={(e) => setPageNo(e.target.value)}
+        size="small"
+      />
+      <KeyboardArrowRightIcon
+        sx={{ cursor: 'pointer' }}
+        onClick={() => setPageNo((prev) => Number(prev) + 1)}
+      />
+      <LastPageIcon
+        sx={{ cursor: 'pointer' }}
+        onClick={() => setPageNo(totalPages)}
+      />
+      <Box ml={1}>Total Pages: {totalPages}</Box>
+    </Box>
+  ),
+});
 
+ 
 
 
 
@@ -993,7 +1065,7 @@ const PurchaseEntry = () => {
       const purchaseDateObj = new Date(PurchaseDate);
       const fromDateObj = new Date(fromdate);
       const toDateObj = new Date(todate);
-  
+
       // Check if invoice date is before from date
       if (purchaseDateObj < fromDateObj) {
         newErrors.PurchaseDate = `PurchaseDate  cannot be before ${new Date(fromdate).toLocaleDateString()}`;
@@ -1023,35 +1095,35 @@ const PurchaseEntry = () => {
 
   //for yearId
   const [yearid, setYearId] = useState('');
-  const[fromdate,setFromDate]= useState('');
-  const[todate,setToDate]= useState('');
-  
-   useEffect(() => {
-          const storedYearId = Cookies.get("YearId");
-          const storedfromdate = Cookies.get("FromDate");
-          const storedtodate = Cookies.get("ToDate");
-  
-          if (storedYearId) {
-              setYearId(storedYearId);
-              console.log('storedYearId', storedYearId);
-          } else {
-              toast.error("Year is not set.");
-          };
-          if (storedfromdate) {
-            setFromDate(storedfromdate);
-            console.log('storedfromdate', storedfromdate);
-        } else {
-            toast.error("FromDate is not set.");
-        }
-  
-        if (storedtodate) {
-          setToDate(storedtodate);
-          console.log('storedTodate', storedtodate);
-      } else {
-          toast.error("ToDate is not set.");
-      }
-       
-      }, [yearid,fromdate,todate]);
+  const [fromdate, setFromDate] = useState('');
+  const [todate, setToDate] = useState('');
+
+  useEffect(() => {
+    const storedYearId = Cookies.get("YearId");
+    const storedfromdate = Cookies.get("FromDate");
+    const storedtodate = Cookies.get("ToDate");
+
+    if (storedYearId) {
+      setYearId(storedYearId);
+      console.log('storedYearId', storedYearId);
+    } else {
+      toast.error("Year is not set.");
+    };
+    if (storedfromdate) {
+      setFromDate(storedfromdate);
+      console.log('storedfromdate', storedfromdate);
+    } else {
+      toast.error("FromDate is not set.");
+    }
+
+    if (storedtodate) {
+      setToDate(storedtodate);
+      console.log('storedTodate', storedtodate);
+    } else {
+      toast.error("ToDate is not set.");
+    }
+
+  }, [yearid, fromdate, todate]);
 
   return (
 
@@ -1068,7 +1140,8 @@ const PurchaseEntry = () => {
         </Box>
 
         <Box mt={4}>
-          <MaterialReactTable table={table}
+          <MaterialReactTable 
+          table={table}
             enableColumnResizing
             muiTableHeadCellProps={{
               sx: {
@@ -1136,8 +1209,14 @@ const PurchaseEntry = () => {
                       <Typography>Purchase No</Typography>
                       <TextField
                         value={PurchaseNo}
-                        // disabled
-                        // onChange={(e) => setPurchaseNo(e.target.value)}
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:after': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                          }, mt: 1
+                        }}
+                        focused
                         size="small"
                         margin="none"
                         placeholder="Purchase No Autogenrated"
@@ -1145,42 +1224,26 @@ const PurchaseEntry = () => {
                       />
                     </Box>
 
-                    {/* <Box>
-                      <Typography>Party</Typography>
-                      <Select
-                        fullWidth
-                        size="small"
-                        value={selectedId || ""}
-                        onChange={(event) => {
-                          const selectedValue = event.target.value;
-                          setSelectedId(selectedValue);
-                          const selectedItem = options.find(option => option.Id.toString() === selectedValue);
-                          setSelectedGSTNo(selectedItem ? selectedItem.GSTNo : "");
-                        }}
-                      >
-                        {options.map((option) => (
-                          <MenuItem key={option.Id} value={option.Id.toString()}>
-                            {option.AccountName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </Box> */}
-
                     <Box flex={1} position="relative">
                       <Typography variant="body2">Party</Typography>
                       <TextField
                         fullWidth
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:before': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                            opacity: 1,
+                          }, mt: 1
+                        }}
                         size="small"
-
                         value={selectedId
                           ? options.find(({ Id }) => String(Id) === selectedId)?.AccountName || options.map((option) => option.AccountName)
                           : ''}
-                        placeholder="Select Customer"
+                       
                         // onClick={() => setShowDropdown(true)}
                         onClick={() =>
-
                           setShowDropdown(true)}
-
                         error={!!errors.selectedId}
                         helperText={errors.selectedId}
 
@@ -1246,11 +1309,20 @@ const PurchaseEntry = () => {
                     <Box>
                       <Typography>Bill No</Typography>
                       <TextField
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:after': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                            opacity: 1,
+                          }, mt: 1
+                        }}
+                        focused
                         value={billNo}
                         onChange={(e) => setBillNo(e.target.value)}
                         size="small"
                         margin="none"
-                        placeholder="Bill No"
+                        placeholder='Bill No'
                         fullWidth
                       />
                     </Box>
@@ -1264,7 +1336,7 @@ const PurchaseEntry = () => {
                         <DatePicker
                           value={PurchaseDate ? new Date(PurchaseDate) : null}
                           format="dd-MM-yyyy"
-                          onChange={(newValue) => {setPurchaseDate(newValue);setErrors({...errors, PurchaseDate: undefined})}}
+                          onChange={(newValue) => { setPurchaseDate(newValue); setErrors({ ...errors, PurchaseDate: undefined }) }}
                           slotProps={{
                             textField: { size: "small", fullWidth: true, error: !!errors.PurchaseDate, helperText: errors.PurchaseDate },
                           }}
@@ -1275,11 +1347,19 @@ const PurchaseEntry = () => {
                     <Box>
                       <Typography>Brand Name</Typography>
                       <TextField
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:after': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                          },
+                        }}
+                        focused
                         value={brandName}
                         onChange={(e) => setBrandName(e.target.value)}
                         size="small"
                         margin="none"
-                        placeholder="Brand Name"
+
                         fullWidth
                       />
                     </Box>
@@ -1290,7 +1370,7 @@ const PurchaseEntry = () => {
                         <DatePicker
                           value={BillDate ? new Date(BillDate) : null}
                           format="dd-MM-yyyy"
-                          onChange={(newValue) => {setBillDate(newValue);setErrors({...errors, BillDate: undefined})}}
+                          onChange={(newValue) => { setBillDate(newValue); setErrors({ ...errors, BillDate: undefined }) }}
                           slotProps={{
                             textField: { size: "small", fullWidth: true, error: !!errors.BillDate, helperText: errors.BillDate },
                           }}
@@ -1303,14 +1383,29 @@ const PurchaseEntry = () => {
 
                 <Box m={1} >
                   <Typography variant="body2">Store Location</Typography>
-                  <FormControl fullWidth size="small"  error={!!errors.selectedLocation}>
+                  <FormControl
+                    fullWidth
+                    size="small"
+                    variant="standard"
+                    error={!!errors.selectedLocation}
+                    sx={{
+                      '& .MuiInput-underline:before': {
+                        borderBottomWidth: 1.5,
+                        borderBottomColor: '#44ad74 ',
+                      },
+                      mt: 1
+                    }}
+                  >
                     <Select
                       value={selectedLocation || ""}
                       // onChange={(event) => setSelectedLocation(event.target.value)}
-                      onChange={(event) => {setSelectedLocation(event.target.value);if (errors.selectedLocation) {
-                        setErrors({...errors, selectedLocation: undefined});
+                      onChange={(event) => {
+                        setSelectedLocation(event.target.value); if (errors.selectedLocation) {
+                          setErrors({ ...errors, selectedLocation: undefined });
+                        }
                       }}
-                    }
+
+                      input={<Input />}
                     >
                       {storeoptions.map((option) => (
                         <MenuItem key={option.value} value={option.value}>
@@ -1333,6 +1428,20 @@ const PurchaseEntry = () => {
 
                           <Select
                             fullWidth
+                            variant="standard"
+
+                            input={
+                              <Input
+                                disableUnderline={false}
+                                sx={{
+                                  '&:before': {
+                                    borderBottomWidth: 1.5,
+                                    borderBottomColor: '#44ad74',
+                                  },
+                                  mt: 1,
+                                }}
+                              />
+                            }
                             size="small"
                             value={selectedProduct || ""}
                             // onChange={(event) => {
@@ -1390,11 +1499,19 @@ const PurchaseEntry = () => {
                       <Box flex={1}>
                         <Typography variant="body2">Quantity</Typography>
                         <TextField
+                          variant="standard"
+                          sx={{
+                            '& .MuiInput-underline:after': {
+                              borderBottomWidth: 1.5,
+                              borderBottomColor: '#44ad74',
+                            }, mt: 1
+                          }}
+                          focused
                           value={quantity}
                           onChange={handleQuantityChange}
                           size="small"
                           margin="none"
-                          placeholder="Quantity"
+
                           fullWidth
                         />
                       </Box>
@@ -1404,10 +1521,18 @@ const PurchaseEntry = () => {
                       <Box flex={1}>
                         <Typography>Rate</Typography>
                         <TextField
+                          variant="standard"
+                          sx={{
+                            '& .MuiInput-underline:after': {
+                              borderBottomWidth: 1.5,
+                              borderBottomColor: '#44ad74',
+                            }, mt: 1
+                          }}
+                          focused
                           value={rate}
                           onChange={handleRateChange}
 
-                          size="small" margin="none" placeholder='Rate' fullWidth />
+                          size="small" margin="none" fullWidth />
                       </Box>
 
 
@@ -1417,8 +1542,15 @@ const PurchaseEntry = () => {
                         <Typography>Amount</Typography>
                         <TextField
                           value={amount}
-
-                          size="small" margin="none" placeholder='Amount' fullWidth />
+                          variant="standard"
+                          sx={{
+                            '& .MuiInput-underline:after': {
+                              borderBottomWidth: 1.5,
+                              borderBottomColor: '#44ad74',
+                            }, mt: 1
+                          }}
+                          focused
+                          size="small" margin="none" fullWidth />
                       </Box>
 
                     </Box>
@@ -1429,60 +1561,108 @@ const PurchaseEntry = () => {
                     <Box flex={1}>
                       <Typography variant="body2">CGST%</Typography>
                       <TextField
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:after': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                          }, mt: 1
+                        }}
+                        focused
                         value={selectedCGST}
                         size="small"
                         margin="none"
-                        placeholder="CGST"
+
                         fullWidth
                       />
                     </Box>
                     <Box flex={1}>
                       <Typography variant="body2">CGST Amount</Typography>
                       <TextField
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:after': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                          }, mt: 1
+                        }}
+                        focused
                         value={cgstAmount}
                         size="small"
                         margin="none"
-                        placeholder="CGST Amount"
+
                         fullWidth
                       />
                     </Box>
                     <Box flex={1}>
                       <Typography variant="body2">SGST%</Typography>
                       <TextField
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:after': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                          }, mt: 1
+                        }}
+                        focused
                         value={selectedSGST}
                         size="small"
                         margin="none"
-                        placeholder="SGST"
+
                         fullWidth
                       />
                     </Box>
                     <Box flex={1}>
                       <Typography variant="body2">SGST Amount</Typography>
                       <TextField
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:after': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                          }, mt: 1
+                        }}
+                        focused
                         value={sgstAmount}
                         size="small"
                         margin="none"
-                        placeholder="SGST Amount"
+
                         fullWidth
                       />
                     </Box>
                     <Box flex={1}>
                       <Typography variant="body2">IGST %</Typography>
                       <TextField
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:after': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                          }, mt: 1
+                        }}
+                        focused
                         value={selectedIGST}
                         size="small"
                         margin="none"
-                        placeholder="IGST%"
+
                         fullWidth
                       />
                     </Box>
                     <Box flex={1}>
                       <Typography variant="body2">IGST Amount</Typography>
                       <TextField
+                        variant="standard"
+                        sx={{
+                          '& .MuiInput-underline:after': {
+                            borderBottomWidth: 1.5,
+                            borderBottomColor: '#44ad74',
+                          }, mt: 1
+                        }}
+                        focused
                         value={igstAmount}
                         size="small"
                         margin="none"
-                        placeholder=" IGST Amount"
+
                         fullWidth
                       />
                     </Box>
@@ -1604,6 +1784,14 @@ const PurchaseEntry = () => {
                   <Box>
                     <Typography variant="body2">Transport</Typography>
                     <TextField
+                      variant="standard"
+                      sx={{
+                        '& .MuiInput-underline:after': {
+                          borderBottomWidth: 1.5,
+                          borderBottomColor: '#44ad74',
+                        }, mt: 1
+                      }}
+                      focused
                       value={transport}
                       onChange={(e) => setTransport(e.target.value)}
                       size="small"
@@ -1615,6 +1803,14 @@ const PurchaseEntry = () => {
                   <Box>
                     <Typography variant="body2">Other</Typography>
                     <TextField
+                      variant="standard"
+                      sx={{
+                        '& .MuiInput-underline:after': {
+                          borderBottomWidth: 1.5,
+                          borderBottomColor: '#44ad74',
+                        }, mt: 1
+                      }}
+                      focused
                       value={other}
                       onChange={(e) => setOther(e.target.value)}
                       size="small"
