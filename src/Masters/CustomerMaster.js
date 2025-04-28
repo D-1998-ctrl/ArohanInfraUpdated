@@ -10,6 +10,11 @@ import { toast } from "react-toastify";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PhoneInput from "react-phone-input-2";
 import qs from 'qs';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+
 
 const CustomerMaster = () => {
   const theme = useTheme();
@@ -43,11 +48,12 @@ const CustomerMaster = () => {
   const [idwiseData, setIdwiseData] = useState('')
   const [addressId, setAddressId] = useState('')
   const [accountId, setAccountId] = useState(null)
+  
   const handleEdit = () => {
     if (currentRow) {
-      // console.log("Editing item with ID:", currentRow.original);
+      //  console.log("Editing item with ID:", currentRow.original);
       setIdwiseData(currentRow.original.Id)
-      // console.log(currentRow.original.Id)
+      //  console.log(currentRow.original.Id)
       setAccountId(currentRow.original.AccountId)
       // console.log(currentRow.original.AccountId)
       setUpdatedAccountName(currentRow.original.AccountName)
@@ -66,6 +72,7 @@ const CustomerMaster = () => {
       setupdatedIsSystem(currentRow.original.IsSystem)
 
       setAddressId(currentRow.original.Id)
+      
     }
   };
 
@@ -82,6 +89,8 @@ const CustomerMaster = () => {
     setEditIsDrawerOpen(false);
   };
   // console.log(idwiseData)
+  const [pageNo, setPageNo] = useState(1)
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchData = async () => {
     const requestOptions = {
@@ -90,35 +99,54 @@ const CustomerMaster = () => {
     };
 
     try {
-      // const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=customermaster", requestOptions);
-      const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/getaccountaddress.php?Typecode=C", requestOptions);
+      const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/getaccountbypage.php?TypeCode=c&PageNo=${pageNo}`, requestOptions);
       const result = await response.json();
-      // console.log("Fetched result:", result);
-      setData(result);
+
+      //  console.log("Fetched result:", result.data);
+
+       setData(result.data);
+      setTotalPages(result.total_pages)
+
     } catch (error) {
       console.error(error);
     }
   };
 
+  // const fetchData = async () => {
+  //   const requestOptions = {
+  //     method: "GET",
+  //     redirect: "follow"
+  //   };
+  //   try {
+  //     // const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=customermaster", requestOptions);
+  //     const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/getaccountaddress.php?Typecode=C", requestOptions);
+  //     const result = await response.json();
+  //     // console.log("Fetched result:", result);
+  //     setData(result);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [pageNo]);
 
   const deleteCustomerMaster = async () => {
     try {
       // Delete Address First
       const addressUrl = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=Address&Id=${currentRow.original.Id}`;
-      console.log("Deleting Address:", addressUrl);
+      // console.log("Deleting Address:", addressUrl);
 
       const addressResponse = await axios.get(addressUrl);
-      console.log("Address Deleted:", addressResponse.data);
+      // console.log("Address Deleted:", addressResponse.data);
 
       // Delete Account After Address
       const accountUrl = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=Account&Id=${currentRow.original.AccountId}`;
-      console.log("Deleting Account:", accountUrl);
+      // console.log("Deleting Account:", accountUrl);
 
       const accountResponse = await axios.get(accountUrl);
-      console.log("Account Deleted:", accountResponse.data);
+      // console.log("Account Deleted:", accountResponse.data);
 
 
       toast.success("Customer master deleted successfully");
@@ -135,7 +163,7 @@ const CustomerMaster = () => {
         accessorKey: 'srNo',
         header: 'Sr No',
         size: 100,
-        Cell: ({ row }) => row.index + 1,
+        Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
       },
       {
         accessorKey: 'AccountName',
@@ -184,7 +212,6 @@ const CustomerMaster = () => {
         header: 'Current Balance',
         size: 150,
       },
-
       {
         id: 'actions',
         header: 'Actions',
@@ -199,7 +226,7 @@ const CustomerMaster = () => {
 
       },
     ];
-  }, []);
+  }, [pageNo]);
 
   //
   const [accountCode, setAccountCode] = useState('')
@@ -405,11 +432,11 @@ const CustomerMaster = () => {
       };
 
       const accountResponse = await axios.request(accountConfig);
-      console.log("Account Response:", accountResponse.data);
+      // console.log("Account Response:", accountResponse.data);
 
       let accId = parseInt(accountResponse.data.Id);
       setAccountId(accId);
-      console.log('accId', accId);
+      // console.log('accId', accId);
 
 
       let addressData = qs.stringify({
@@ -441,7 +468,7 @@ const CustomerMaster = () => {
       };
 
       const addressResponse = await axios.request(addressConfig);
-      console.log("Address Response:", addressResponse.data);
+      // console.log("Address Response:", addressResponse.data);
       handleDrawerClose()
       handleClearTemplate();
       toast.success("Customer Master created successfully");
@@ -568,18 +595,109 @@ const CustomerMaster = () => {
         </Box>
 
 
-        <Box mt={4}>
+        {/* <Box mt={4}>
           <MaterialReactTable
             columns={columns}
             data={data}
+            enablePagination={false}
+            muiTableHeadCellProps={{
+              style: {
+                backgroundColor: "#E9ECEF",
+                color: "black",
+                fontSize: "16px",
+              },
+            }}
+            renderBottomToolbarCustomActions={() => (
+              <Box
+                mt={2}
+                alignItems="center"
+                display="flex"
+                justifyContent="flex-end"
+                width="100%"
+              >
+                <FirstPageIcon
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => setPageNo(1)}
+                />
+                <KeyboardArrowLeftIcon
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => setPageNo((prev) => Math.max(Number(prev) - 1, 1))}
+                />
+                <Box>Page No</Box>
+                <TextField
+                  sx={{
+                    width: "4.5%",
+                    ml: 1,
+                    '@media (max-width: 768px)': {
+                      width: '10%',
+                    },
+                  }}
+                  value={pageNo}
+                  onChange={(e) => setPageNo(e.target.value)}
+                  size="small"
+                />
+                <KeyboardArrowRightIcon
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => setPageNo((prev) => Number(prev) + 1)}
+                />
+                <LastPageIcon
+                  sx={{ cursor: "pointer" }}
+                  onClick={() => setPageNo(totalPages)}
+                />
+                <Box>Total Pages: {totalPages}</Box>
+              </Box>
+            )}
+          />
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={handleEditDrawerOpen}>
+              Edit
+            </MenuItem>
+            <MenuItem onClick={deleteCustomerMaster}>
+              Delete
+            </MenuItem>
+          </Menu>
+        </Box> */}
+        <Box mt={1}>
+          <MaterialReactTable
+            columns={columns}
+            data={data}
+            enablePagination={false}
             muiTableHeadCellProps={{
               sx: {
 
-                color: 'var(--primary-color)',
-
+                backgroundColor: '#E9ECEF',
+                color: "black",
+                fontSize: "16px",
               },
             }}
+            renderBottomToolbarCustomActions={() => (
+              <Box mt={2} alignItems={'center'} display={'flex'} justifyContent="flex-end"
+                width="100%" >
+                <FirstPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(1)} />
+                <KeyboardArrowLeftIcon sx={{ cursor: "pointer" }} onClick={() =>
+                  setPageNo((prev) => Math.max(Number(prev) - 1, 1))
+                } />
+                <Box > Page No </Box>
+                <TextField
+                  sx={{
+                    width: "4.5%", ml: 1,
+                    '@media (max-width: 768px)': {
+                      width: '10%',
+                    },
+                  }}
+                  value={pageNo}
+                  onChange={(e) => setPageNo(e.target.value)}
+                  size="small" />
+                <KeyboardArrowRightIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo((prev) => Number(prev) + 1)} />
+                <LastPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(totalPages)} />
+                Total Pages : {totalPages}
+              </Box>
 
+            )}
           />
           <Menu
             anchorEl={anchorEl}
@@ -587,14 +705,14 @@ const CustomerMaster = () => {
             onClose={handleMenuClose}
           >
             <MenuItem
+
               onClick={handleEditDrawerOpen}
-            >Edit </MenuItem>
-            <MenuItem
-              onClick={deleteCustomerMaster}
-            >
-              Delete</MenuItem>
+
+            >Edit</MenuItem>
+            <MenuItem onClick={deleteCustomerMaster}>Delete</MenuItem>
           </Menu>
         </Box>
+
 
         <Drawer
           anchor="right"
@@ -683,6 +801,8 @@ const CustomerMaster = () => {
                   <Typography>Type Code</Typography>
                   <TextField
                    variant="standard"
+                   placeholder="C"
+                  //  value={typecode}
                    sx={{
                      '& .MuiInput-underline:after': {
                        borderBottomWidth: 1.5,
@@ -690,10 +810,7 @@ const CustomerMaster = () => {
                      }, mt: 1
                    }}
                    focused
-                    value={typecode}
-                   
-                   
-                    size="small" placeholder="Enter Type Code" fullWidth />
+                    size="small"  fullWidth />
                 </Box>
 
                 <Box m={1.5}>

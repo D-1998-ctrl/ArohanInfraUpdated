@@ -311,7 +311,7 @@ const Payment = () => {
                 accessorKey: 'srNo',
                 header: 'Sr No',
                 size: 100,
-                Cell: ({ row }) => row.index + 1,
+                Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
             },
 
             {

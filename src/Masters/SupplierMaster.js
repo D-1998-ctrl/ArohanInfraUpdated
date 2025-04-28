@@ -10,6 +10,10 @@ import { toast } from "react-toastify";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PhoneInput from "react-phone-input-2";
 import qs from 'qs';
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import FirstPageIcon from '@mui/icons-material/FirstPage';
 
 const SupplierMaster = () => {
   const theme = useTheme();
@@ -44,11 +48,11 @@ const SupplierMaster = () => {
   const [accountId, setAccountId] = useState(null)
   const handleEdit = () => {
     if (currentRow) {
-      console.log("Editing item with ID:", currentRow.original);
+      // console.log("Editing item with ID:", currentRow.original);
       setIdwiseData(currentRow.original.Id)
-      console.log(currentRow.original.Id)
+      // console.log(currentRow.original.Id)
       setAccountId(currentRow.original.AccountId)
-      console.log(currentRow.original.AccountId)
+      // console.log(currentRow.original.AccountId)
       setUpdatedAccountName(currentRow.original.AccountName)
       setSelectedGroupOption(currentRow.original.GroupId)
       setSelectedSubGroupOption(currentRow.original.SubGroupId)
@@ -82,25 +86,52 @@ const SupplierMaster = () => {
   };
   // console.log(idwiseData)
 
+
+
+
+
+  const [pageNo, setPageNo] = useState(1)
+  const [totalPages, setTotalPages] = useState(1);
+
+
   const fetchData = async () => {
     const requestOptions = {
-      method: "GET",
-      redirect: "follow"
+        method: "GET",
+        redirect: "follow"
     };
 
     try {
-      // const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=customermaster", requestOptions);
-      const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/getaccountaddress.php?Typecode=S", requestOptions);
-      const result = await response.json();
-      // console.log("Fetched result:", result);
-      setData(result);
-      // setID(result.map(item => item.Id));
-      // console.log('id', setID)
+        const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/getaccountbypage.php?TypeCode=s&PageNo=${pageNo}`, requestOptions);
+        const result = await response.json();
+
+       // console.log("Fetched result:", result.data);
+
+        setData(result.data);
+        setTotalPages(result.total_pages)
 
     } catch (error) {
-      console.error(error);
+        console.error(error);
     }
-  };
+};
+  // const fetchData = async () => {
+  //   const requestOptions = {
+  //     method: "GET",
+  //     redirect: "follow"
+  //   };
+
+  //   try {
+  //     // const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=customermaster", requestOptions);
+  //     const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/getaccountaddress.php?Typecode=S", requestOptions);
+  //     const result = await response.json();
+  //     // console.log("Fetched result:", result);
+  //     setData(result);
+  //     // setID(result.map(item => item.Id));
+  //     // console.log('id', setID)
+
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
 
 
@@ -115,7 +146,7 @@ const SupplierMaster = () => {
         accessorKey: 'srNo',
         header: 'Sr No',
         size: 100,
-        Cell: ({ row }) => row.index + 1,
+        Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
       },
       {
         accessorKey: 'AccountName',
@@ -612,7 +643,7 @@ const SupplierMaster = () => {
           >Create Supplier Master </Button>
         </Box>
 
-
+{/* 
         <Box mt={4}>
           <MaterialReactTable
             columns={columns}
@@ -638,6 +669,57 @@ const SupplierMaster = () => {
               onClick={deleteCustomerMaster}
             >
               Delete</MenuItem>
+          </Menu>
+        </Box> */}
+            <Box mt={1}>
+          <MaterialReactTable
+            columns={columns}
+            data={data}
+            enablePagination={false}
+            muiTableHeadCellProps={{
+              sx: {
+
+                backgroundColor: '#E9ECEF',
+                color: "black",
+                fontSize: "16px",
+              },
+            }}
+            renderBottomToolbarCustomActions={() => (
+              <Box mt={2} alignItems={'center'} display={'flex'} justifyContent="flex-end"
+                width="100%" >
+                <FirstPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(1)} />
+                <KeyboardArrowLeftIcon sx={{ cursor: "pointer" }} onClick={() =>
+                  setPageNo((prev) => Math.max(Number(prev) - 1, 1))
+                } />
+                <Box > Page No </Box>
+                <TextField
+                  sx={{
+                    width: "4.5%", ml: 1,
+                    '@media (max-width: 768px)': {
+                      width: '10%',
+                    },
+                  }}
+                  value={pageNo}
+                  onChange={(e) => setPageNo(e.target.value)}
+                  size="small" />
+                <KeyboardArrowRightIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo((prev) => Number(prev) + 1)} />
+                <LastPageIcon sx={{ cursor: "pointer" }} onClick={() => setPageNo(totalPages)} />
+                Total Pages : {totalPages}
+              </Box>
+
+            )}
+          />
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem
+
+              onClick={handleEditDrawerOpen}
+
+            >Edit</MenuItem>
+            <MenuItem onClick={deleteCustomerMaster}>Delete</MenuItem>
           </Menu>
         </Box>
 
@@ -737,7 +819,7 @@ const SupplierMaster = () => {
                    focused
                     value={typecode}
                     
-                    size="small" placeholder="Enter Type Code" fullWidth />
+                    size="small" placeholder="S" fullWidth />
                 </Box>
 
                 <Box m={1.5}>

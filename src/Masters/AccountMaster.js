@@ -208,11 +208,11 @@ const AccountMaster = () => {
 
   const handleEdit = () => {
     if (currentRow) {
-      console.log("Editing item with ID:", currentRow.original);
+      // console.log("Editing item with ID:", currentRow.original);
       setIdwiseData(currentRow.original.Id)
-      console.log(currentRow.original.Id)
+      // console.log(currentRow.original.Id)
       // setAccountId(currentRow.original.AccountId)
-      console.log(currentRow.original.AccountId)
+      // console.log(currentRow.original.AccountId)
       setUpdatedAccountName(currentRow.original.AccountName)
       setSelectedGroupOption(currentRow.original.GroupId)
       setSelectedSubGroupOption(currentRow.original.SubGroupId)
@@ -245,7 +245,7 @@ const AccountMaster = () => {
 
       const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=account&PageNo=${pageNo}`, requestOptions);
       const result = await response.json();
-      console.log("Fetched result:", result.data);
+      // console.log("Fetched result:", result.data);
       setData(result.data);
       setTotalPages(result.total_pages)
 

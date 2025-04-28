@@ -42,7 +42,7 @@ const MaterialMaster = () => {
   const [idwiseData, setIdwiseData] = useState('')
   const handleEdit = () => {
     if (currentRow) {
-      console.log("Editing item with ID:", currentRow.original);
+      // console.log("Editing item with ID:", currentRow.original);
       setIdwiseData(currentRow.original.Id)
       setUpdateMaterialCode(currentRow.original.MaterialCode)
       setSelectedGroupOption(currentRow.original.MaterialGroupId)
@@ -188,7 +188,7 @@ const MaterialMaster = () => {
       const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=Materialmaster&PageNo=${pageNo}`, requestOptions);
       const result = await response.json();
 
-       console.log("Fetched result:", result.data);
+      //  console.log("Fetched result:", result.data);
 
       setData(result.data);
       setTotalPages(result.total_pages)
