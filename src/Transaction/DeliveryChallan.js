@@ -87,10 +87,10 @@ const [pageNo, setPageNo] = useState(1)
         };
     
         try {
-          const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=DeliveryChallanHeader&PageNo=${pageNo}`, requestOptions);
+          const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=DeliveryChallanHeader&PageNo=${pageNo}`, requestOptions);
           const result = await response.json();
     
-           console.log("Fetched result:", result.data);
+           //console.log("Fetched result:", result.data);
     
            setChallanheaders(result.data);
           setTotalPages(result.total_pages)
@@ -107,7 +107,7 @@ const [pageNo, setPageNo] = useState(1)
     const fetchInwarddetails = async () => {
         try {
             const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=DeliveryChallanDetail"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=DeliveryChallanDetail"
             );
             setChallandetails(response.data);
             // console.log('detail', response.data)
@@ -162,7 +162,7 @@ const [pageNo, setPageNo] = useState(1)
 
     //for get data in main table and form
     const handleSubmit = (rowData) => {
-        console.log("This row has been clicked:", rowData);
+        //console.log("This row has been clicked:", rowData);
 
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
@@ -277,7 +277,7 @@ const [pageNo, setPageNo] = useState(1)
         };
 
         fetch(
-            "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Branch",
+            "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Branch",
             requestOptions
         )
             .then((response) => response.json())
@@ -332,7 +332,7 @@ const [pageNo, setPageNo] = useState(1)
     const fetchProduct = async () => {
         try {
             const response = await axios.get(
-                'https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=productmaster',
+                'https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=productmaster',
             );
             // console.log(response.data);
             processMaterialData(response.data)
@@ -352,7 +352,7 @@ const [pageNo, setPageNo] = useState(1)
                 purchaseRate: product?.SellPrice,
             }));
 
-            console.log('options', productsOptions)
+            //console.log('options', productsOptions)
             setProductOptions(productsOptions);
         }
     };
@@ -391,7 +391,7 @@ const [pageNo, setPageNo] = useState(1)
             BatchDate: batchDate,
         };
 
-        console.log("newRow", newRow);
+        //console.log("newRow", newRow);
         // Update rows state and ensure the new row is added to the table
         setRows((prevRows) => [...prevRows, newRow]);
     };
@@ -461,8 +461,8 @@ const [pageNo, setPageNo] = useState(1)
 
         try {
             const invoiceurl = rowId
-            ? "https://arohanagroapi.microtechsolutions.co.in/php/updatedeliverychallanheader.php"
-            : "https://arohanagroapi.microtechsolutions.co.in/php/postdeliverychallanheader.php";
+            ? "https://arohanagroapi.microtechsolutions.net.in/php/updatedeliverychallanheader.php"
+            : "https://arohanagroapi.microtechsolutions.net.in/php/postdeliverychallanheader.php";
 
             const response = await axios.post(
                 invoiceurl,
@@ -471,11 +471,11 @@ const [pageNo, setPageNo] = useState(1)
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 }
             );
-            console.log('postinwardheaders', response.data)
+           // console.log('postinwardheaders', response.data)
 
             let InwardId = rowId ? rowId : parseInt(response.data.ID, 10);
-            //console.log("Inward Id ", InwardId);
-            console.log("rows", rows);
+        
+           // console.log("rows", rows);
 
             for (const row of rows) {
 
@@ -495,8 +495,8 @@ const [pageNo, setPageNo] = useState(1)
                 console.log("this row has rowData ", rowData);
 
                 const invoicdedetailurl = row.Id
-                ? "https://arohanagroapi.microtechsolutions.co.in/php/updatedeliverychallandetail.php"
-                : "https://arohanagroapi.microtechsolutions.co.in/php/postdeliverychallandetail.php";
+                ? "https://arohanagroapi.microtechsolutions.net.in/php/updatedeliverychallandetail.php"
+                : "https://arohanagroapi.microtechsolutions.net.in/php/postdeliverychallandetail.php";
 
                 console.log(" invoicdedetailurl is used ", invoicdedetailurl);
 
@@ -510,7 +510,7 @@ const [pageNo, setPageNo] = useState(1)
                             },
                         }
                     );
-                    console.log("Response:", response);
+                 //   console.log("Response:", response);
                 } catch (error) {
                     console.error("Error:", error);
                 }
@@ -569,10 +569,10 @@ const [pageNo, setPageNo] = useState(1)
 
         console.log("Deleted Id:", rowId);
 
-        fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=DeliveryChallanHeader&Id=${rowId}`, requestOptions)
+        fetch(`https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=DeliveryChallanHeader&Id=${rowId}`, requestOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result);
+               // console.log(result);
                 setOpen(false);
                 handleDrawerClose();
                 fetchInwardHeader();
@@ -639,20 +639,20 @@ const [pageNo, setPageNo] = useState(1)
   
           if (storedYearId) {
               setYearId(storedYearId);
-              console.log('storedYearId', storedYearId);
+             // console.log('storedYearId', storedYearId);
           } else {
               toast.error("Year is not set.");
           };
           if (storedfromdate) {
             setFromDate(storedfromdate);
-            console.log('storedfromdate', storedfromdate);
+           // console.log('storedfromdate', storedfromdate);
         } else {
             toast.error("FromDate is not set.");
         }
   
         if (storedtodate) {
           setToDate(storedtodate);
-          console.log('storedTodate', storedtodate);
+          //console.log('storedTodate', storedtodate);
       } else {
           toast.error("ToDate is not set.");
       }
@@ -1022,7 +1022,8 @@ const [pageNo, setPageNo] = useState(1)
                                         {/* Total Row */}
                                         <TableRow>
                                             <TableCell colSpan={6} align="right"><strong>Total:</strong></TableCell>
-                                            <TableCell><strong>{totalAmount}</strong></TableCell>
+                                            <TableCell><strong>{Math.ceil(totalAmount)}</strong></TableCell>
+                                      
                                             <TableCell></TableCell>
                                         </TableRow>
                                     </TableBody>

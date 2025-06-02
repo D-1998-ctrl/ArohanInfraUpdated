@@ -67,14 +67,14 @@ const Payment = () => {
 
         if (storedUserId) {
             setUserId(storedUserId);
-            console.log('storedUserId', storedUserId);
+          //  console.log('storedUserId', storedUserId);
         } else {
             toast.error("User is not logged in.");
         }
 
         if (storedYearId) {
             setYearId(storedYearId);
-            console.log('storedYearId', storedYearId);
+            //console.log('storedYearId', storedYearId);
         } else {
             toast.error("Year is not set.");
         }
@@ -89,10 +89,10 @@ const Payment = () => {
     const fetchBranch = async () => {
         try {
             const response = await fetch(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Account"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Account"
             );
             const result = await response.json();
-            console.log("Branch info:", result);
+          //  console.log("Branch info:", result);
             const options = result.map((branch) => ({
                 value: branch.Id,
                 label: branch.AccountName,
@@ -112,8 +112,8 @@ const Payment = () => {
         const fetchOptions = async () => {
             try {
                 const urls = [
-                    "https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=7",
-                    "https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=8"
+                    "https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=7",
+                    "https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=8"
                 ];
 
                 const responses = await Promise.all(urls.map(url => axios.get(url)));
@@ -143,10 +143,10 @@ const Payment = () => {
         };
     
         try {
-          const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/getvoucherbypage.php?VoucherType=PY&PageNo=${pageNo}`, requestOptions);
+          const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/getvoucherbypage.php?VoucherType=PY&PageNo=${pageNo}`, requestOptions);
           const result = await response.json();
     
-           console.log("Fetched result:", result.data);
+         //  console.log("Fetched result:", result.data);
     
            setData(result.data);
           setTotalPages(result.total_pages)
@@ -158,24 +158,9 @@ const Payment = () => {
         useEffect(() => {
               fetchData();
               }, [pageNo]);
-    // const fetchData = async () => {
-    //     const requestOptions = {
-    //         method: "GET",
-    //         redirect: "follow"
-    //     };
-
-    //     try {
-    //         const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=VoucherHD&Colname=VoucherType&Colvalue=PY", requestOptions);
-    //         const result = await response.json();
-    //         console.log("Fetched result:", result);
-    //         setData(result);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
-
+    
     useEffect(() => {
-        // fetchData();
+        
         fetchBranch();
         fetchReceiptdetails();
     }, []);
@@ -187,10 +172,10 @@ const Payment = () => {
     const fetchReceiptdetails = async () => {
         try {
             const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=VoucherDetail"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=VoucherDetail"
             );
             setReceiptdetails(response.data);
-            console.log('detail', response.data)
+            //console.log('detail', response.data)
         } catch (error) { }
     };
 
@@ -215,8 +200,8 @@ const Payment = () => {
 
         try {
             const invoiceurl = rowId
-                ? "https://arohanagroapi.microtechsolutions.co.in/php/updatevoucherhd.php"
-                : "https://arohanagroapi.microtechsolutions.co.in/php/postvoucherhd.php";
+                ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
+                : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
 
 
             const response = await axios.post(
@@ -226,11 +211,11 @@ const Payment = () => {
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 }
             );
-            console.log('postinwardheaders', paymentheaderdata)
+            //console.log('postinwardheaders', paymentheaderdata)
 
             let PaymentId = rowId ? rowId : parseInt(response.data.ID, 10);
-            console.log("Payment Id ", PaymentId);
-            console.log("rows", rows);
+            //console.log("Payment Id ", PaymentId);
+            //console.log("rows", rows);
 
             for (const [index, row] of rows.entries()) {
 
@@ -261,13 +246,13 @@ const Payment = () => {
                     CreatedBy: !isEditing ? userId : undefined,
                     UpdatedBy: isEditing ? userId : undefined,
                 };
-                console.log("this row has rowData ", rowData);
+                //console.log("this row has rowData ", rowData);
 
                 const paymentdetailurl = row.Id
-                    ? "https://arohanagroapi.microtechsolutions.co.in/php/updatevoucherdetail.php"
-                    : "https://arohanagroapi.microtechsolutions.co.in/php/postvoucherdetail.php";
+                    ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
+                    : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
 
-                console.log(" paymentdetailurl is used ", paymentdetailurl);
+                //console.log(" paymentdetailurl is used ", paymentdetailurl);
 
                 try {
                     const response = await axios.post(
@@ -279,7 +264,7 @@ const Payment = () => {
                             },
                         }
                     );
-                    console.log("Response:", response);
+                   // console.log("Response:", response);
                 } catch (error) {
                     console.error("Error:", error);
                 }
@@ -408,9 +393,9 @@ const Payment = () => {
     });
 
     const handleEdit = (rowData) => {
-        console.log("This row has been clicked:", rowData);
-        // console.log("selected Id",idwiseData)
-        console.log("rowData.Id:", rowData.Id);
+       // console.log("This row has been clicked:", rowData);
+        
+        //console.log("rowData.Id:", rowData.Id);
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
         setIsEditing(!!rowData.Id);
@@ -436,12 +421,12 @@ const Payment = () => {
             setAccountId(receiptetail[0].AccountId)
             setNarration(receiptetail[0]?.Narration)
             setAmount(receiptetail[0]?.Amount)
-            console.log('amt', receiptetail[0]?.Amount)
+          //  console.log('amt', receiptetail[0]?.Amount)
 
         }
 
 
-        console.log('receiptetail', receiptetail)
+       // console.log('receiptetail', receiptetail)
 
 
 
@@ -460,7 +445,7 @@ const Payment = () => {
             bankName: detail.BankName,
             bankBranch: detail.BankBranch,
         }));
-        console.log('mappedRows', mappedRows)
+       // console.log('mappedRows', mappedRows)
 
         setRows(mappedRows)
 
@@ -509,12 +494,12 @@ const Payment = () => {
             redirect: "follow"
         };
 
-        console.log("Deleted Id:", rowId);
+       // console.log("Deleted Id:", rowId);
 
-        fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=VoucherHD&Id=${rowId}`, requestOptions)
+        fetch(`https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=VoucherHD&Id=${rowId}`, requestOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result);
+               // console.log(result);
                 setOpen(false);
                 handleDrawerClose();
                 fetchData();
@@ -567,7 +552,7 @@ const Payment = () => {
             AccountPayeeCheque: "",
         };
 
-        console.log("newRow", newRow);
+       // console.log("newRow", newRow);
         // Update rows state and ensure the new row is added to the table
         setRows((prevRows) => [...prevRows, newRow]);
     };

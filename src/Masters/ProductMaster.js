@@ -34,7 +34,7 @@ const ProductMaster = () => {
   const fetchGroup = async () => {
     try {
       const response = await fetch(
-        "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=productgroup"
+        "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=productgroup"
       );
       const result = await response.json();
 
@@ -71,7 +71,7 @@ const ProductMaster = () => {
   const [idwiseData, setIdwiseData] = useState('')
   const handleEdit = () => {
     if (currentRow) {
-      console.log("Editing item with ID:", currentRow.original);
+      // console.log("Editing item with ID:", currentRow.original);
       setIdwiseData(currentRow.original.Id)
       setUpdateProductCode(currentRow.original.ProductCode)
       setSelectedGroupOption(currentRow.original.ProductGroupId)
@@ -251,7 +251,7 @@ const ProductMaster = () => {
 
     axios
       .post(
-        "https://arohanagroapi.microtechsolutions.co.in/php/postproductmaster.php",
+        "https://arohanagroapi.microtechsolutions.net.in/php/postproductmaster.php",
         urlencoded,
         requestOptions
       )
@@ -289,7 +289,7 @@ const ProductMaster = () => {
   // Fetch data from API material group
   useEffect(() => {
     axios
-      .get("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=productmaster")
+      .get("https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=productmaster")
       .then((response) => {
         if (response.data && Array.isArray(response.data)) {
           // Extract unique MaterialGroupId values
@@ -314,7 +314,7 @@ const ProductMaster = () => {
     };
 
     try {
-      const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=productmaster&PageNo=${pageNo}`, requestOptions);
+      const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=productmaster&PageNo=${pageNo}`, requestOptions);
       // const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=productmaster", requestOptions);
       const result = await response.json();
 
@@ -358,7 +358,9 @@ const ProductMaster = () => {
     };
 
     fetch(
-      `https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Id=${idwiseData}&Table=productmaster`,
+      // `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Id=${idwiseData}&Table=productmaster`,
+
+      `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=productmaster&Colname=Id&Colvalue=${idwiseData}`,
       requestOptions
     )
       .then((response) => response.json())
@@ -414,7 +416,7 @@ const ProductMaster = () => {
 
     axios
       .post(
-        "https://arohanagroapi.microtechsolutions.co.in/php/updateproductmaster.php",
+        "https://arohanagroapi.microtechsolutions.net.in/php/updateproductmaster.php",
         urlencoded,
         requestOptions
       )
@@ -439,10 +441,10 @@ const ProductMaster = () => {
       method: "GET",
       redirect: "follow"
     };
-    const url = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=productmaster&Id=${currentRow.original.Id}`
+    const url = `https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=productmaster&Id=${currentRow.original.Id}`
     console.log(url)
     fetch(url, requestOptions)
-      .then((response) => response.json())
+      .then((response) => response.text())
       .then((result) => {
         console.log(result)
 
@@ -596,9 +598,9 @@ const ProductMaster = () => {
                }}
                focused
                 value={productCode}
-                onChange={(e) => setProductCode(e.target.value)}
+                // onChange={(e) => setProductCode(e.target.value)}
                 size="small"
-                placeholder="Enter Product Code"
+                placeholder="Product Code Autogenrated"
                 fullWidth
               />
             </Box>
@@ -951,7 +953,7 @@ focused
                }}
                focused
                 value={updateproductCode}
-                onChange={(e) => setUpdateProductCode(e.target.value)}
+                // onChange={(e) => setUpdateProductCode(e.target.value)}
                 size="small"
                 placeholder="Enter Product Code"
                 fullWidth

@@ -85,10 +85,10 @@ const InwordAtStore = () => {
         };
     
         try {
-          const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=InwardHeader&PageNo=${pageNo}`, requestOptions);
+          const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=InwardHeader&PageNo=${pageNo}`, requestOptions);
           const result = await response.json();
     
-           console.log("Fetched result:", result.data);
+          // console.log("Fetched result:", result.data);
     
            setInwardheaders(result.data);
           setTotalPages(result.total_pages)
@@ -115,7 +115,7 @@ const InwordAtStore = () => {
     const fetchInwarddetails = async () => {
         try {
             const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=InwardDetail"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=InwardDetail"
             );
             setInwarddetails(response.data);
             // console.log('detail', response.data)
@@ -186,7 +186,7 @@ const InwordAtStore = () => {
 
     //for get data in main table and form
     const handleSubmit = (rowData) => {
-        console.log("This row has been clicked:", rowData);
+        //console.log("This row has been clicked:", rowData);
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
         setIsEditing(!!rowData.Id);
@@ -213,7 +213,7 @@ const InwordAtStore = () => {
             Amount: parseFloat(detail.Amount) || 0,
         }));
 
-     console.log('mappedRows', mappedRows)
+     //console.log('mappedRows', mappedRows)
         setRows(mappedRows);
     };
 
@@ -304,7 +304,7 @@ const InwordAtStore = () => {
         };
 
         fetch(
-            "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Branch",
+            "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Branch",
             requestOptions
         )
             .then((response) => response.json())
@@ -359,12 +359,12 @@ const InwordAtStore = () => {
     const fetchProduct = async () => {
         try {
             const response = await axios.get(
-                'https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=productmaster',
+                'https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=productmaster',
             );
             // console.log(response.data);
             processMaterialData(response.data)
         } catch (error) {
-            console.error(error);
+            //console.error(error);
 
         }
     };
@@ -379,7 +379,7 @@ const InwordAtStore = () => {
                 purchaseRate: product?.SellPrice,
             }));
 
-            console.log('options', productsOptions)
+          //  console.log('options', productsOptions)
             setProductOptions(productsOptions);
         }
     };
@@ -418,7 +418,7 @@ const InwordAtStore = () => {
             BatchDate: batchDate,
         };
 
-        console.log("newRow", newRow);
+       // console.log("newRow", newRow);
         // Update rows state and ensure the new row is added to the table
         setRows((prevRows) => [...prevRows, newRow]);
     };
@@ -488,8 +488,8 @@ const InwordAtStore = () => {
 
         try {
             const invoiceurl = rowId
-                ? "https://arohanagroapi.microtechsolutions.co.in/php/updateinwardheader.php"
-                : "https://arohanagroapi.microtechsolutions.co.in/php/postinwardheader.php";
+                ? "https://arohanagroapi.microtechsolutions.net.in/php/updateinwardheader.php"
+                : "https://arohanagroapi.microtechsolutions.net.in/php/postinwardheader.php";
 
             const response = await axios.post(
                 invoiceurl,
@@ -498,7 +498,7 @@ const InwordAtStore = () => {
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 }
             );
-            console.log('postinwardheaders', response.data)
+            //console.log('postinwardheaders', response.data)
 
             let InwardId = rowId ? rowId : parseInt(response.data.ID, 10);
             //console.log("Inward Id ", InwardId);
@@ -519,13 +519,13 @@ const InwordAtStore = () => {
                     Rate: parseFloat(row.Rate),
                     Amount: parseInt(row.Amount),
                 };
-                console.log("this row has rowData ", rowData);
+              //  console.log("this row has rowData ", rowData);
 
                 const invoicdedetailurl = row.Id
-                    ? "https://arohanagroapi.microtechsolutions.co.in/php/updateinwarddetail.php"
-                    : "https://arohanagroapi.microtechsolutions.co.in/php/postinwarddetail.php";
+                    ? "https://arohanagroapi.microtechsolutions.net.in/php/updateinwarddetail.php"
+                    : "https://arohanagroapi.microtechsolutions.net.in/php/postinwarddetail.php";
 
-                console.log(" invoicdedetailurl is used ", invoicdedetailurl);
+                //console.log(" invoicdedetailurl is used ", invoicdedetailurl);
 
                 try {
                     const response = await axios.post(
@@ -596,10 +596,10 @@ const InwordAtStore = () => {
 
         console.log("Deleted Id:", rowId);
 
-        fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=InwardHeader&Id=${rowId}`, requestOptions)
+        fetch(`https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=InwardHeader&Id=${rowId}`, requestOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result);
+               // console.log(result);
                 setOpen(false);
                 handleDrawerClose();
                 fetchInwardHeader();
@@ -667,20 +667,20 @@ const InwordAtStore = () => {
       
               if (storedYearId) {
                   setYearId(storedYearId);
-                  console.log('storedYearId', storedYearId);
+                //  console.log('storedYearId', storedYearId);
               } else {
                   toast.error("Year is not set.");
               };
               if (storedfromdate) {
                 setFromDate(storedfromdate);
-                console.log('storedfromdate', storedfromdate);
+              //  console.log('storedfromdate', storedfromdate);
             } else {
                 toast.error("FromDate is not set.");
             }
       
             if (storedtodate) {
               setToDate(storedtodate);
-              console.log('storedTodate', storedtodate);
+              //console.log('storedTodate', storedtodate);
           } else {
               toast.error("ToDate is not set.");
           }
@@ -1091,7 +1091,7 @@ const InwordAtStore = () => {
                                         {/* Total Row */}
                                         <TableRow>
                                             <TableCell colSpan={6} align="right"><strong>Total:</strong></TableCell>
-                                            <TableCell><strong>{totalAmount}</strong></TableCell>
+                                            <TableCell><strong> {Math.ceil(totalAmount)}</strong></TableCell>
                                             <TableCell></TableCell>
                                         </TableRow>
                                     </TableBody>

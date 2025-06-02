@@ -57,14 +57,14 @@ const Receipt = () => {
 
         if (storedUserId) {
             setUserId(storedUserId);
-            console.log('storedUserId', storedUserId);
+           // console.log('storedUserId', storedUserId);
         } else {
             toast.error("User is not logged in.");
         }
 
         if (storedYearId) {
             setYearId(storedYearId);
-            console.log('storedYearId', storedYearId);
+            //console.log('storedYearId', storedYearId);
         } else {
             toast.error("Year is not set.");
         }
@@ -79,12 +79,12 @@ const Receipt = () => {
     const fetchBranch = async () => {
         try {
             const response = await fetch(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Account"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Account"
 
             );
             const result = await response.json();
 
-            console.log("Branch info:", result);
+          //  console.log("Branch info:", result);
 
             const options = result.map((branch) => ({
                 value: branch.Id,
@@ -107,8 +107,8 @@ const Receipt = () => {
         const fetchOptions = async () => {
             try {
                 const urls = [
-                    "https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=7",
-                    "https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=8"
+                    "https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=7",
+                    "https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=8"
                 ];
 
                 const responses = await Promise.all(urls.map(url => axios.get(url)));
@@ -155,10 +155,10 @@ const Receipt = () => {
         };
 
         try {
-            const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/getvoucherbypage.php?VoucherType=RE&PageNo=${pageNo}`, requestOptions);
+            const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/getvoucherbypage.php?VoucherType=RE&PageNo=${pageNo}`, requestOptions);
             const result = await response.json();
 
-            console.log("Fetched result:", result.data);
+            //console.log("Fetched result:", result.data);
 
             setData(result.data);
             setTotalPages(result.total_pages)
@@ -186,11 +186,11 @@ const Receipt = () => {
     const fetchReceiptdetails = async (idwiseData) => {
         try {
             const response = await axios.get(
-                // "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=VoucherDetail"
-                `https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=VoucherDetail&Colname=VoucherId&Colvalue=${idwiseData}`
+           
+                `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=VoucherDetail&Colname=VoucherId&Colvalue=${idwiseData}`
             );
-            // setReceiptdetails(response.data);
-            console.log('fetchReceiptdetails', response.data)
+            
+            //console.log('fetchReceiptdetails', response.data)
             Receiptdetails(response.data);
 
         } catch (error) { }
@@ -200,7 +200,7 @@ const Receipt = () => {
 
     function Receiptdetails(data) {
         let detail1 = data[0]
-        console.log('detail1', detail1)
+       // console.log('detail1', detail1)
         setSelectedBranchOption(detail1.AccountId);
         setAmount(detail1.Amount);
         setChequeOrDd(detail1.DOrC)
@@ -208,7 +208,7 @@ const Receipt = () => {
         setDetailId(detail1.Id)
 
         let detail2 = data[1]
-        console.log('detail2', detail2)
+        //console.log('detail2', detail2)
         setBankName(detail2.BankName);
         setDetailId2(detail2.Id)
 
@@ -239,15 +239,15 @@ const Receipt = () => {
 
         try {
             const voucherurl = isEditing
-                ? "https://arohanagroapi.microtechsolutions.co.in/php/updatevoucherhd.php"
-                : "https://arohanagroapi.microtechsolutions.co.in/php/postvoucherhd.php";
+                ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
+                : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
 
 
             const response = await axios.post(voucherurl, headerData, {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
             });
 
-            console.log(response.data, "receipt response");
+          //  console.log(response.data, "receipt response");
             const voucherId = isEditing ? rowId : parseInt(response.data.ID, 10);
 
 
@@ -302,8 +302,8 @@ const Receipt = () => {
             ];
 
             const voucherdetailurl = isEditing
-                ? "https://arohanagroapi.microtechsolutions.co.in/php/updatevoucherdetail.php"
-                : "https://arohanagroapi.microtechsolutions.co.in/php/postvoucherdetail.php";
+                ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
+                : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
 
             // Send the detailsData in two separate API requests
             await axios.post(voucherdetailurl, qs.stringify(detailsData[0]), {
@@ -436,13 +436,13 @@ const Receipt = () => {
     });
 
     const handleEdit = (rowData) => {
-        console.log("This row has been clicked:", rowData);
-        // console.log("selected Id",idwiseData)
-        console.log("rowData.Id:", rowData.Id);
+      //  console.log("This row has been clicked:", rowData);
+        
+     //   console.log("rowData.Id:", rowData.Id);
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
         setIsEditing(!!rowData.Id);
-        // setIdwiseData(rowData.Id);
+        
 
         setReceiptNo(rowData.VoucherNo)
         //receipt date
@@ -491,10 +491,10 @@ const Receipt = () => {
 
         console.log("Deleted Id:", rowId);
 
-        fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=VoucherHD&Id=${rowId}`, requestOptions)
+        fetch(`https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=VoucherHD&Id=${rowId}`, requestOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result);
+              //  console.log(result);
                 setOpen(false);
                 handleDrawerClose();
                 fetchData();

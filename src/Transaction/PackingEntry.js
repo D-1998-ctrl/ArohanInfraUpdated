@@ -39,9 +39,9 @@ const PackingEntry = () => {
         };
 
         try {
-            const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=PackingGoods&PageNo=${pageNo}`, requestOptions);
+            const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=PackingGoods&PageNo=${pageNo}`, requestOptions);
             const result = await response.json();
-            console.log("Fetched result:", result);
+           // console.log("Fetched result:", result);
             setData(result.data);
             setTotalPages(result.total_pages)
 
@@ -121,10 +121,10 @@ const PackingEntry = () => {
 
         try {
             const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=MaterialMaster"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=MaterialMaster"
             );
 
-            console.log("API Response:", response.data); // Debugging log
+           // console.log("API Response:", response.data); // Debugging log
 
             if (Array.isArray(response.data)) {
                 const materialsOptions = response.data.map((material) => ({
@@ -149,10 +149,10 @@ const PackingEntry = () => {
     const fetchProduct = async () => {
         try {
             const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=ProductMaster"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=ProductMaster"
             );
 
-            console.log("API Response:", response.data); // Debugging log
+          //  console.log("API Response:", response.data); // Debugging log
 
             if (Array.isArray(response.data)) {
                 const productsOptions = response.data.map((product) => ({
@@ -176,10 +176,10 @@ const PackingEntry = () => {
     const fetchOprator = async () => {
         try {
             const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Operators"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Operators"
             );
 
-            console.log("API Response:", response.data); // Debugging log
+            //console.log("API Response:", response.data); // Debugging log
 
             if (Array.isArray(response.data)) {
                 const opratorsOptions = response.data.map((oprator) => ({
@@ -194,7 +194,6 @@ const PackingEntry = () => {
         } catch (error) {
             console.error("Error fetching states:", error);
         }
-
     };
 
     useEffect(() => {
@@ -225,10 +224,10 @@ const PackingEntry = () => {
             redirect: "follow"
         };
 
-        fetch("https://arohanagroapi.microtechsolutions.co.in/php/postpackinggoods.php", requestOptions)
+        fetch("https://arohanagroapi.microtechsolutions.net.in/php/postpackinggoods.php", requestOptions)
             .then((response) => response.json())
             .then((result) => {
-                console.log(result);
+              //  console.log(result);
                 toast.success("Packing entry created successfully!");
                 handleDrawerClose();
                 fetchData();
@@ -241,8 +240,8 @@ const PackingEntry = () => {
 
     //setdata
     const handleEdit = (rowData) => {
-        console.log("This row has been clicked:", rowData);
-        console.log("rowData.Id:", rowData.Id);
+       // console.log("This row has been clicked:", rowData);
+        //console.log("rowData.Id:", rowData.Id);
         setIsEditing(!!rowData.Id);
         setIdwiseData(rowData.Id);
         setIsDrawerOpen(true);
@@ -279,13 +278,13 @@ const PackingEntry = () => {
 
         axios
             .post(
-                "https://arohanagroapi.microtechsolutions.co.in/php/updatepackinggoods.php",
+                "https://arohanagroapi.microtechsolutions.net.in/php/updatepackinggoods.php",
                 urlencoded,
                 requestOptions
             )
 
             .then((response) => {
-                console.log("API Response:", response.data);
+                //console.log("API Response:", response.data);
                 toast.success("Packing Entry Updated successfully");
 
                 fetchData();
@@ -314,12 +313,12 @@ const PackingEntry = () => {
             redirect: "follow"
         };
 
-        console.log("Deleted Id:", idwiseData);
+        //console.log("Deleted Id:", idwiseData);
 
-        fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=PackingGoods&Id=${idwiseData}`, requestOptions)
+        fetch(`https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=PackingGoods&Id=${idwiseData}`, requestOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result);
+                //console.log(result);
                 setOpen(false);
                 handleDrawerClose();
                 fetchData();

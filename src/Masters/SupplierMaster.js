@@ -101,7 +101,7 @@ const SupplierMaster = () => {
     };
 
     try {
-        const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/getaccountbypage.php?TypeCode=s&PageNo=${pageNo}`, requestOptions);
+        const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/getaccountbypage.php?TypeCode=s&PageNo=${pageNo}`, requestOptions);
         const result = await response.json();
 
        // console.log("Fetched result:", result.data);
@@ -267,7 +267,7 @@ const SupplierMaster = () => {
   const fetchGroup = async () => {
     try {
       const response = await fetch(
-        "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=accountgroup"
+        "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=accountgroup"
       );
       const result = await response.json();
 
@@ -296,7 +296,7 @@ const SupplierMaster = () => {
     };
 
     fetch(
-      "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=subaccountgroup",
+      "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=subaccountgroup",
       requestOptions
     )
       .then((response) => response.json())
@@ -325,7 +325,7 @@ const SupplierMaster = () => {
     };
 
     fetch(
-      "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=city",
+      "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=city",
       requestOptions
     )
       .then((response) => response.json())
@@ -382,7 +382,7 @@ const SupplierMaster = () => {
     };
 
     fetch(
-      "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=state",
+      "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=state",
       requestOptions
     )
       .then((response) => response.json())
@@ -430,7 +430,7 @@ const SupplierMaster = () => {
       let accountConfig = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://arohanagroapi.microtechsolutions.co.in/php/postaccount.php',
+        url: 'https://arohanagroapi.microtechsolutions.net.in/php/postaccount.php',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -466,7 +466,7 @@ const SupplierMaster = () => {
       let addressConfig = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://arohanagroapi.microtechsolutions.co.in/php/postaddress.php',
+        url: 'https://arohanagroapi.microtechsolutions.net.in/php/postaddress.php',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -531,14 +531,14 @@ const SupplierMaster = () => {
   const deleteCustomerMaster = async () => {
     try {
       // Delete Address First
-      const addressUrl = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=Address&Id=${currentRow.original.Id}`;
+      const addressUrl = `https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=Address&Id=${currentRow.original.Id}`;
       console.log("Deleting Address:", addressUrl);
 
       const addressResponse = await axios.get(addressUrl);
       console.log("Address Deleted:", addressResponse.data);
 
       // Delete Account After Address
-      const accountUrl = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=Account&Id=${currentRow.original.AccountId}`;
+      const accountUrl = `https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=Account&Id=${currentRow.original.AccountId}`;
       console.log("Deleting Account:", accountUrl);
 
       const accountResponse = await axios.get(accountUrl);
@@ -571,7 +571,7 @@ const SupplierMaster = () => {
       let accountConfig = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://arohanagroapi.microtechsolutions.co.in/php/updateaccount.php',
+        url: 'https://arohanagroapi.microtechsolutions.net.in/php/updateaccount.php',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -607,7 +607,7 @@ const SupplierMaster = () => {
       let addressConfig = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://arohanagroapi.microtechsolutions.co.in/php/updateaddress.php',
+        url: 'https://arohanagroapi.microtechsolutions.net.in/php/updateaddress.php',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },

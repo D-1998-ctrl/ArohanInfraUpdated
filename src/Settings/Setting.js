@@ -80,7 +80,7 @@ const Settings = () => {
         setLoading(true);
         try {
             const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=city"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=city"
             );
 
             console.log("API Response:", response.data); // Debugging log
@@ -110,7 +110,7 @@ const Settings = () => {
         setLoadingState(true);
         try {
             const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=state"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=state"
             );
 
             console.log("API Response:", response.data); // Debugging log
@@ -157,7 +157,7 @@ const Settings = () => {
 
         axios
             .post(
-                "https://arohanagroapi.microtechsolutions.co.in/php/postcompanymaster.php",
+                "https://arohanagroapi.microtechsolutions.net.in/php/postcompanymaster.php",
                 urlencoded,
                 requestOptions
             )
@@ -179,7 +179,7 @@ const Settings = () => {
             redirect: "follow"
         };
 
-        fetch(`https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Id=24&Table=companymaster`, requestOptions)
+        fetch(`https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Id=24&Table=companymaster`, requestOptions)
             .then((response) => response.json())
             .then((result) => {
                 setUpdateCompanyName(result.CompanyName)

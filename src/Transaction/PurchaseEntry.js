@@ -80,13 +80,13 @@ const PurchaseEntry = () => {
 
     try {
       const response = await fetch(
-        `https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=purchaseheader&PageNo=${pageNo}`,
+        `https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=purchaseheader&PageNo=${pageNo}`,
         requestOptions
       );
       const result = await response.json();
       setPurchaseheaders(result.data);
       setTotalPages(result.total_pages);
-      console.log('purchase header', result.data);
+      // console.log('purchase header', result.data);
     } catch (error) {
       console.error('Error fetching purchase headers:', error);
     }
@@ -101,7 +101,7 @@ const PurchaseEntry = () => {
   const fetchpurchasedetails = async () => {
     try {
       const response = await axios.get(
-        "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=purchasedetail"
+        "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=purchasedetail"
       );
       setPurchasedetails(response.data);
       ////  console.log('detail', response.data)
@@ -217,7 +217,7 @@ const PurchaseEntry = () => {
   const fetchMaterialMaster = async () => {
     try {
       const response = await axios.get(
-        'https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=materialmaster',
+        'https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=materialmaster',
       );
       ////  console.log(response.data);
       processMaterialData(response.data)
@@ -250,25 +250,10 @@ const PurchaseEntry = () => {
     }
   };
 
-
-  // const fetchTypeCodeS = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       'https://arohanagroapi.microtechsolutions.co.in/php/gettypecode.php?TypeCode=S',
-  //       // "https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=Account&Colname=TypeCode&Colvalue=S"
-  //     );
-  //     ////  console.log("fetchTypeCodeS", response.data);
-  //     setOptions(response.data);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
-
   const fetchCompanyMaster = async () => {
     try {
       const response = await axios.get(
-        'https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=companymaster',
+        'https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=companymaster',
         { maxBodyLength: Infinity }
       );
       ////  console.log(response.data);
@@ -607,8 +592,8 @@ const PurchaseEntry = () => {
     //  console.log("purchaseheaderdata", purchaseheaderdata);
     try {
       const invoiceurl = isEditing
-        ? "https://arohanagroapi.microtechsolutions.co.in/php/updatepurchaseheader.php"
-        : "https://arohanagroapi.microtechsolutions.co.in/php/postpurchaseheader.php";
+        ? "https://arohanagroapi.microtechsolutions.net.in/php/updatepurchaseheader.php"
+        : "https://arohanagroapi.microtechsolutions.net.in/php/postpurchaseheader.php";
 
       const response = await axios.post(
         invoiceurl,
@@ -647,8 +632,8 @@ const PurchaseEntry = () => {
 
         const invoicdedetailurl =
           row.Id
-            ? "https://arohanagroapi.microtechsolutions.co.in/php/updatepurchasedetail.php"
-            : "https://arohanagroapi.microtechsolutions.co.in/php/postpurchasedetail.php";
+            ? "https://arohanagroapi.microtechsolutions.net.in/php/updatepurchasedetail.php"
+            : "https://arohanagroapi.microtechsolutions.net.in/php/postpurchasedetail.php";
 
         //  console.log(" invoicdedetailurl is used ", invoicdedetailurl);
         try {
@@ -808,7 +793,7 @@ const PurchaseEntry = () => {
     };
 
     fetch(
-      "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Branch",
+      "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Branch",
       requestOptions
     )
       .then((response) => response.json())
@@ -846,7 +831,7 @@ const PurchaseEntry = () => {
 
     //  console.log("Deleted Id:", rowId);
 
-    fetch(`https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=PurchaseHeader&Id=${rowId}`, requestOptions)
+    fetch(`https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=PurchaseHeader&Id=${rowId}`, requestOptions)
       .then((response) => response.text())
       .then((result) => {
         //  console.log(result);
@@ -870,13 +855,11 @@ const PurchaseEntry = () => {
       redirect: "follow"
     };
 
-    fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/searchaccount.php?TypeCode=S&Text=${text}`, requestOptions)
+    fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/searchaccount.php?TypeCode=S&Text=${text}`,requestOptions)
       .then((response) => response.json())
       .then((result) => {
         //setAccountOptions(result);
         setOptions(Array.isArray(result) ? result : []);
-
-
       })
       .catch((error) => console.error(error));
   }
@@ -925,7 +908,7 @@ const PurchaseEntry = () => {
       redirect: "follow",
     };
 
-    fetch("https://arohanagroapi.microtechsolutions.co.in/php/postaccount.php", requestOptions)
+    fetch("https://arohanagroapi.microtechsolutions.net.in/php/postaccount.php", requestOptions)
       .then((response) => response.json())
       .then((result) => {
         //  console.log("Customer Created:", result);
@@ -939,7 +922,7 @@ const PurchaseEntry = () => {
 
           addressData.append("GSTNo", "270000000000000");
 
-          return fetch("https://arohanagroapi.microtechsolutions.co.in/php/postaddress.php", {
+          return fetch("https://arohanagroapi.microtechsolutions.net.in/php/postaddress.php", {
             method: "POST",
             headers: myHeaders,
             body: addressData,
@@ -953,7 +936,7 @@ const PurchaseEntry = () => {
       )
       // .then((addressResult) => console.log("Address Added:", addressResult))
       .then((addressResult) => {
-        console.log("Address Added:", addressResult);
+        // console.log("Address Added:", addressResult);
         // Clear the input field after successful creation
         setAccountName("");
 
@@ -969,13 +952,13 @@ const PurchaseEntry = () => {
       method: "GET",
       redirect: "follow"
     };
-    fetch(`https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=Address&Colname=AccountId&Colvalue=${customerId}`, requestOptions)
+    fetch(`https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=Address&Colname=AccountId&Colvalue=${customerId}`, requestOptions)
 
       .then((response) => response.json())
       .then((result) => {
-        console.log(result)
+        // console.log(result)
         let temp = result[0]
-        console.log("gstno", temp.GSTNo)
+        // console.log("gstno", temp.GSTNo)
         setSelectedGSTNo(temp.GSTNo)
       }
 
@@ -988,11 +971,11 @@ const PurchaseEntry = () => {
       method: "GET",
       redirect: "follow"
     };
-    fetch(`https://arohanagroapi.microtechsolutions.co.in/php/getbyid.php?Table=Account&Colname=Id&Colvalue=${acctname}`, requestOptions)
+    fetch(`https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=Account&Colname=Id&Colvalue=${acctname}`, requestOptions)
 
       .then((response) => response.json())
       .then((result) => {
-        console.log('accountname', result)
+        // console.log('accountname', result)
 
         setOptions(Array.isArray(result) ? result : []);
       }
@@ -1007,7 +990,7 @@ const PurchaseEntry = () => {
     const selectedValue = event.target.value;
     setSelectedProduct(selectedValue);
     const selectedItem = productOptions.find(option => option.value.toString() === selectedValue);
-    console.log("selected Items", selectedItem)
+    //console.log("selected Items", selectedItem)
     setMaterialName(selectedItem.label)
     setRate(selectedItem.purchaseRate);
     console.log("Purchase rate:", selectedItem.purchaseRate);
@@ -1105,20 +1088,20 @@ const PurchaseEntry = () => {
 
     if (storedYearId) {
       setYearId(storedYearId);
-      console.log('storedYearId', storedYearId);
+      // console.log('storedYearId', storedYearId);
     } else {
       toast.error("Year is not set.");
     };
     if (storedfromdate) {
       setFromDate(storedfromdate);
-      console.log('storedfromdate', storedfromdate);
+      // console.log('storedfromdate', storedfromdate);
     } else {
       toast.error("FromDate is not set.");
     }
 
     if (storedtodate) {
       setToDate(storedtodate);
-      console.log('storedTodate', storedtodate);
+      // console.log('storedTodate', storedtodate);
     } else {
       toast.error("ToDate is not set.");
     }
@@ -1849,7 +1832,12 @@ const PurchaseEntry = () => {
 
                   <Box>
                     <Typography variant="h6">Total</Typography>
-                    <Box sx={{ fontSize: '20px', mr: 4, }} ><b>{total} Rs</b></Box>
+                    <Box sx={{ fontSize: '20px', mr: 4, }} >
+                      {/* <b>{total} Rs</b> */}
+                      
+                      <b>{Math.ceil(total)} Rs</b>
+                      
+                      </Box>
 
 
                   </Box>

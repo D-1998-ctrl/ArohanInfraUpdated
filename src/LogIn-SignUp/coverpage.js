@@ -20,7 +20,7 @@ function CoverPage() {
     setIsLoading(true);
     try {
       const response = await axios.get(
-        "https://arohanagroapi.microtechsolutions.co.in/php/getyears.php"
+        "https://arohanagroapi.microtechsolutions.net.in/php/getyears.php"
       );
       setYears(response.data);
     } catch (error) {

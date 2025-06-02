@@ -39,7 +39,7 @@ const UserMaster = () => {
 
 
             // const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=User", requestOptions);
-            const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=User&PageNo=${pageNo}`, requestOptions);
+            const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=User&PageNo=${pageNo}`, requestOptions);
             const result = await response.json();
             // console.log("Fetched result:", result);
             setData(result.data);
@@ -150,7 +150,7 @@ const UserMaster = () => {
     const fetchLevel = async () => {
         try {
             const response = await fetch(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=levelMaster"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=levelMaster"
             );
             const result = await response.json();
 
@@ -175,7 +175,7 @@ const UserMaster = () => {
     const fetchBranch = async () => {
         try {
             const response = await fetch(
-                "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Branch"
+                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Branch"
             );
             const result = await response.json();
 
@@ -210,7 +210,7 @@ const UserMaster = () => {
 
         axios
             .post(
-                "https://arohanagroapi.microtechsolutions.co.in/php/postuser.php",
+                "https://arohanagroapi.microtechsolutions.net.in/php/postuser.php",
                 urlencoded,
                 requestOptions
             )
@@ -247,7 +247,7 @@ const UserMaster = () => {
 
         axios
             .post(
-                "https://arohanagroapi.microtechsolutions.co.in/php/updateuser.php",
+                "https://arohanagroapi.microtechsolutions.net.in/php/updateuser.php",
                 urlencoded,
                 requestOptions
             )

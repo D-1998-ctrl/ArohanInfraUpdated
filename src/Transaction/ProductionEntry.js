@@ -1732,20 +1732,20 @@ const ProductionEntry = () => {
 
     const handleEdit = () => {
         if (currentRow) {
-            console.log("Editing item with ID:", currentRow.original);
+           // console.log("Editing item with ID:", currentRow.original);
 
             let updatedproductionDate = currentRow.original.ProductionDate.date || null;
-            console.log('updatedproductionDate', updatedproductionDate)
+            //console.log('updatedproductionDate', updatedproductionDate)
             const updatedproductionDateObject = updatedproductionDate
                 ? dayjs(updatedproductionDate).format("YYYY-MM-DD")
                 : null;
-            console.log('updatedproductionDateObject', updatedproductionDateObject)
+            //console.log('updatedproductionDateObject', updatedproductionDateObject)
 
             const startTimeParts = getTimeParts(currentRow.original.MachineStartTime.date);
-            console.log('startTimeParts', startTimeParts)
+           // console.log('startTimeParts', startTimeParts)
 
             const endTimeParts = getEndTimeParts(currentRow.original.MachineEndTime.date);
-            console.log('endTimeParts', endTimeParts)
+           // console.log('endTimeParts', endTimeParts)
 
             setIdwiseData(currentRow.original.Id);
             setUpdateProductNo(currentRow.original.ProductionNo);
@@ -1969,7 +1969,7 @@ const ProductionEntry = () => {
 
     const fetchAccounts = async () => {
         try {
-            const response = await axios.get("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=operators");
+            const response = await axios.get("https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=operators");
             const opratorOptions = response.data.map((operator) => ({
                 value: operator.Id,
                 label: operator.OperatorName,
@@ -1986,7 +1986,7 @@ const ProductionEntry = () => {
 
     const fetchMachines = async () => {
         try {
-            const response = await axios.get("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=machines");
+            const response = await axios.get("https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=machines");
             const machineOptions = response.data.map((machine) => ({
                 value: machine.Id,
                 label: machine.MachineName,
@@ -2004,7 +2004,7 @@ const ProductionEntry = () => {
     const fetchOilseed = async () => {
         try {
 
-            const response = await axios.get("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=materialmaster");
+            const response = await axios.get("https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=materialmaster");
             //console.log(response.data)
             const oil = response.data.map((oilseed) => ({
                 value: oilseed.Id,
@@ -2081,7 +2081,7 @@ const ProductionEntry = () => {
         };
 
         axios.post(
-            "https://arohanagroapi.microtechsolutions.co.in/php/postproduction.php",
+            "https://arohanagroapi.microtechsolutions.net.in/php/postproduction.php",
             urlencoded,
             requestOptions
         )
@@ -2106,7 +2106,7 @@ const ProductionEntry = () => {
         };
 
         try {
-            const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=production&PageNo=${pageNo}`, requestOptions);
+            const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=production&PageNo=${pageNo}`, requestOptions);
             // const response = await fetch("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=production", requestOptions);
             const result = await response.json();
 
@@ -2214,7 +2214,7 @@ const ProductionEntry = () => {
         let config = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: 'https://arohanagroapi.microtechsolutions.co.in/php/updateproduction.php',
+            url: 'https://arohanagroapi.microtechsolutions.net.in/php/updateproduction.php',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
@@ -2222,7 +2222,7 @@ const ProductionEntry = () => {
         };
         axios.request(config)
             .then((response) => {
-                console.log(JSON.stringify(response.data));
+                //console.log(JSON.stringify(response.data));
 
                 toast.success("Production Entry updated successfully");
                 handleEditDrawerClose()
@@ -2240,12 +2240,12 @@ const ProductionEntry = () => {
             method: "GET",
             redirect: "follow"
         };
-        const url = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=production&Id=${currentRow.original.Id}`
+        const url = `https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=production&Id=${currentRow.original.Id}`
         console.log(url)
         fetch(url, requestOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result)
+               // console.log(result)
                 toast.success("Production Entry deleted successfully!");
             })
             .catch((error) => console.error(error));
@@ -2424,20 +2424,20 @@ const ProductionEntry = () => {
 
         if (storedYearId) {
             setYearId(storedYearId);
-            console.log('storedYearId', storedYearId);
+            //console.log('storedYearId', storedYearId);
         } else {
             toast.error("Year is not set.");
         };
         if (storedfromdate) {
             setFromDate(storedfromdate);
-            console.log('storedfromdate', storedfromdate);
+            //console.log('storedfromdate', storedfromdate);
         } else {
             toast.error("FromDate is not set.");
         }
 
         if (storedtodate) {
             setToDate(storedtodate);
-            console.log('storedTodate', storedtodate);
+           // console.log('storedTodate', storedtodate);
         } else {
             toast.error("ToDate is not set.");
         }

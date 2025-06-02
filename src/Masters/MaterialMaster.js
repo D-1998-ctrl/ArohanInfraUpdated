@@ -153,7 +153,7 @@ const MaterialMaster = () => {
   const fetchGroup = async () => {
     try {
       const response = await fetch(
-        "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=materialgroup"
+        "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=materialgroup"
       );
       const result = await response.json();
 
@@ -185,7 +185,7 @@ const MaterialMaster = () => {
     };
 
     try {
-      const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=Materialmaster&PageNo=${pageNo}`, requestOptions);
+      const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=Materialmaster&PageNo=${pageNo}`, requestOptions);
       const result = await response.json();
 
       //  console.log("Fetched result:", result.data);
@@ -255,7 +255,7 @@ const MaterialMaster = () => {
 
     axios
       .post(
-        "https://arohanagroapi.microtechsolutions.co.in/php/postmaterialmaster.php",
+        "https://arohanagroapi.microtechsolutions.net.in/php/postmaterialmaster.php",
         urlencoded,
         requestOptions
       )
@@ -299,7 +299,7 @@ const MaterialMaster = () => {
   // Fetch data from API material group
   useEffect(() => {
     axios
-      .get("https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=Materialmaster")
+      .get("https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Materialmaster")
       .then((response) => {
         if (response.data && Array.isArray(response.data)) {
           // Extract unique MaterialGroupId values
@@ -339,7 +339,7 @@ const MaterialMaster = () => {
       method: "GET",
       redirect: "follow"
     };
-    const url = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=Materialmaster&Id=${currentRow.original.Id}`
+    const url = `https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=Materialmaster&Id=${currentRow.original.Id}`
     console.log(url)
     fetch(url, requestOptions)
       .then((response) => response.text())
@@ -410,7 +410,7 @@ const MaterialMaster = () => {
 
     axios
       .post(
-        "https://arohanagroapi.microtechsolutions.co.in/php/updatematerialmaster.php",
+        "https://arohanagroapi.microtechsolutions.net.in/php/updatematerialmaster.php",
         urlencoded,
         requestOptions
       )

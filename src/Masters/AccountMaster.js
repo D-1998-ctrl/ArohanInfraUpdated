@@ -94,7 +94,7 @@ const AccountMaster = () => {
   const fetchGroup = async () => {
     try {
       const response = await fetch(
-        "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=accountgroup"
+        "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=accountgroup"
       );
       const result = await response.json();
 
@@ -123,7 +123,7 @@ const AccountMaster = () => {
     };
 
     fetch(
-      "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=subaccountgroup",
+      "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=subaccountgroup",
       requestOptions
     )
       .then((response) => response.json())
@@ -164,7 +164,7 @@ const AccountMaster = () => {
 
     axios
       .post(
-        "https://arohanagroapi.microtechsolutions.co.in/php/postaccount.php",
+        "https://arohanagroapi.microtechsolutions.net.in/php/postaccount.php",
         urlencoded,
         requestOptions
       )
@@ -243,7 +243,7 @@ const AccountMaster = () => {
 
     try {
 
-      const response = await fetch(`https://arohanagroapi.microtechsolutions.co.in/php/get/gettblpage.php?Table=account&PageNo=${pageNo}`, requestOptions);
+      const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=account&PageNo=${pageNo}`, requestOptions);
       const result = await response.json();
       // console.log("Fetched result:", result.data);
       setData(result.data);
@@ -280,7 +280,7 @@ const AccountMaster = () => {
 
     axios
       .post(
-        "https://arohanagroapi.microtechsolutions.co.in/php/updateaccount.php",
+        "https://arohanagroapi.microtechsolutions.net.in/php/updateaccount.php",
         urlencoded,
         requestOptions
       )
@@ -309,7 +309,7 @@ const AccountMaster = () => {
       method: "GET",
       redirect: "follow"
     };
-    const url = `https://arohanagroapi.microtechsolutions.co.in/php/delete/deletetable.php?Table=Account&Id=${currentRow.original.Id}`
+    const url = `https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=Account&Id=${currentRow.original.Id}`
     console.log(url)
     fetch(url, requestOptions)
       .then((response) => response.json())
