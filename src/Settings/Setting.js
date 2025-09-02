@@ -1,6 +1,6 @@
 
 
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import { Drawer, useMediaQuery, Card, CardContent, Avatar, Button, TextField, Typography, Box, Paper, Chip, Divider, Autocomplete } from "@mui/material";
 import { AiOutlinePlusCircle, AiOutlineDelete } from "react-icons/ai";
 import "react-phone-input-2/lib/style.css";
@@ -76,137 +76,22 @@ const Settings = () => {
 
 
 
-    const fetchCity = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=city"
-            );
-
-            console.log("API Response:", response.data); // Debugging log
-
-            if (Array.isArray(response.data)) {
-                const cityOptions = response.data.map((city) => ({
-                    value: city?.Id || "",
-                    label: city?.CityName,
-                }));
-
-                setOptions(cityOptions);
-            } else {
-                console.error("Unexpected API response format:", response.data);
-            }
-        } catch (error) {
-            console.error("Error fetching states:", error);
-        }
-        setLoading(false);
-    };
+ 
     //for state id 
     const [stateOptions, setStateOptions] = useState([]);
     const [loadingState, setLoadingState] = useState(false);
     const [selectedState, setSelectedState] = useState(null);
 
 
-    const fetchState = async () => {
-        setLoadingState(true);
-        try {
-            const response = await axios.get(
-                "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=state"
-            );
 
-            console.log("API Response:", response.data); // Debugging log
-
-            if (Array.isArray(response.data)) {
-                const stateOptions = response.data.map((state) => ({
-                    value: state?.Id || "",
-                    label: state?.StateName || "Unknown",
-                }));
-
-                setStateOptions(stateOptions);
-            } else {
-                console.error("Unexpected API response format:", response.data);
-            }
-        } catch (error) {
-            console.error("Error fetching states:", error);
-        }
-        setLoading(false);
-    };
 
     //create CompanyMaster
 
 
-    const createCompanyMaster = () => {
-        const urlencoded = new URLSearchParams();
-        urlencoded.append("CompanyName", companyName);
-        urlencoded.append("Director", director);
-        urlencoded.append("Designation", dessignation);
-        urlencoded.append("Address1", address);
-        urlencoded.append("CityId", selectedCity?.value || "");
-        urlencoded.append("StateId", selectedState?.value || "");
-        urlencoded.append("Pincode", pinCode);
-        urlencoded.append("MobileNo", phone);
-        urlencoded.append("FaxNo", faxNum);
-        urlencoded.append("EmailId", email);
-        urlencoded.append("Website", website);
-        urlencoded.append("GSTNo", gstNum);
-
-        const requestOptions = {
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-        };
-
-        axios
-            .post(
-                "https://arohanagroapi.microtechsolutions.net.in/php/postcompanymaster.php",
-                urlencoded,
-                requestOptions
-            )
-            .then((response) => {
-                console.log("API Response:", response.data);
-
-                toast.success("Comapny Master Created successfully!");
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-                toast.error("Failed to Create Comapny Master");
-            });
-    };
 
 
-    const companyMasterId = () => {
-        const requestOptions = {
-            method: "GET",
-            redirect: "follow"
-        };
 
-        fetch(`https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Id=24&Table=companymaster`, requestOptions)
-            .then((response) => response.json())
-            .then((result) => {
-                setUpdateCompanyName(result.CompanyName)
-                SetUpdateDirector(result.Director)
-                setUpdateDessignation(result.Designation)
-                setUpdateAddress(result.Address1)
-                setUpdateGSTNum(result.GSTNo)
 
-                setupdatePinCode(result.Pincode)
-                setupdatePhone(result.MobileNo)
-                setUpdateFaxNum(result.FaxNo)
-
-                setUpdateEmail(result.EmailId)
-                setUpdateWebsite(result.Website)
-                setSelectedCity(result.CityId)
-
-                console.log(result)
-            }
-
-            )
-            .catch((error) => console.error(error));
-
-    }
-
-    useEffect(() => {
-        companyMasterId();
-    }, []);
     //for edit drawer
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
@@ -240,7 +125,9 @@ const Settings = () => {
             <Paper elevation={3} sx={{ p: 3, width: 800 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                     <Typography textAlign="center" variant="h5" sx={{ flex: 1, textAlign: 'center' }}>Company Information</Typography>
-                    <Box onClick={handleDrawerOpen} sx={{ cursor: 'pointer' }}>
+                    <Box 
+                    onClick={handleDrawerOpen}
+                     sx={{ cursor: 'pointer' }}>
                         <BorderColorIcon />
                     </Box>
                 </Box>
@@ -261,12 +148,12 @@ const Settings = () => {
                                 <Box>
                                     <Typography>City</Typography>
                                     <Autocomplete
-                                        options={options}
+                                        // options={options}
                                         getOptionLabel={(option) => (option?.label ? option.label.toString() : "")}
-                                        isOptionEqualToValue={(option, value) => option.value === value.value}
+                                        // isOptionEqualToValue={(option, value) => option.value === value.value}
                                         loading={loading}
-                                        onOpen={fetchCity}
-                                        onChange={(event, newValue) => setSelectedCity(newValue)}
+                                        // onOpen={fetchCity}
+                                        // onChange={(event, newValue) => setSelectedCity(newValue)}
                                         renderInput={(params) => (
                                             <TextField {...params} size="small" placeholder="Enter City" fullWidth />
                                         )}
@@ -312,8 +199,8 @@ const Settings = () => {
                                         getOptionLabel={(option) => (option?.label ? option.label.toString() : "")}
                                         isOptionEqualToValue={(option, value) => option.value === value.value}
                                         loading={loadingState}
-                                        onOpen={fetchState}
-                                        onChange={(event, newValue) => setSelectedState(newValue)}
+                                        // onOpen={fetchState}
+                                        // onChange={(event, newValue) => setSelectedState(newValue)}
                                         renderInput={(params) => (
                                             <TextField {...params} size="small" placeholder="Enter State" fullWidth />
                                         )}
@@ -358,7 +245,9 @@ const Settings = () => {
 
 
                     <Box display={'flex'} alignItems={"center"} gap={2} justifyContent={'center'} mt={2}>
-                        <Button onClick={createCompanyMaster} variant="contained"> Save </Button>
+                        <Button
+                        //  onClick={createCompanyMaster}
+                         variant="contained"> Save </Button>
 
                         <Button variant="outlined"> Cancel </Button>
 

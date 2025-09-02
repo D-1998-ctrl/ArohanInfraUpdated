@@ -1,6 +1,6 @@
 
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+
 import SettingsIcon from '@mui/icons-material/Settings';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -15,6 +15,7 @@ export const menuItems = [
   //   icon: <LibraryBooksIcon />,
   //   submenus: [],
   // },
+
   {
     title: "Masters",
     path: '/master',
@@ -56,6 +57,7 @@ export const menuItems = [
 
     ],
   },
+
   {
     title: "Transaction",
     path: '/transaction',
@@ -124,31 +126,37 @@ export const menuItems = [
     icon: <DescriptionIcon />,
     submenus: [
       {
+        title: " Sales Report",
+        path: "/salesReport ",
+        icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
+      },
+
+      {
         title: "Productwise Sales",
-        path: "commonpage",
+        path: "/productwisesales",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
       {
         title: "Customerwise Sales",
-        path: "commonpage",
+        path: "/customerwisesales",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
       {
         title: "Stock Report",
-        path: "commonpage",
+        path: "/stockreport",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
 
       {
         title: "Account Receivable",
-        path: "commonpage",
+        path: "/accountreceivable",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
 
 
       {
         title: "Account Payable",
-        path: "commonpage",
+        path: "/accountpayable",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
     ],

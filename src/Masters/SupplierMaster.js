@@ -142,12 +142,7 @@ const SupplierMaster = () => {
 
   const columns = useMemo(() => {
     return [
-      {
-        accessorKey: 'srNo',
-        header: 'Sr No',
-        size: 100,
-        Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
-      },
+    
       {
         accessorKey: 'AccountName',
         header: 'Account Name',
@@ -163,16 +158,7 @@ const SupplierMaster = () => {
       },
 
 
-      {
-        accessorKey: 'Address1',
-        header: 'Address 1',
-        size: 150,
-      },
-      {
-        accessorKey: 'Address2',
-        header: 'Address 2',
-        size: 150,
-      },
+     
       {
         accessorKey: 'EmailId',
         header: 'Email ',
@@ -183,18 +169,7 @@ const SupplierMaster = () => {
         header: 'Mobile No',
         size: 150,
       },
-      {
-        accessorKey: 'GSTNo',
-        header: 'GST No',
-        size: 150,
-      },
-
-      {
-        accessorKey: 'OpeningBalance',
-        header: 'Current Balance',
-        size: 150,
-      },
-
+     
       {
         id: 'actions',
         header: 'Actions',

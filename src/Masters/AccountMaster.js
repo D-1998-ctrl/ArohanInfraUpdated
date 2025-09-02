@@ -1,8 +1,8 @@
-import React, { useMemo, useState, useEffect } from 'react'
-import { Alert, InputLabel, IconButton, Menu, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
+import  { useMemo, useState, useEffect } from 'react'
+import { IconButton, Menu, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
-import suppliermaster from './suppliermaster.json'
+//import suppliermaster from './suppliermaster.json'
 import { useTheme } from "@mui/material/styles";
 import { toast } from "react-toastify";
 import axios from 'axios';
@@ -41,11 +41,11 @@ const AccountMaster = () => {
         header: 'Account Name',
         size: 150,
       },
-      {
-        accessorKey: 'TypeCode',
-        header: 'Type Code',
-        size: 150,
-      },
+      // {
+      //   accessorKey: 'TypeCode',
+      //   header: 'Type Code',
+      //   size: 150,
+      // },
 
       {
         accessorKey: 'DrORCr',
@@ -83,7 +83,7 @@ const AccountMaster = () => {
   const [updatedcurrentBal, setUpdatedCurrentBal] = useState('');
 
   const [typecode, setTypecode] = useState('');
-  const [updatedtypecode, setUpdatedTypecode] = useState('');
+  //const [updatedtypecode, setUpdatedTypecode] = useState('');
 
   const [debitCredit, setDebitCredit] = useState('D');
 
@@ -169,7 +169,7 @@ const AccountMaster = () => {
         requestOptions
       )
       .then((response) => {
-        console.log("API Response:", response.data);
+        // console.log("API Response:", response.data);
 
         toast.success("Account Master created successfully");
         handleClearTemplate();
@@ -522,8 +522,10 @@ const AccountMaster = () => {
 
                   onChange={(event) => setTypecode(event.target.value)}
                 >
-                  <MenuItem value="C">C</MenuItem>
-                  <MenuItem value="S">S</MenuItem>
+                  <MenuItem value="C">Customer</MenuItem>
+                  <MenuItem value="S">Supplier</MenuItem>
+                   <MenuItem value="P">Profit and loss</MenuItem>
+                   <MenuItem value="B">Balance Sheet</MenuItem>
                 </Select>
 
               </FormControl>
@@ -730,8 +732,10 @@ const AccountMaster = () => {
 
                   onChange={(event) => setTypecode(event.target.value)}
                 >
-                  <MenuItem value="C">C</MenuItem>
-                  <MenuItem value="S">S</MenuItem>
+                  <MenuItem value="C">Customer</MenuItem>
+                  <MenuItem value="S">Supplier</MenuItem>
+                   <MenuItem value="P">Profit and loss</MenuItem>
+                   <MenuItem value="B">Balance Sheet</MenuItem>
                 </Select>
 
               </FormControl>

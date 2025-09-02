@@ -1,8 +1,8 @@
-import React, { useMemo, useState, useEffect } from 'react'
-import { Alert, Autocomplete, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
+import  { useMemo, useState, useEffect } from 'react'
+import { useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
-import suppliermaster from './suppliermaster.json'
+
 import { useTheme } from "@mui/material/styles";
 import axios from 'axios';
 import { toast } from "react-toastify";
@@ -71,7 +71,7 @@ const ProductMaster = () => {
   const [idwiseData, setIdwiseData] = useState('')
   const handleEdit = () => {
     if (currentRow) {
-      // console.log("Editing item with ID:", currentRow.original);
+     console.log("Editing item with ID:", currentRow.original);
       setIdwiseData(currentRow.original.Id)
       setUpdateProductCode(currentRow.original.ProductCode)
       setSelectedGroupOption(currentRow.original.ProductGroupId)
@@ -90,22 +90,23 @@ const ProductMaster = () => {
       setUpdateSGST(currentRow.original.SGSTPercentage)
     }
   };
-  // console.log('idwiseData', idwiseData)
+  //  console.log('idwiseData', idwiseData)
 
   const [data, setData] = useState([]);
   const [pageNo, setPageNo] = useState(1)
   const columns = useMemo(() => [
-      {
-        accessorKey: 'srNo',
-        header: 'Sr No',
-        size: 150,
-        Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
-      },
       // {
-      //   accessorKey: 'ProductGroupId',
-      //   header: 'Product GroupId',
+      //   accessorKey: 'srNo',
+      //   header: 'Sr No',
       //   size: 150,
+      //   Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
       // },
+      {
+        accessorKey: 'ProductCode',
+        header: 'Product Code',
+        size: 150,
+      },
+      
       {
         accessorKey: 'ProductName',
         header: 'ProductName',
@@ -113,11 +114,11 @@ const ProductMaster = () => {
       },
 
 
-      {
-        accessorKey: 'UOM',
-        header: 'UOM',
-        size: 150,
-      },
+      // {
+      //   accessorKey: 'UOM',
+      //   header: 'UOM',
+      //   size: 150,
+      // },
       {
         accessorKey: 'SellPrice',
         header: 'Sell Price',
@@ -128,52 +129,44 @@ const ProductMaster = () => {
         header: 'Purchase Price',
         size: 150,
       },
-      {
-        accessorKey: 'Location',
-        header: 'Location',
-        size: 150,
-      },
-      {
-        accessorKey: 'OpeningValue',
-        header: 'OpeningValue',
-        size: 150,
-      },
-      {
-        accessorKey: 'ReOrderLevel',
-        header: 'Reorder Level',
-        size: 150,
-      },
+     
+      
+      // {
+      //   accessorKey: 'ReOrderLevel',
+      //   header: 'Reorder Level',
+      //   size: 150,
+      // },
 
-      {
-        accessorKey: 'MinBalance',
-        header: 'Min Balance',
-        size: 150,
-      },
-      {
-        accessorKey: 'MaxBalance',
-        header: 'Max Balance',
-        size: 150,
-      },
-      {
-        accessorKey: 'HSNCode',
-        header: 'HSN',
-        size: 150,
-      },
-      {
-        accessorKey: 'CGSTPercentage',
-        header: 'CGST%',
-        size: 150,
-      },
-      {
-        accessorKey: 'SGSTPercentage',
-        header: 'SGST%',
-        size: 150,
-      },
-      {
-        accessorKey: 'IGSTPercentage',
-        header: 'IGST%',
-        size: 150,
-      },
+      // {
+      //   accessorKey: 'MinBalance',
+      //   header: 'Min Balance',
+      //   size: 150,
+      // },
+      // {
+      //   accessorKey: 'MaxBalance',
+      //   header: 'Max Balance',
+      //   size: 150,
+      // },
+      // {
+      //   accessorKey: 'HSNCode',
+      //   header: 'HSN',
+      //   size: 150,
+      // },
+      // {
+      //   accessorKey: 'CGSTPercentage',
+      //   header: 'CGST%',
+      //   size: 150,
+      // },
+      // {
+      //   accessorKey: 'SGSTPercentage',
+      //   header: 'SGST%',
+      //   size: 150,
+      // },
+      // {
+      //   accessorKey: 'IGSTPercentage',
+      //   header: 'IGST%',
+      //   size: 150,
+      // },
 
 
       {
@@ -195,38 +188,43 @@ const ProductMaster = () => {
   //integration
   const [productCode, setProductCode] = useState('');
   const [updateproductCode, setUpdateProductCode] = useState('');
-  const [productGroup, setProductGroup] = useState('');
-  const [updateproductGroup, setUpdateProductGroup] = useState('');
+  //const [productGroup, setProductGroup] = useState('');
+  //const [updateproductGroup, setUpdateProductGroup] = useState('');
   const [productName, setProductName] = useState('');
   const [updateproductName, setUpdateProductName] = useState('');
-  const [UOM, setUOM] = useState('');
+  const [UOM, setUOM] = useState(null);
   const [updateUOM, setUpdateUOM] = useState('');
-  const [salesPrice, setSalesPrice] = useState('');
+  const [salesPrice, setSalesPrice] = useState(0);
   const [updatesalesPrice, setUpdateSalesPrice] = useState('');
 
-  const [purchasePrice, setPurchasePrice] = useState('');
+  const [purchasePrice, setPurchasePrice] = useState(0);
   const [updatepurchasePrice, setUpdatePurchasePrice] = useState('');
   const [location, setLocation] = useState('');
   const [updatelocation, setUpdateLocation] = useState('');
-  const [openingValue, setOpeningValue] = useState('');
+  const [openingValue, setOpeningValue] = useState(0);
   const [updateopeningValue, setUpdateOpeningValue] = useState('');
-  const [reorderLevel, setReorderLevel] = useState('');
+  const [reorderLevel, setReorderLevel] = useState(0);
   const [updatereorderLevel, setUpdateReorderLevel] = useState('');
-  const [minbal, setMinBal] = useState('');
+  const [minbal, setMinBal] = useState(0);
   const [updateminbal, setUpdateMinBal] = useState('');
-  const [maxbal, setMaxBal] = useState('');
+  const [maxbal, setMaxBal] = useState(0);
   const [updatemaxbal, setUpdateMaxBal] = useState('');
-  const [hsnCode, setHsnCode] = useState('');
+  const [hsnCode, setHsnCode] = useState(null);
   const [updatehsnCode, setUpdateHsnCode] = useState('');
-  const [CGST, setCGST] = useState('');
+  const [CGST, setCGST] = useState(0);
   const [updateCGST, setUpdateCGST] = useState('');
-  const [IGST, setIGST] = useState('');
+  const [IGST, setIGST] = useState(0);
   const [updateIGST, setUpdateIGST] = useState('');
-  const [SGST, setSGST] = useState('');
+  const [SGST, setSGST] = useState(0);
   const [updateSGST, setUpdateSGST] = useState('');
 
 
   const CreateProductMaster = () => {
+      if (!productName || productName.trim() === "") {
+    alert("Please select a product name before saving.");
+    return;
+  }
+
     const urlencoded = new URLSearchParams();
     urlencoded.append("ProductCode", productCode);
     urlencoded.append("ProductGroupId", selectedGroupOption);
@@ -260,10 +258,11 @@ const ProductMaster = () => {
         fetchData();
         handleClearTemplate();
         handleDrawerClose()
-        toast.success("Product Master created successfully");
+        toast.success("Product  created successfully");
       })
       .catch((error) => {
         console.error("Error:", error);
+        toast.error("Product  not created ");
       });
   };
 
@@ -272,16 +271,16 @@ const ProductMaster = () => {
     setSelectedGroupOption('');
     setProductName('');
     setUOM('');
-    setSalesPrice('');
-    setPurchasePrice(' ');
+    setSalesPrice(0);
+    setPurchasePrice(0);
     setLocation('');
-    setOpeningValue('');
-    setReorderLevel('');
-    setMinBal('');
-    setMaxBal('');
-    setHsnCode('');
-    setCGST(' ');
-    setIGST('')
+    setOpeningValue(0);
+    setReorderLevel(0);
+    setMinBal(0);
+    setMaxBal(0);
+    setHsnCode(0);
+    setCGST(0);
+    setIGST(0)
   }
 
   const [productsGroups, setProductsGroups] = useState([]);
@@ -301,7 +300,7 @@ const ProductMaster = () => {
       })
       .catch((error) => {
         console.error("Error fetching Material Groups:", error);
-        setMaterialGroupError("Failed to load Material Groups.");
+        // setMaterialGroupError("Failed to load Material Groups.");
       });
   }, []);
 
@@ -351,43 +350,45 @@ const ProductMaster = () => {
 
 
   //get Data by Id
-  const fetchDataById = () => {
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
+  // const fetchDataById = () => {
+  //   const requestOptions = {
+  //     method: "GET",
+  //     redirect: "follow",
+  //   };
 
-    fetch(
-      // `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Id=${idwiseData}&Table=productmaster`,
+  //   fetch(
+  //     // `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Id=${idwiseData}&Table=productmaster`,
 
-      `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=productmaster&Colname=Id&Colvalue=${idwiseData}`,
-      requestOptions
-    )
-      .then((response) => response.json())
-      .then((result) => {
-        console.log(result)
-        setUpdateProductCode(result.ProductCode)
-        setUpdateProductGroup(result.ProductGroupId)
-        setUpdateProductName(result.ProductName)
-        setUpdateUOM(result.UOM)
-        setUpdateSalesPrice(result.SellPrice)
-        setUpdatePurchasePrice(result.PurchasePrice)
-        setUpdateLocation(result.Location)
-        setUpdateOpeningValue(result.OpeningValue)
-        setUpdateReorderLevel(result.ReOrderLevel)
-        setUpdateMinBal(result.MinBalance)
-        setUpdateMaxBal(result.MaxBalance)
-        setUpdateHsnCode(result.HSNCode)
-        setUpdateCGST(result.CGSTPercentage)
-        setUpdateIGST(result.IGSTPercentage)
-        setUpdateSGST(result.SGSTPercentage)
-      })
-      .catch((error) => console.error(error));
-  };
-  useEffect(() => {
-    // CreateMaterialMaster();
-    fetchDataById(idwiseData)
-  }, [idwiseData]);
+  //     `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=productmaster&Colname=Id&Colvalue=${idwiseData}`,
+  //     requestOptions
+  //   )
+  //     .then((response) => response.json())
+  //     .then((result) => {
+  //        console.log(result)
+  //       setUpdateProductCode(result.ProductCode)
+  //       console.log('product code',result.ProductCode)
+  //       //setUpdateProductGroup(result.ProductGroupId)
+  //       setUpdateProductName(result.ProductName)
+  //       setUOM(result.UOM)
+    
+  //       setUpdateSalesPrice(result.SellPrice)
+  //       setUpdatePurchasePrice(result.PurchasePrice)
+  //       setUpdateLocation(result.Location)
+  //       setUpdateOpeningValue(result.OpeningValue)
+  //       setUpdateReorderLevel(result.ReOrderLevel)
+  //       setUpdateMinBal(result.MinBalance)
+  //       setUpdateMaxBal(result.MaxBalance)
+  //       setUpdateHsnCode(result.HSNCode)
+  //       setUpdateCGST(result.CGSTPercentage)
+  //       setUpdateIGST(result.IGSTPercentage)
+  //       setUpdateSGST(result.SGSTPercentage)
+  //     })
+  //     .catch((error) => console.error(error));
+  // };
+  // useEffect(() => {
+  //   // CreateMaterialMaster();
+  //   fetchDataById(idwiseData)
+  // }, [idwiseData]);
 
   //update 
   const UpdateProductMaster = () => {
@@ -423,8 +424,9 @@ const ProductMaster = () => {
       .then((response) => {
         console.log("API Response:", response.data);
         toast.success("Product Master Updated successfully");
-        handleEditDrawerClose()
         fetchData();
+        handleEditDrawerClose()
+        
       })
       .catch((error) => {
         console.error("Error:", error);

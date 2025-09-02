@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, useMediaQuery, Button, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
@@ -13,6 +13,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import moment from 'moment';
+import logonew from '../imgs/logo_white.png'
 
 const PackingEntry = () => {
     const theme = useTheme();
@@ -51,6 +52,10 @@ const PackingEntry = () => {
     };
 
     const [pageNo, setPageNo] = useState(1)
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
+
+
     const columns = useMemo(() => {
         return [
             {
@@ -96,6 +101,44 @@ const PackingEntry = () => {
                 accessorKey: 'Quantity',
                 header: 'Quantity',
                 size: 150,
+            },
+
+
+
+
+            {
+                header: 'Actions',
+                size: 200,
+                Cell: ({ row }) => (
+                    <Box display="flex" gap={1}>
+                        <Button
+                            sx={{ background: 'var(--primary-color)' }}
+                            variant="contained"
+                            size="small"
+                            onClick={() => {
+                                // setCurrentRow(row);
+                                handleEdit(row.original);
+                            }}
+                        >
+                            Edit
+                        </Button>
+
+                        <Button
+                            variant="contained"
+                            sx={{ background: 'var(--complementary-color)' }}
+                            size="small"
+                            onClick={() => {
+
+                                setPreviewData({ ...row.original });
+                                setPreviewOpen(true);
+                                console.log('previewdata', row.original)
+                            }}
+                        >
+                            Preview
+                        </Button>
+
+                    </Box>
+                ),
             },
 
         ];
@@ -204,6 +247,31 @@ const PackingEntry = () => {
 
     //create Entry
     const createPackingEntry = () => {
+
+        if (!selectedOprator) {
+            alert("Please select  Oprator before saving form");
+            return;
+        }
+        if (!selectedMaterial) {
+            alert("Please select  Material before saving form");
+            return;
+        }
+        if (!oilInLit) {
+            alert("Please select  oilInLit before saving form");
+            return;
+        }
+        if (!brandName) {
+            alert("Please select  brandName  before saving form");
+            return;
+        }
+        if (!selectedProduct) {
+            alert("Please select  Product before saving form");
+            return;
+        }
+        if (!quantity) {
+            alert("Please select  quantity before saving form");
+            return;
+        }
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
         const formattedInwardDate = moment(packingDate).format("YYYY-MM-DD");
@@ -227,11 +295,15 @@ const PackingEntry = () => {
         fetch("https://arohanagroapi.microtechsolutions.net.in/php/postpackinggoods.php", requestOptions)
             .then((response) => response.json())
             .then((result) => {
-              //  console.log(result);
+            if (result.success || result.status === "success") {  // Adjust based on actual API response
                 toast.success("Packing entry created successfully!");
                 handleDrawerClose();
                 fetchData();
-            })
+            } else {
+                toast.error("Failed to create packing entry. " + (result.message || ""));
+                handleDrawerClose();
+            }
+        })
             .catch((error) => {
                 console.error(error);
                 toast.error("Failed to create packing entry");
@@ -368,10 +440,10 @@ const PackingEntry = () => {
                                 fontSize: '16px',
                             },
                         }}
-                        muiTableBodyRowProps={({ row }) => ({
-                            onClick: () => handleEdit(row.original),
-                            style: { cursor: 'pointer' },
-                        })}
+                        // muiTableBodyRowProps={({ row }) => ({
+                        //     onClick: () => handleEdit(row.original),
+                        //     style: { cursor: 'pointer' },
+                        // })}
                         renderBottomToolbarCustomActions={() => (
                             <Box
                                 mt={2}
@@ -410,6 +482,100 @@ const PackingEntry = () => {
                         )}
                     />
                 </Box>
+
+                <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="xlg" fullWidth>
+                    <DialogTitle sx={{ textAlign: 'center' }}>
+                        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                            <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
+                            <Typography variant="h6">Arohan Agro Kolhapur</Typography>
+
+                        </Box>
+                        <Typography sx={{ mt: 1 }}>
+                            Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
+                        </Typography>
+
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
+                            Packing Entry Preview
+                        </Typography>
+
+
+
+                    </DialogTitle>
+                    <DialogContent dividers>
+                        <Box>
+                            {previewData ? (
+                                <Box>
+                                    <Box display={'flex'} justifyContent={'space-between'} gap={2}>
+                                        <Typography><strong>Packing No:</strong> {previewData.PackingNo}</Typography>
+                                        <Typography>
+                                            <strong>Packing Date:</strong>{" "}
+                                            {new Date(previewData.PackingDate.date).toLocaleDateString()}
+                                        </Typography>
+                                    </Box>
+
+                                    <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={2}>
+
+                                        <Box><Typography><strong>Batch No:</strong> {previewData.BatchNo}</Typography></Box>
+
+                                        <Box>
+                                            <Typography>
+                                                <strong>Oprator:</strong>{" "}
+
+                                                {opratorOptions.find(option => option.value.toString() === previewData.OperatorId.toString())?.label || 'N/A'}
+                                            </Typography>
+                                        </Box>
+
+                                        <Box>
+                                            <Typography>
+                                                <strong>Material:</strong>{" "}
+
+                                                {materialOptions.find(option => option.value.toString() === previewData.MaterialId.toString())?.label || 'N/A'}
+                                            </Typography>
+                                        </Box>
+                                        <Box><Typography><strong>Oil Lit:</strong> {previewData.OilLit}</Typography></Box>
+
+
+                                    </Box>
+
+
+                                    <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={2}>
+
+                                        <Box><Typography><strong>Brand Name:</strong> {previewData.BrandName}</Typography></Box>
+
+                                        <Box>
+                                            <Typography>
+                                                <strong>Quantity:</strong>{" "}
+
+                                                {previewData.Quantity}
+                                            </Typography>
+                                        </Box>
+
+                                        <Box>
+                                            <Typography>
+                                                <strong>Product:</strong>{" "}
+
+                                                {productOptions.find(option => option.value.toString() === previewData.ProductId.toString())?.label || 'N/A'}
+                                            </Typography>
+                                        </Box>
+                                        {/* <Box><Typography><strong>Oil Lit:</strong> {previewData.OilLit}</Typography></Box> */}
+
+
+                                    </Box>
+
+
+
+
+                                </Box>
+                            ) : (
+                                <Typography>No data to preview</Typography>
+                            )}
+                        </Box>
+                    </DialogContent>
+                    <DialogActions>
+                        {/* <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{fontSize:35}}/></Button> */}
+                        <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
+                    </DialogActions>
+                </Dialog>
 
 
                 <Drawer

@@ -28,6 +28,10 @@ const Login = () => {
 
   //login
   const Login = () => {
+     if (!userName || !password) {
+    alert("Please enter username and password.");
+    return;
+  }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
 
@@ -106,6 +110,15 @@ const Login = () => {
     // setIsLoading(true);
 
     try {
+      if (!FromDate || !ToDate) {
+        toast.error("Please select both From and To dates");
+        return;
+      }
+      
+      if (!selectedYearId) {
+        toast.error("Please select a year");
+        return;
+      }
       const fromDate = FromDate.format("YYYY-MM-DD");
       const toDate = ToDate.format("YYYY-MM-DD");
       const selectedYear = years.find(year => year.Id === selectedYearId);
@@ -261,6 +274,7 @@ const Login = () => {
                   fullWidth
                   onClick={handleOkClick}
                   variant='contained'
+                  disabled={!FromDate || !ToDate || !selectedYearId}
                 >
                   Continue
                 </Button>

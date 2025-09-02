@@ -1,6 +1,6 @@
 
 import React, { useMemo, useState, useEffect } from 'react'
-import { TableBody, Autocomplete, TableCell, TableContainer, TableHead, TableRow, Paper, Table, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
+import { TableBody,Grid, Autocomplete, TableCell,TableFooter, TableContainer, TableHead, TableRow, Paper, Table, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
 import { DatePicker } from "@mui/x-date-pickers";
@@ -11,16 +11,22 @@ import axios from 'axios';
 import { toast } from "react-toastify";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import moment from 'moment';
-import dayjs from "dayjs";
+
 import qs from "qs";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import DeleteIcon from '@mui/icons-material/Delete';
+
 import {useMaterialReactTable,} from "material-react-table";
 import Cookies from 'js-cookie';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
+import autoTable from 'jspdf-autotable';
+import jsPDF from 'jspdf';
+import PrintIcon from '@mui/icons-material/Print';
+import logonew from '../imgs/logo_white.png'
+
+
 
 const DeliveryChallan = () => {
     const theme = useTheme();
@@ -57,7 +63,7 @@ const DeliveryChallan = () => {
         setRowId('')
         setIsDrawerOpen(true);
         setIsEditing(false);       
-        console.log(rowId)
+        // console.log(rowId)
     };
 
     const handleDrawerClose = () => {
@@ -115,24 +121,26 @@ const [pageNo, setPageNo] = useState(1)
     };
 
     useEffect(() => {
-        // fetchInwardHeader();
+         fetchInwardHeader();
         fetchInwarddetails();
         fetchLocation();
         fetchProduct();
-    }, []);
+    }, );
 
 
 
     //main table
-   
+    //for preview
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
     const columns = useMemo(() => [
-        
-            {
-                accessorKey: 'SrNo',
-                header: 'Sr No',
-                size: 150,
-                Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
-              },
+
+        {
+            accessorKey: 'SrNo',
+            header: 'Sr No',
+            size: 150,
+            Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
+        },
           
             {
                 accessorKey: 'ChallanNo',
@@ -158,11 +166,53 @@ const [pageNo, setPageNo] = useState(1)
                 header: 'VehicleNo',
                 size: 150,
             },
+
+
+                {
+                    header: 'Actions',
+                    size: 200,
+                    Cell: ({ row }) => (
+                      <Box display="flex" gap={1}>
+                        <Button
+                         sx={{ background: 'var(--primary-color)'}}
+                          variant="contained"
+                          size="small"
+                          onClick={() => handleSubmit(row.original)}
+                        >
+                          Edit
+                        </Button>
+            
+                        <Button
+                         variant="contained"
+                          sx={{ background: 'var(--complementary-color)'}}
+                          size="small"
+                          onClick={() => {
+                            const invdetail = challandetails
+                              .filter((detail) => detail.ChallanId === row.original.Id)
+                              .map((detail) => {
+                                const matchedMaterial = productOptions.find(
+                                  (item) => item.value.toString() === detail.ProductId?.toString()
+                                );
+                                return {
+                                  ...detail,
+                                  ProductName: matchedMaterial?.label || "Unknown",
+                                };
+                              });
+                            setPreviewData({ ...row.original, invdetail });
+                            setPreviewOpen(true);
+                            // console.log('previewdata',row.original)
+                          }}
+                        >
+                          Preview
+                        </Button>
+                      </Box>
+                    ),
+                  },
     ], [challanheaders]);
 
     //for get data in main table and form
     const handleSubmit = (rowData) => {
-        //console.log("This row has been clicked:", rowData);
+        // console.log("This row has been clicked:", rowData);
 
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
@@ -174,7 +224,7 @@ const [pageNo, setPageNo] = useState(1)
         //console.log("storelocation", rowData.StoreLocation);
         const inwdetail = challandetails.filter(
             (detail) => detail.ChallanId === rowData.Id);
-        //console.log('invdetail', inwdetail)
+        // console.log('invdetail', inwdetail)
 
         const mappedRows = inwdetail.map((detail) => ({
             Id: detail.Id,
@@ -187,66 +237,66 @@ const [pageNo, setPageNo] = useState(1)
             Amount: parseFloat(detail.Amount) || 0,
         }));
 
-        // console.log('mappedRows', mappedRows)
+    //  console.log('mappedRows', mappedRows)
         setRows(mappedRows);
     };
 
     const table = useMaterialReactTable({
         columns,
         data: challanheaders,
-        enablePagination:false,
+        enablePagination: false,
         muiTableHeadCellProps: {
-          style: {
-            backgroundColor: "#E9ECEF",
-            color: "black",
-            fontSize: "16px",
-          },
+            style: {
+                backgroundColor: "#E9ECEF",
+                color: "black",
+                fontSize: "16px",
+            },
         },
-        muiTableBodyRowProps: ({ row }) => ({
-          onClick: () => handleSubmit(row.original),
-          style: { cursor: "pointer" },
-        }),
+        // muiTableBodyRowProps: ({ row }) => ({
+        //   onClick: () => handleSubmit(row.original),
+        //   style: { cursor: "pointer" },
+        // }),
         renderBottomToolbarCustomActions: () => (
-          <Box 
-            mt={2} 
-            alignItems="center" 
-            display="flex"  
-            justifyContent="flex-end" 
-            width="100%"
-          >
-            <FirstPageIcon 
-              sx={{ cursor: "pointer" }} 
-              onClick={() => setPageNo(1)} 
-            />
-            <KeyboardArrowLeftIcon 
-              sx={{ cursor: "pointer" }} 
-              onClick={() => setPageNo((prev) => Math.max(Number(prev) - 1, 1))} 
-            />
-            <Box>Page No</Box>
-            <TextField
-              sx={{ 
-                width: "4.5%",
-                ml: 1,
-                '@media (max-width: 768px)': {
-                  width: '10%',
-                },
-              }}
-              value={pageNo}
-              onChange={(e) => setPageNo(e.target.value)}
-              size="small" 
-            />
-            <KeyboardArrowRightIcon 
-              sx={{ cursor: "pointer" }} 
-              onClick={() => setPageNo((prev) => Number(prev) + 1)} 
-            />
-            <LastPageIcon 
-              sx={{ cursor: "pointer" }} 
-              onClick={() => setPageNo(totalPages)} 
-            />
-            <Box>Total Pages: {totalPages}</Box>
-          </Box>
+            <Box
+                mt={2}
+                alignItems="center"
+                display="flex"
+                justifyContent="flex-end"
+                width="100%"
+            >
+                <FirstPageIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo(1)}
+                />
+                <KeyboardArrowLeftIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo((prev) => Math.max(Number(prev) - 1, 1))}
+                />
+                <Box>Page No</Box>
+                <TextField
+                    sx={{
+                        width: "4.5%",
+                        ml: 1,
+                        '@media (max-width: 768px)': {
+                            width: '10%',
+                        },
+                    }}
+                    value={pageNo}
+                    onChange={(e) => setPageNo(e.target.value)}
+                    size="small"
+                />
+                <KeyboardArrowRightIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo((prev) => Number(prev) + 1)}
+                />
+                <LastPageIcon
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => setPageNo(totalPages)}
+                />
+                <Box>Total Pages: {totalPages}</Box>
+            </Box>
         ),
-      });
+    });
 
     //for drawer table row btn
     const [rows, setRows] = useState([]);
@@ -398,6 +448,22 @@ const [pageNo, setPageNo] = useState(1)
 
     //for updaterows
     const handleSaveOrAddRow = () => {
+ if (!selectedProduct) {
+      alert("Please select an Product before adding or saving the row.");
+      return;
+    }
+
+
+     if (!batchNo) {
+      alert("Please select an batchNo before adding or saving the row.");
+      return;
+    }
+      if (!batchDate) {
+      alert("Please select an batchDate before adding or saving the row.");
+      return;
+    }
+
+
         if (editingRow !== null) {
             // Update the existing row
             const updatedRows = [...rows];
@@ -660,6 +726,106 @@ const [pageNo, setPageNo] = useState(1)
       }, [yearid,fromdate,todate]);
 
 
+    //for print
+    const generatePDF = () => {
+        const doc = new jsPDF();
+        if (!previewData) return;
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        let y = 10;
+
+        // Header
+        doc.setLineWidth(0.1); // Set border thickness
+        doc.rect(5, 5, pageWidth - 10, pageHeight - 10); // Draw rectangle with 5mm margin on all sides
+
+        // Header
+        const logoDiameter = 20; // Diameter of the circle
+        const logoRadius = logoDiameter / 2;
+        const x = pageWidth / 2 - logoRadius;
+
+        doc.setFillColor(255, 255, 255);
+
+        doc.setDrawColor(0);
+        doc.circle(x + logoRadius, y + logoRadius, logoRadius, 'FD');
+        doc.clip();
+        doc.addImage(logonew, 'JPEG', x, y, logoDiameter, logoDiameter);
+
+        doc.discardPath();
+        y += logoDiameter + 6;
+
+        doc.setFontSize(16);
+        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+        y += 7;
+        doc.setFontSize(10)
+        doc.text("Address: Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
+        y += 7;
+        doc.setFontSize(12);
+        doc.text("Delivery Challan At Godown Preview", pageWidth / 2, y, { align: "center" });
+
+        y += 6;
+        doc.setLineWidth(0.5);
+        doc.line(10, y, 200, y);
+        y += 6;
+
+
+        // Basic Details
+        doc.text(`Challan No: ${previewData.ChallanNo}`, 10, y);
+        doc.text(`Challan Date: ${new Date(previewData.ChallanDate.date).toLocaleDateString()}`, 80, y);
+        doc.text(`Vehicle No: ${previewData.VehicleNo}`, 150, y);
+        y += 6;
+
+
+        doc.setLineWidth(0.1);
+        doc.line(10, y, 200, y);
+        doc.setLineWidth(0.2);
+        y += 6;
+
+        // Challan Details Title
+        doc.setFontSize(11);
+        doc.text("Challan Details", 10, y);
+        let finalY = y + 2;
+
+        // Prepare rows
+        const purchaseRows = previewData.invdetail.map((item, idx) => {
+            const name = productOptions.find(opt => opt.value.toString() === item.ProductId?.toString())?.label || 'Unknown';
+            return [item.SerialNo || idx + 1, name, item.Quantity, item.Rate, item.Amount];
+        });
+
+        // Full-width table
+        //   autoTable(doc, {
+        //     head: [["S.No", "Material", "Quantity(Lit)", "Rate", "Amount (Rs)"]],
+        //     body: purchaseRows,
+        //     startY: finalY + 5,
+        //     margin: { left: 10, right: 10 },
+        //     theme: "grid",
+        //     styles: { fontSize: 9 },
+        //     headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" }
+        //   });
+        autoTable(doc, {
+            head: [["S.No", "Material", "Quantity(Lit)", "Rate", "Amount (Rs)"]],
+            body: purchaseRows,
+            startY: finalY + 5,
+            margin: { left: 10, right: 10 },
+            theme: "grid",
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" }
+        });
+
+
+        const afterTableY = doc.lastAutoTable.finalY + 6;
+        doc.setFontSize(10);
+        doc.setTextColor(0);
+        doc.setFont(undefined, "bold");
+
+        doc.text("Total", 140, afterTableY);
+        doc.text(`${previewData.Total}`, 175, afterTableY, { align: "right" });
+        // Save
+        doc.save("Challan_Preview.pdf");
+    };
+
+
+
     return (
         <Box>
             <Box textAlign={'center'}>
@@ -682,6 +848,97 @@ const [pageNo, setPageNo] = useState(1)
                             sx: { color: 'var(--primary-color)', },
                         }}
                     />
+                </Box>
+                
+                {/* ///for preview///////// */}
+                <Box>
+                    <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="lg" fullWidth>
+                        <DialogTitle sx={{ textAlign: 'center' }}>
+                            <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+                                <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
+                                <Typography >Arohan Agro Kolhapur</Typography>
+
+                            </Box>
+                            <Typography sx={{ mt: 1 }}>
+                                Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
+                            </Typography>
+                            <Typography  mt={1} ><b>Delivery Challan At Godown Preview</b>  </Typography>
+                        </DialogTitle>
+                        <DialogContent dividers>
+                            <Box>
+                                {previewData ? (
+                                    <Box>
+                                        <Box display={'flex'} justifyContent={'space-between'} gap={2}>
+                                            <Typography><strong>Challan No:</strong> {previewData.ChallanNo}</Typography>
+                                            <Typography>
+                                                <strong>Challan Date:</strong>{" "}
+                                                {new Date(previewData.ChallanDate.date).toLocaleDateString()}
+                                            </Typography>
+                                        </Box>
+
+
+                                        <Divider sx={{ mt: 2 }} />
+
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} md={8}>
+                                                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                                                    Challan Details
+                                                </Typography>
+
+                                                <TableContainer component={Paper} sx={{ width: '150%', mt: 2 }}>
+                                                    <Table size="small" >
+                                                        <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                                                            <TableRow>
+
+                                                                <TableCell><strong>Material</strong></TableCell>
+                                                                <TableCell><strong>Quantity(Lit)</strong></TableCell>
+                                                                <TableCell><strong>Rate</strong></TableCell>
+                                                                <TableCell><strong>Amount (Rs)</strong></TableCell>
+                                                            </TableRow>
+                                                        </TableHead>
+                                                        <TableBody>
+                                                            {previewData.invdetail.map((item, index) => {
+                                                                const ProductName = productOptions.find(
+                                                                    (opt) => opt.value.toString() === item.ProductId?.toString()
+                                                                )?.label || "Unknown";
+
+                                                                return (
+                                                                    <TableRow key={index}>
+                                                                        <TableCell>{ProductName}</TableCell>
+                                                                        <TableCell>{item.Quantity}</TableCell>
+                                                                        <TableCell>{item.Rate}</TableCell>
+                                                                        <TableCell>{item.Amount}</TableCell>
+                                                                    </TableRow>
+
+
+                                                                );
+                                                            })}
+                                                        </TableBody>
+                                                        <TableFooter>
+                                                            <TableRow>
+                                                                <TableCell></TableCell>
+                                                                <TableCell></TableCell>
+                                                                <TableCell sx={{ color: 'black', fontSize: 15 }} colSpan={1}><strong>Total</strong></TableCell>
+                                                                <TableCell sx={{ color: 'black', fontSize: 15 }} colSpan={2}><strong>{previewData.Total}</strong></TableCell>
+                                                            </TableRow>
+                                                        </TableFooter>
+
+
+                                                    </Table>
+                                                </TableContainer>
+                                            </Grid>
+                                        </Grid>
+                                    </Box>
+                                ) : (
+                                    <Typography>No data to preview</Typography>
+                                )}
+                            </Box>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{ fontSize: 35 }} /></Button>
+                            <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
+                        </DialogActions>
+                    </Dialog>
                 </Box>
 
                 <Drawer

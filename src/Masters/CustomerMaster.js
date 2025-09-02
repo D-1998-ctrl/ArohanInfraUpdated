@@ -55,8 +55,9 @@ const CustomerMaster = () => {
       setIdwiseData(currentRow.original.Id)
       //  console.log(currentRow.original.Id)
       setAccountId(currentRow.original.AccountId)
-      // console.log(currentRow.original.AccountId)
+       console.log(currentRow.original.AccountId)
       setUpdatedAccountName(currentRow.original.AccountName)
+      console.log(currentRow.original.AccountName)
       setSelectedGroupOption(currentRow.original.GroupId)
       setSelectedSubGroupOption(currentRow.original.SubGroupId)
       setUpdatedCurrentBal(currentRow.original.OpeningBalance)
@@ -159,12 +160,7 @@ const CustomerMaster = () => {
 
   const columns = useMemo(() => {
     return [
-      {
-        accessorKey: 'srNo',
-        header: 'Sr No',
-        size: 100,
-        Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
-      },
+     
       {
         accessorKey: 'AccountName',
         header: 'Account Name',
@@ -177,17 +173,7 @@ const CustomerMaster = () => {
         size: 150,
       },
 
-      {
-        accessorKey: 'Address1',
-        header: 'Address 1',
-        size: 150,
-      },
-
-      {
-        accessorKey: 'Address2',
-        header: 'Address 2',
-        size: 150,
-      },
+     
 
       {
         accessorKey: 'EmailId',
@@ -201,17 +187,7 @@ const CustomerMaster = () => {
         size: 150,
       },
 
-      {
-        accessorKey: 'GSTNo',
-        header: 'GST No',
-        size: 150,
-      },
-
-      {
-        accessorKey: 'OpeningBalance',
-        header: 'Current Balance',
-        size: 150,
-      },
+     
       {
         id: 'actions',
         header: 'Actions',

@@ -78,7 +78,20 @@ function Sidebar() {
   
     return initials || '?'; 
   }; 
+//network connectivity
+const [isOnline, setIsOnline] = useState(navigator.onLine); 
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
 
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   return (
     <div className="grid-container">
@@ -93,6 +106,12 @@ function Sidebar() {
 
             <Typography color="var(--primary-color)" variant="body">
               <b>Welcome To Arohan Agro</b>
+
+              {!isOnline && (
+                <Typography color="error" variant="body2" >
+                  ⚠️ No Internet Connection
+                </Typography>
+              )}
             </Typography>
 
 

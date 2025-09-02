@@ -25,6 +25,13 @@ import Receipt from './Transaction/Receipt';
 import CoverPage from './LogIn-SignUp/coverpage';
 import Payment from './Transaction/Payment';
 import PackingEntry from './Transaction/PackingEntry';
+import Salesreport from './Reports/salesreport';
+import ProductwiseSales from './Reports/productwiseSales';
+import CustomerWiseSales from './Reports/customerWiseSales';
+import StockReport from './Reports/stockReport';
+import AccountReceivable from './Reports/accountReceivable';
+import AccountPayable from './Reports/accountPayable';
+
 
 function App() {
   return (
@@ -52,7 +59,14 @@ function App() {
           <Route path='/receipts' element={<Receipt/>}/>
           <Route path='/payments' element={<Payment/>}/>
           <Route path='/packingEntry' element={<PackingEntry/>}/>
-          
+          {/* Reports */}
+          <Route path="/salesReport" element={<Salesreport />} />
+          <Route path="/productwisesales" element={<ProductwiseSales />} />
+          <Route path="/customerwisesales" element={<CustomerWiseSales />} />
+          <Route path="/stockreport" element={<StockReport />} />
+           <Route path="/accountreceivable" element={<AccountReceivable />} />
+           
+<Route path="/accountpayable" element={<AccountPayable />} />
 
 
           <Route path="/commonpage" element={<Commonpage/>} />
