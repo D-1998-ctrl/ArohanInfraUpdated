@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { Paper, Dialog, DialogActions, DialogContent, DialogTitle, Box, TableBody, TableCell, TableContainer, TableHead, TableRow, Table, Typography, Button } from '@mui/material';
+import {Dialog, DialogActions, DialogContent, DialogTitle, Box, TableBody, TableCell, TableContainer, TableHead, TableRow, Table, Typography, Button } from '@mui/material';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -10,9 +10,7 @@ import logonew from '../imgs/logo_white.png'
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-
 import moment from 'moment';
-import qs from "qs";
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
 
@@ -20,7 +18,6 @@ import { MaterialReactTable, } from 'material-react-table';
 const SalesReport = () => {
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
-
     const [salesData, setSalesData] = useState([]);
     const [showTable, setShowTable] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
@@ -32,12 +29,8 @@ const SalesReport = () => {
             if (!date) return '';
             return new Date(date).toLocaleDateString('en-CA');
         };
-
         const formattedFromDate = formatDate(fromDate);
         const formattedToDate = formatDate(toDate);
-
-
-
         const url = `https://arohanagroapi.microtechsolutions.net.in/php/getsalesreport.php?fromdate=${formattedFromDate}&todate=${formattedToDate}`;
         console.log("URL:", url);
 
@@ -66,6 +59,125 @@ const SalesReport = () => {
     };
 
 
+    // const generatePDF = () => {
+    //     const doc = new jsPDF();
+    //     if (!salesData) return;
+
+    //     const pageWidth = doc.internal.pageSize.getWidth();
+    //     const pageHeight = doc.internal.pageSize.getHeight();
+    //     let y = 10;
+
+
+    //     doc.setLineWidth(0.5); // Set border thickness
+    //     doc.rect(5, 5, pageWidth - 10, pageHeight - 10); // Draw rectangle with 5mm margin on all sides
+
+    //     // Convert logo image to data URL (you might need to adjust this based on your logo format)
+    //     const logoDataUrl = logonew;
+    //     // Header
+    //     // Size in jsPDF units (mm for default)
+    //     const width = 20; // about 70px
+    //     const height = 20;
+    //     const x = pageWidth / 2 - width / 2;
+
+
+
+    //     doc.addImage(logoDataUrl, 'JPEG', x, y, width, height, '', 'FAST');
+    //     // Reset clipping so future drawing isn't affected
+    //     doc.discardPath();
+    //     y += height + 6;
+
+    //     doc.setFontSize(16);
+    //     doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+    //     y += 7;
+    //     doc.setFontSize(10)
+    //     doc.text(" Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
+    //     y += 9;
+
+    //     doc.setFontSize(16);
+    //     doc.text("Sales Report Preview", pageWidth / 2, y, { align: "center" });
+
+
+    //     y += 6;
+    //     doc.setLineWidth(0.5);
+    //     doc.line(10, y, 200, y);
+    //     y += 6;
+
+
+    //     // Main table with all details
+    //     const tableHeaders = [
+    //         "Invoice No",
+    //         "Invoice Date",
+    //         "Account Name",
+
+    //         "Product  Name",
+    //         "Rate",
+    //         "Quantity",
+    //         "Amount",
+    //         "CGST",
+    //         "IGST",
+    //         "SGST",
+    //         "Transport",
+    //         "Sub Total",
+    //         "Total amount",
+
+    //     ];
+
+    //     const tableData = salesData.map((item) => {
+
+
+    //         return [
+    //             item.InvoiceNo,
+    //             item.InvoiceDate,
+    //             item.AccountName,
+
+    //             item.ProductName || 0,
+    //             item.Rate || 0,
+    //             item.Quantity || 0,
+    //             item.Amount || 0,
+    //             item["Product CGST AMT"] || 0,
+    //             item["Product IGST AMT"] || 0,
+    //             item["Product SGST AMT"] || 0,
+    //             item.Transport || 0,
+    //             item["Product Subtotal"],
+    //             item["Total amt"],
+
+    //         ];
+    //     });
+
+    //     autoTable(doc, {
+    //         head: [tableHeaders],
+    //         body: tableData,
+    //         startY: y,
+    //         margin: 8,
+    //         theme: "grid",
+    //         styles: { fontSize: 8, cellPadding: 1.5 }, // Smaller font size to fit all columns
+    //         headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" },
+    //         // columnStyles: {
+    //         //     0: { cellWidth: 'auto' },
+    //         //     1: { cellWidth: 'auto' },
+    //         //     2: { cellWidth: 'auto' },
+    //         //     3: { cellWidth: 'auto' },
+    //         //     4: { cellWidth: 'auto' },
+    //         //     5: { cellWidth: 'auto' },
+    //         //     6: { cellWidth: 'auto' },
+    //         //     7: { cellWidth: 'auto' },
+    //         //     8: { cellWidth: 'auto' },
+    //         //     9: { cellWidth: 'auto' },
+    //         //      10: { cellWidth: 'auto' },
+    //         //     11: { cellWidth: 'auto' },
+    //         //     12: { cellWidth: 'auto' },
+    //         //     13: { cellWidth: 'auto' },
+    //         //     14: { cellWidth: 'auto' },
+    //         //     15: { cellWidth: 'auto' },
+    //         // }
+    //     });
+
+    //     y = doc.lastAutoTable.finalY + 10;
+
+    //     // Save
+    //     doc.save("Sales_Report_Preview.pdf");
+    // };
+
     const generatePDF = () => {
         const doc = new jsPDF();
         if (!salesData) return;
@@ -74,82 +186,59 @@ const SalesReport = () => {
         const pageHeight = doc.internal.pageSize.getHeight();
         let y = 10;
 
+        doc.setLineWidth(0.5);
+        doc.rect(5, 5, pageWidth - 10, pageHeight - 10);
 
-        doc.setLineWidth(0.5); // Set border thickness
-        doc.rect(5, 5, pageWidth - 10, pageHeight - 10); // Draw rectangle with 5mm margin on all sides
-
-        // Convert logo image to data URL (you might need to adjust this based on your logo format)
         const logoDataUrl = logonew;
-        // Header
-        // Size in jsPDF units (mm for default)
-        const width = 20; // about 70px
+        const width = 20;
         const height = 20;
         const x = pageWidth / 2 - width / 2;
 
-
-
         doc.addImage(logoDataUrl, 'JPEG', x, y, width, height, '', 'FAST');
-        // Reset clipping so future drawing isn't affected
         doc.discardPath();
         y += height + 6;
 
         doc.setFontSize(16);
-        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center" });
         y += 7;
-        doc.setFontSize(10)
-        doc.text(" Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
+        doc.setFontSize(10);
+        doc.text("Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
         y += 9;
 
         doc.setFontSize(16);
         doc.text("Sales Report Preview", pageWidth / 2, y, { align: "center" });
-
-
         y += 6;
         doc.setLineWidth(0.5);
         doc.line(10, y, 200, y);
         y += 6;
 
-
-        // Main table with all details
+        // Table headers
         const tableHeaders = [
-            "Invoice No",
-            "Invoice Date",
-            "Account Name",
-
-            "Product  Name",
-            "Rate",
-            "Quantity",
-            "Amount",
-            "CGST",
-            "IGST",
-            "SGST",
-            "Transport",
-            "Sub Total",
-            "Total amount",
-
+            "Invoice No", "Invoice Date", "Account Name",
+            "Product Name", "Rate", "Quantity", "Amount",
+            "CGST", "IGST", "SGST", "Transport",
+            "Sub Total", "Total amount",
         ];
 
-        const tableData = salesData.map((item) => {
+        // Table data
+        const tableData = salesData.map((item) => [
+            item.InvoiceNo,
+            item.InvoiceDate,
+            item.AccountName,
+            item.ProductName || 0,
+            item.Rate || 0,
+            item.Quantity || 0,
+            item.Amount || 0,
+            item["Product CGST AMT"] || 0,
+            item["Product IGST AMT"] || 0,
+            item["Product SGST AMT"] || 0,
+            item.Transport || 0,
+            item["Product Subtotal"] || 0,
+            item["Total amt"] || 0,
+        ]);
 
-
-            return [
-                item.InvoiceNo,
-                item.InvoiceDate,
-                item.AccountName,
-
-                item.ProductName || 0,
-                item.Rate || 0,
-                item.Quantity || 0,
-                item.Amount || 0,
-                item["Product CGST AMT"] || 0,
-                item["Product IGST AMT"] || 0,
-                item["Product SGST AMT"] || 0,
-                item.Transport || 0,
-                item["Product Subtotal"],
-                item["Total amt"],
-
-            ];
-        });
+        // Calculate grand total
+        const grandTotal = salesData?.reduce((acc, row) => acc + (Number(row["Product Subtotal"]) || 0), 0);
 
         autoTable(doc, {
             head: [tableHeaders],
@@ -157,75 +246,20 @@ const SalesReport = () => {
             startY: y,
             margin: 8,
             theme: "grid",
-            styles: { fontSize: 8, cellPadding: 1.5 }, // Smaller font size to fit all columns
+            styles: { fontSize: 8, cellPadding: 1.5 },
             headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" },
-            // columnStyles: {
-            //     0: { cellWidth: 'auto' },
-            //     1: { cellWidth: 'auto' },
-            //     2: { cellWidth: 'auto' },
-            //     3: { cellWidth: 'auto' },
-            //     4: { cellWidth: 'auto' },
-            //     5: { cellWidth: 'auto' },
-            //     6: { cellWidth: 'auto' },
-            //     7: { cellWidth: 'auto' },
-            //     8: { cellWidth: 'auto' },
-            //     9: { cellWidth: 'auto' },
-            //      10: { cellWidth: 'auto' },
-            //     11: { cellWidth: 'auto' },
-            //     12: { cellWidth: 'auto' },
-            //     13: { cellWidth: 'auto' },
-            //     14: { cellWidth: 'auto' },
-            //     15: { cellWidth: 'auto' },
-            // }
+            foot: [
+                [
+                    { content: "Grand Total", colSpan: 11, styles: { halign: "right", fontStyle: "bold" } },
+                    { content: grandTotal.toFixed(2), colSpan: 2, styles: { halign: "right", fontStyle: "bold" } }
+                ]
+            ]
         });
 
-        y = doc.lastAutoTable.finalY + 10;
-
-        // Save
         doc.save("Sales_Report_Preview.pdf");
     };
 
-
-    // const exportToExcel = (data) => {
-    //   if (!data || data.length === 0) {
-    //     alert("No data available to export");
-    //     return;
-    //   }
-
-    //   // Pick only the fields shown in your Table
-    //   const formattedData = data.map((item) => ({
-    //     "Invoice No": item.InvoiceNo,
-    //     "Invoice Date": item.InvoiceDate,
-    //     "Account Name": item.AccountName || "N/A",
-    //     "Product Name": item.ProductName || "N/A",
-    //     "Rate": item.Rate || "N/A",
-    //     "Quantity (Nos)": item.Quantity || 0,
-    //     "Amount (Rs)": item.Amount || 0,
-    //     "CGST": item["Product CGST AMT"] || 0,
-    //     "IGST": item["Product IGST AMT"] || 0,
-    //     "SGST": item["Product SGST AMT"] || 0,
-    //     "Transport": item.Transport || 0,
-    //     "Sub Total": item["Product Subtotal"] || 0,
-    //     "Total Amount": item["Total amt"] || 0,
-    //   }));
-
-    //   // Convert JSON to sheet
-    //   const worksheet = XLSX.utils.json_to_sheet(formattedData);
-    //   const workbook = XLSX.utils.book_new();
-    //   XLSX.utils.book_append_sheet(workbook, worksheet, "SalesReport");
-
-    //   // Save Excel file
-    //   const excelBuffer = XLSX.write(workbook, {
-    //     bookType: "xlsx",
-    //     type: "array",
-    //   });
-
-    //   const blob = new Blob([excelBuffer], {
-    //     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    //   });
-
-    //   saveAs(blob, `SalesReport.xlsx`);
-    // };
+   
 
     const exportToExcel = async (data) => {
         if (!data || data.length === 0) {
@@ -314,7 +348,7 @@ const SalesReport = () => {
             },
 
             {
-                accessorKey: 'InvoiceDate.date',
+                accessorKey: 'InvoiceDate',
                 header: 'Invoice Date',
                 size: 50,
                 Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
@@ -334,7 +368,7 @@ const SalesReport = () => {
             },
 
             {
-                accessorKey: 'OrderDate.date',
+                accessorKey: 'OrderDate',
                 header: 'Order Date',
                 size: 50,
                 Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
@@ -403,7 +437,7 @@ const SalesReport = () => {
 
             {
                 accessorKey: ["Product Subtotal" || 0],
-                header: 'Sub Total',
+                header: 'Total With Tax',
                 size: 50,
             },
 
@@ -411,6 +445,7 @@ const SalesReport = () => {
                 accessorKey: ["Total amt"],
                 header: 'Total Amount',
                 size: 50,
+                 Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
             },
         ];
     }, []);
@@ -429,7 +464,7 @@ const SalesReport = () => {
 
     //grand Total
     const grandTotal = useMemo(() => {
-        return salesData?.reduce((acc, row) => acc + (Number(row["Total amt"]) || 0), 0);
+        return salesData?.reduce((acc, row) => acc + (Number(row["Product Subtotal"]) || 0), 0);
     }, [salesData]);
 
     return (

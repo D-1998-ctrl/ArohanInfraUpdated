@@ -8,13 +8,7 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 
 export const menuItems = [
 
-  // {
 
-  //   title: "Masters",
-  //   path: '/master/customermaster',
-  //   icon: <LibraryBooksIcon />,
-  //   submenus: [],
-  // },
 
   {
     title: "Masters",
@@ -54,6 +48,8 @@ export const menuItems = [
         path: "/usermaster",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
+
+
 
     ],
   },
@@ -159,18 +155,26 @@ export const menuItems = [
         path: "/accountpayable",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
+
+
+         {
+        title: "Purchase Report",
+        path: "/purchasereport",
+        icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
+      },
+
+
+         {
+        title: "Product-Group wise Stock",
+        path: "/product-group-wise-Stock",
+        icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
+      },
+  
     ],
   },
 
 
 
-
-  // {
-  //   title: "Company Information",
-  //   path: "commonpage",
-  //   icon: <PermIdentityIcon />,
-  //   submenus: [],
-  // },
 
   {
     title: "Settings",

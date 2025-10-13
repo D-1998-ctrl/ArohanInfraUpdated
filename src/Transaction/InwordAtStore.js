@@ -871,7 +871,7 @@ const InwordAtStore = () => {
     return (
         <Box>
             <Box textAlign={'center'}>
-                <Typography color='var(--complementary-color)' variant='h4'><b>Inword At Store</b></Typography>
+                <Typography color='var(--complementary-color)' variant='h4'><b>Inward At Store</b></Typography>
             </Box>
             <Box sx={{ p: 5, height: 'auto' }}>
 
@@ -879,7 +879,7 @@ const InwordAtStore = () => {
                     <Button sx={{ background: 'var(--complementary-color)', }}
                         variant="contained"
                         onClick={handleDrawerOpen}
-                    >Create Inword At Store </Button>
+                    >Create Inward At Store </Button>
                 </Box>
 
                 {/* main table */}
@@ -906,7 +906,7 @@ const InwordAtStore = () => {
                             <Typography sx={{ mt: 1 }}>
                                 Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                             </Typography>
-                            <Typography variant="h6" mt={1} ><b>Inword At Store Preview</b>  </Typography>
+                            <Typography variant="h6" mt={1} ><b>Inward At Store Preview</b>  </Typography>
                         </DialogTitle>
                         <DialogContent dividers>
                             <Box>
@@ -1010,7 +1010,7 @@ const InwordAtStore = () => {
                         <Box sx={{ padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgb(236, 253, 230)' }}>
                             {/* <Typography m={2} variant="h6"><b>Create Inword At Store</b></Typography> */}
                             <Typography m={2} fontWeight="bold" variant="h6">
-                                {isEditing ? "Update Inword At Store" : "Create Inword At Store"}
+                                {isEditing ? "Update Inward At Store" : "Create Inward At Store"}
                                 {/* {rows.length} */}
                             </Typography>
                             <CloseIcon sx={{ cursor: 'pointer' }} onClick={handleDrawerClose} />
@@ -1021,7 +1021,7 @@ const InwordAtStore = () => {
                             <Box display={'flex'} alignItems={'center'} mt={2} m={2} gap={2} >
                                 <Box flex={1} >
                                     <Box >
-                                        <Typography variant="body2">Inword No</Typography>
+                                        <Typography variant="body2">Inward No</Typography>
                                         <TextField
                                             variant="standard"
                                             sx={{

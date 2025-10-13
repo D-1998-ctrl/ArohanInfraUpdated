@@ -253,20 +253,21 @@ const StockReport = () => {
                 size: 50,
             },
 
-           
 
-            {
-                accessorKey: 'OrderDate.date',
-                header: 'Order Date',
-                size: 50,
-                Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
-            },
+
+            // {
+            //     accessorKey: 'OrderDate.date',
+            //     header: 'Order Date',
+            //     size: 50,
+            //     Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
+            // },
 
 
             {
                 accessorKey: 'InwardTotal',
                 header: 'Inward Total',
                 size: 50,
+                Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
             },
 
 
@@ -274,12 +275,14 @@ const StockReport = () => {
                 accessorKey: 'PurchaseTotal',
                 header: 'PurchaseTotal',
                 size: 50,
+                Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
             },
 
             {
                 accessorKey: 'InvoiceTotal',
                 header: 'InvoiceTotal ',
                 size: 50,
+                Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
             },
 
 
@@ -294,8 +297,9 @@ const StockReport = () => {
                 accessorKey: 'Value',
                 header: 'Value',
                 size: 50,
-                Cell: ({ cell }) => cell.getValue() || 0,
-            },  
+                // Cell: ({ cell }) => cell.getValue() || 0,
+                Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
+            },
         ];
     }, []);
     const table = useMaterialReactTable({
@@ -311,6 +315,18 @@ const StockReport = () => {
         },
     });
 
+    const grandTotal = useMemo(() => {
+        return stockData?.reduce((acc, row) => acc + (Number(row.InwardTotal) || 0), 0);
+    }, [stockData]);
+
+    const PurchaseTotal = useMemo(() => {
+        return stockData?.reduce((acc, row) => acc + (Number(row.PurchaseTotal) || 0), 0);
+    }, [stockData]);
+
+
+    const InvoiceTotal = useMemo(() => {
+        return stockData?.reduce((acc, row) => acc + (Number(row.InvoiceTotal) || 0), 0);
+    }, [stockData]);
 
     return (
         <Box >
@@ -455,10 +471,73 @@ const StockReport = () => {
                                             )}
                                         </Box>
                                     </DialogContent>
-                                    <DialogActions>
+                                    {/* <DialogActions>
                                         <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{ fontSize: 35 }} /></Button>
                                         <Button variant='contained' endIcon={<FileDownloadIcon />} onClick={() => exportToExcel(stockData)}>Excel Data</Button>
                                         <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
+                                    </DialogActions> */}
+                                    <DialogActions sx={{ p: 0 }}>
+                                        <Box
+                                            display="flex"
+                                            justifyContent="space-between"
+                                            alignItems="center"
+                                            width="100%"
+                                            sx={{ borderTop: "2px solid #ddd", backgroundColor: "#f8f9fa", p: 2 }}
+                                        >
+                                            {/* ✅ Left side: Buttons */}
+                                            <Box display="flex" gap={2}>
+                                                <Button onClick={generatePDF} color="primary">
+                                                    <PrintIcon sx={{ fontSize: 35 }} />
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    endIcon={<FileDownloadIcon />}
+                                                    onClick={() => exportToExcel(stockData)}
+                                                >
+                                                    Excel Data
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={() => setPreviewOpen(false)}
+                                                    color="primary"
+                                                >
+                                                    Close
+                                                </Button>
+                                            </Box>
+
+                                            {/* ✅ Right side: Grand Total */}
+                                            <Box display="flex" alignItems="center" fontWeight="bold" gap={2}>
+                                                <Box display={'flex'}>
+                                                    <Typography variant="h6" sx={{ mr: 2 }}>
+                                                        <b>Inward Total:</b>
+                                                    </Typography>
+                                                    <Typography variant="h6" color="primary">
+                                                        <b> {grandTotal.toLocaleString("en-IN")} </b>
+                                                    </Typography>
+                                                </Box>
+
+
+                                                <Box display={'flex'}>
+                                                    <Typography variant="h6" sx={{ mr: 2 }}>
+                                                        <b>Purchase Total:</b>
+                                                    </Typography>
+                                                    <Typography variant="h6" color="primary">
+                                                        <b> {PurchaseTotal.toLocaleString("en-IN")} </b>
+                                                    </Typography>
+                                                </Box>
+
+
+                                                <Box display={'flex'}>
+                                                    <Typography variant="h6" sx={{ mr: 2 }}>
+                                                        <b>Invoice Total:</b>
+                                                    </Typography>
+                                                    <Typography variant="h6" color="primary">
+                                                        <b> {InvoiceTotal.toLocaleString("en-IN")} </b>
+                                                    </Typography>
+                                                </Box>
+
+                                            </Box>
+                                        </Box>
                                     </DialogActions>
                                 </Dialog>
                             </>

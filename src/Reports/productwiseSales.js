@@ -260,7 +260,8 @@ const ProductwiseSales = () => {
                     accessorKey: 'InvoiceAmount',
                     header: 'InvoiceAmount',
                     size: 30,
-                   Cell:({cell})=>cell.getValue()||0
+                
+                    Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
                 },
     
     
@@ -276,7 +277,8 @@ const ProductwiseSales = () => {
                     accessorKey: 'PurchaseOtherAmount',
                     header: 'PurchaseOtherAmount',
                     size: 30,
-                    Cell:({cell})=>cell.getValue()||0
+                    // Cell:({cell})=>cell.getValue()||0
+                     Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
                 },
             ];
         }, []);

@@ -252,38 +252,64 @@ const getSalesReport = () => {
                     size: 50,
                     Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
                 },
-    
+
                 {
                     accessorKey: 'DocNo',
                     header: 'DocNo',
                     size: 50,
-                    
+
                 },
-    
+
                 {
                     accessorKey: 'Contact',
                     header: 'Contact',
                     size: 50,
+
+                    Cell: ({ cell }) => cell.getValue() || "-",
                 },
-    
+
+                // {
+                //     accessorKey: 'Amount',
+                //     header: 'Amount',
+                //     size: 50,
+
+                // },
+
                 {
-                    accessorKey: 'Amount',
-                    header: 'Amount',
+                    accessorKey: 'Credit',
+                    header: 'Credit Amount',
                     size: 50,
-                    
+                    Cell: ({ row }) => (row.original.Source === 'Credit' ? row.original.Amount : '-'),
+
                 },
-    
+                {
+                    accessorKey: 'Debit',
+                    header: 'Debit Amount',
+                    size: 50,
+                    Cell: ({ row }) => (row.original.Source === 'Debit' ? row.original.Amount : '-'),
+
+                },
+
                 {
                     accessorKey: 'Source',
                     header: 'Source',
                     size: 50,
-                    
+
                 },
-    
-    
-               
+
+                {
+                    accessorKey: 'Closing Balance',
+                    header: 'Closing Balance',
+                    size: 50,
+                    Cell: ({ row }) => {
+                        const debit = row.original.Source === 'Debit' ? parseFloat(row.original.Amount) : 0;
+                        const credit = row.original.Source === 'Credit' ? parseFloat(row.original.Amount) : 0;
+                        return (debit - credit).toLocaleString();
+                    },
+                }
             ];
         }, []);
+        
         const table = useMaterialReactTable({
             columns,
             data: salesData,
@@ -296,6 +322,27 @@ const getSalesReport = () => {
                 },
             },
         });
+
+    const grandTotal = useMemo(() => {
+        return salesData?.reduce((acc, row) =>
+            acc + (row.Source === 'Credit' ? Number(row.Amount) || 0 : 0)
+            , 0);
+    }, [salesData]);
+
+    const grandDebitTotal = useMemo(() => {
+        return salesData?.reduce((acc, row) =>
+            acc + (row.Source === 'Debit' ? Number(row.Amount) || 0 : 0)
+            , 0);
+    }, [salesData]);
+
+
+    const grandClosingBalTotal = useMemo(() => {
+    return salesData?.reduce((acc, row) => {
+        const debit = row.Source === 'Debit' ? parseFloat(row.Amount) || 0 : 0;
+        const credit = row.Source === 'Credit' ? parseFloat(row.Amount) || 0 : 0;
+        return acc + (debit - credit);
+    }, 0);
+}, [salesData]);
 
     return (
         <Box >
@@ -486,11 +533,74 @@ const getSalesReport = () => {
                                             )}
                                         </Box>
                                     </DialogContent>
-                                    <DialogActions>
+                                    {/* <DialogActions>
                                          <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{fontSize:35}}/></Button>
                                           <Button variant='contained' endIcon={<FileDownloadIcon />} onClick={() => exportToExcel(salesData)}>Excel Data</Button>
                                          
                                         <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
+                                    </DialogActions> */}
+                                          <DialogActions sx={{ p: 0 }}>
+                                                                            <Box
+                                                                                display="flex"
+                                                                                justifyContent="space-between"
+                                                                                alignItems="center"
+                                                                                width="100%"
+                                                                                sx={{ borderTop: "2px solid #ddd", backgroundColor: "#f8f9fa", p: 2 }}
+                                                                            >
+                                                                                {/* ✅ Left side: Buttons */}
+                                                                                <Box display="flex" gap={2}>
+                                                                                    <Button onClick={generatePDF} color="primary">
+                                                                                        <PrintIcon sx={{ fontSize: 35 }} />
+                                                                                    </Button>
+                                                                                    <Button
+                                                                                        variant="contained"
+                                                                                        endIcon={<FileDownloadIcon />}
+                                                                                        onClick={() => exportToExcel(salesData)}
+                                                                                    >
+                                                                                        Excel Data
+                                                                                    </Button>
+                                                                                    <Button
+                                                                                        variant="contained"
+                                                                                        onClick={() => setPreviewOpen(false)}
+                                                                                        color="primary"
+                                                                                    >
+                                                                                        Close
+                                                                                    </Button>
+                                                                                </Box>
+                                    
+                                                                                {/* ✅ Right side: Grand Total */}
+                                            <Box display="flex" alignItems="center" fontWeight="bold" gap={2}>
+                                                <Box display={'flex'}>
+                                                    <Typography variant="h6" sx={{ mr: 2 }}>
+                                                        <b> Credit Total:</b>
+                                                    </Typography>
+                                                    <Typography variant="h6" color="primary">
+                                                        <b> {grandTotal.toLocaleString("en-IN")} </b>
+                                                    </Typography>
+                                                </Box>
+
+
+                                                  <Box display={'flex'}>
+                                                    <Typography variant="h6" sx={{ mr: 2 }}>
+                                                        <b> Debit Total:</b>
+                                                    </Typography>
+                                                    <Typography variant="h6" color="primary">
+                                                        <b> {grandDebitTotal.toLocaleString("en-IN")} </b>
+                                                    </Typography>
+                                                </Box>
+
+                                                 <Box display={'flex'}>
+                                                    <Typography variant="h6" sx={{ mr: 2 }}>
+                                                        <b> ClosingBal Total:</b>
+                                                    </Typography>
+                                                    <Typography variant="h6" color="primary">
+                                                        <b> {grandClosingBalTotal.toLocaleString("en-IN")} </b>
+                                                    </Typography>
+                                                </Box>
+                                                
+
+                                            </Box>
+                                        </Box>
                                     </DialogActions>
                                 </Dialog>
                             </>

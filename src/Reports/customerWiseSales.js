@@ -46,7 +46,7 @@ const CustomerWiseSales = () => {
             .then((response) => response.json())
             .then(data => {
                 console.log('data', data)
-                setSalesData(data);
+                setSalesData(data);  
                 setShowTable(true);
                 setPreviewOpen(true)
             })
@@ -331,9 +331,10 @@ const CustomerWiseSales = () => {
 
             {
                 accessorKey: ["Product Subtotal"],
-                header: 'Sub total',
+                header: 'Total with Tax',
                 size: 50,
-                Cell: ({ cell }) => cell.getValue() || 0,
+                // Cell: ({ cell }) => cell.getValue() || 0,
+                Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
             },
 
 
@@ -341,6 +342,7 @@ const CustomerWiseSales = () => {
                 accessorKey: 'Total',
                 header: 'Total',
                 size: 50,
+                Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
             },
 
 
@@ -363,7 +365,9 @@ const CustomerWiseSales = () => {
 
     //grand Total
     const grandTotal = useMemo(() => {
-        return salesData?.reduce((acc, row) => acc + (Number(row.Total) || 0), 0);
+         return salesData?.reduce((acc, row) => acc + (Number(row['Product Subtotal']) || 0), 0);
+// return salesData?.reduce((acc, row) => acc + (Number(row.Total) || 0), 0);
+        
     }, [salesData]);
 
     return (

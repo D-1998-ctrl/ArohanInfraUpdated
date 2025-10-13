@@ -95,7 +95,7 @@ const UserMaster = () => {
 
     const [idwiseData, setIdwiseData] = useState('')
     const [data, setData] = useState([]);
-    
+
     // const table = useMaterialReactTable({
     //     columns,
     //     data: data,
@@ -194,6 +194,22 @@ const UserMaster = () => {
 
     //create UserMaster
     const CreateUserMaster = () => {
+        if (!name || name.trim() === "") {
+            toast.error("Name is required");
+            return;
+        }
+
+         if (!user || user.trim() === "") {
+            toast.error("User Name is required");
+            return;
+        }
+
+         if (!password || password.trim() === "") {
+            toast.error("password is required");
+            return;
+        }
+
+
         const urlencoded = new URLSearchParams();
         urlencoded.append("Name", name);
         urlencoded.append("UserId", user);
@@ -330,11 +346,12 @@ const UserMaster = () => {
                                 />
                                 <Box> Page No </Box>
                                 <TextField
-                                    sx={{ width: '4.5%', ml: 1,
+                                    sx={{
+                                        width: '4.5%', ml: 1,
                                         '@media (max-width: 768px)': {
                                             width: '10%',
                                         },
-                                     }}
+                                    }}
                                     value={pageNo}
                                     onChange={(e) => setPageNo(e.target.value)}
                                     size="small"
@@ -379,14 +396,14 @@ const UserMaster = () => {
                         <Box>
                             <Typography>Full Name</Typography>
                             <TextField
-                  variant="standard"
-                  sx={{
-                    '& .MuiInput-underline:after': {
-                      borderBottomWidth: 1.5,
-                      borderBottomColor: '#44ad74',
-                    },mt:1
-                  }}
-                  focused
+                                variant="standard"
+                                sx={{
+                                    '& .MuiInput-underline:after': {
+                                        borderBottomWidth: 1.5,
+                                        borderBottomColor: '#44ad74',
+                                    }, mt: 1
+                                }}
+                                focused
 
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
@@ -396,14 +413,14 @@ const UserMaster = () => {
                         <Box mt={2}>
                             <Typography>User Name</Typography>
                             <TextField
-                            variant="standard"
-                            sx={{
-                              '& .MuiInput-underline:after': {
-                                borderBottomWidth: 1.5,
-                                borderBottomColor: '#44ad74',
-                              },mt:1
-                            }}
-                            focused
+                                variant="standard"
+                                sx={{
+                                    '& .MuiInput-underline:after': {
+                                        borderBottomWidth: 1.5,
+                                        borderBottomColor: '#44ad74',
+                                    }, mt: 1
+                                }}
+                                focused
 
                                 value={user}
                                 onChange={(e) => setUser(e.target.value)}
@@ -413,14 +430,14 @@ const UserMaster = () => {
                         <Box mt={2}>
                             <Typography>Password</Typography>
                             <TextField
-                            variant="standard"
-                            sx={{
-                              '& .MuiInput-underline:after': {
-                                borderBottomWidth: 1.5,
-                                borderBottomColor: '#44ad74',
-                              },mt:1
-                            }}
-                            focused
+                                variant="standard"
+                                sx={{
+                                    '& .MuiInput-underline:after': {
+                                        borderBottomWidth: 1.5,
+                                        borderBottomColor: '#44ad74',
+                                    }, mt: 1
+                                }}
+                                focused
 
                                 value={password}
                                 // onChange={(e) => setPassword(e.target.value)}
@@ -435,14 +452,14 @@ const UserMaster = () => {
                             <Box flex={1}  >
                                 <Typography variant="body2">Level</Typography>
                                 <FormControl fullWidth size="small" variant="standard"
-                                                    sx={{
-                                                      '& .MuiInput-underline:after': {
-                                                        borderBottomWidth: 1.5,
-                                                        borderBottomColor: '#44ad74',
-                                                      },mt:1
-                                                    }}
-                                                    focused
->
+                                    sx={{
+                                        '& .MuiInput-underline:after': {
+                                            borderBottomWidth: 1.5,
+                                            borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                    }}
+                                    focused
+                                >
                                     <Select
                                         value={selectedLevelOption || ""}
                                         onChange={(event) => setSelectedLevelOption(event.target.value)}
@@ -459,14 +476,14 @@ const UserMaster = () => {
                             <Box flex={1}>
                                 <Typography variant="body2">Branch</Typography>
                                 <FormControl fullWidth size="small" variant="standard"
-                                                    sx={{
-                                                      '& .MuiInput-underline:after': {
-                                                        borderBottomWidth: 1.5,
-                                                        borderBottomColor: '#44ad74',
-                                                      },mt:1
-                                                    }}
-                                                    focused
->
+                                    sx={{
+                                        '& .MuiInput-underline:after': {
+                                            borderBottomWidth: 1.5,
+                                            borderBottomColor: '#44ad74',
+                                        }, mt: 1
+                                    }}
+                                    focused
+                                >
                                     <Select
                                         value={selectedBranchOption || ""}
                                         onChange={(event) => setSelectedBranchOption(event.target.value)}

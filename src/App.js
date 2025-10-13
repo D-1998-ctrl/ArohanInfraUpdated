@@ -1,10 +1,10 @@
 
 
 
-import React from 'react';
+
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './Components/Sidebar';
-import Masters from './Masters/Masters';
+
 import CustomerMaster from './Masters/CustomerMaster';
 import SupplierMaster from './Masters/SupplierMaster';
 import ProductMaster from './Masters/ProductMaster';
@@ -31,7 +31,8 @@ import CustomerWiseSales from './Reports/customerWiseSales';
 import StockReport from './Reports/stockReport';
 import AccountReceivable from './Reports/accountReceivable';
 import AccountPayable from './Reports/accountPayable';
-
+import PurchaseReport from './Reports/PurchaseReport';
+import ProductGroupwiseStock from './Reports/ProductGroupwiseStock';
 
 function App() {
   return (
@@ -64,10 +65,12 @@ function App() {
           <Route path="/productwisesales" element={<ProductwiseSales />} />
           <Route path="/customerwisesales" element={<CustomerWiseSales />} />
           <Route path="/stockreport" element={<StockReport />} />
-           <Route path="/accountreceivable" element={<AccountReceivable />} />
-           
-<Route path="/accountpayable" element={<AccountPayable />} />
+          <Route path="/accountreceivable" element={<AccountReceivable />} />
 
+          <Route path="/accountpayable" element={<AccountPayable />} />
+          <Route path="/purchasereport" element={<PurchaseReport />} />
+           <Route path="/product-group-wise-Stock" element={<ProductGroupwiseStock />} />
+          
 
           <Route path="/commonpage" element={<Commonpage/>} />
         </Route>
