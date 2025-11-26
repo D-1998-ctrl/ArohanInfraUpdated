@@ -157,16 +157,23 @@ export const menuItems = [
       },
 
 
-         {
+      {
         title: "Purchase Report",
         path: "/purchasereport",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
 
 
-         {
+      {
         title: "Product-Group wise Stock",
         path: "/product-group-wise-Stock",
+        icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
+      },
+
+
+       {
+        title: " Production Report",
+        path: "/productionReport ",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
   

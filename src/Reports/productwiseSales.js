@@ -158,73 +158,166 @@ const ProductwiseSales = () => {
     };
 
 
-    const exportToExcel = async (data) => {
-      if (!data || data.length === 0) {
-        alert("No data available to export");
-        return;
-      }
+    // const exportToExcel = async (data) => {
+    //   if (!data || data.length === 0) {
+    //     alert("No data available to export");
+    //     return;
+    //   }
     
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("SalesReport");
+    //   const workbook = new ExcelJS.Workbook();
+    //   const worksheet = workbook.addWorksheet("SalesReport");
     
-      // Define header row
-      const headers = [
-        "Product Name",
-        "UOM",
-        "SellPrice",
-        "InvoiceQuantity",
-        "InvoiceAmount",
-        "PurchaseOtherQuantity",
-        "PurchaseOtherAmount",
+    //   // Define header row
+    //   const headers = [
+    //     "Product Name",
+    //     "UOM",
+    //     "SellPrice",
+    //     "InvoiceQuantity",
+    //     "InvoiceAmount",
+    //     "PurchaseOtherQuantity",
+    //     "PurchaseOtherAmount",
 
      
-      ];
+    //   ];
     
-      worksheet.addRow(headers);
+    //   worksheet.addRow(headers);
     
-      // Apply header styling
-      worksheet.getRow(1).eachCell((cell) => {
-        cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; // white bold
-        cell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "FF4F81BD" }, // blue background
-        };
-        cell.alignment = { horizontal: "center", vertical: "middle" };
-      });
+    //   // Apply header styling
+    //   worksheet.getRow(1).eachCell((cell) => {
+    //     cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; // white bold
+    //     cell.fill = {
+    //       type: "pattern",
+    //       pattern: "solid",
+    //       fgColor: { argb: "FF4F81BD" }, // blue background
+    //     };
+    //     cell.alignment = { horizontal: "center", vertical: "middle" };
+    //   });
     
-      // Add data rows
-      data.forEach((item) => {
-        worksheet.addRow([
+    //   // Add data rows
+    //   data.forEach((item) => {
+    //     worksheet.addRow([
        
-          item.ProductName,
-          item.UOM || "N/A",
-          item.SellPrice || 0,
-          item.InvoiceQuantity || 0,
-          item.InvoiceAmount || 0,
-          item.PurchaseOtherQuantity || 0,
-          item.PurchaseOtherAmount || 0,
+    //       item.ProductName,
+    //       item.UOM || "N/A",
+    //       item.SellPrice || 0,
+    //       item.InvoiceQuantity || 0,
+    //       item.InvoiceAmount || 0,
+    //       item.PurchaseOtherQuantity || 0,
+    //       item.PurchaseOtherAmount || 0,
           
-        ]);
-      });
+    //     ]);
+    //   });
     
-      // Auto-fit columns
-      worksheet.columns.forEach((col) => {
-        let maxLength = 10;
-        col.eachCell({ includeEmpty: true }, (cell) => {
-          const columnLength = cell.value ? cell.value.toString().length : 0;
-          if (columnLength > maxLength) maxLength = columnLength;
-        });
-        col.width = maxLength + 5;
-      });
+    //   // Auto-fit columns
+    //   worksheet.columns.forEach((col) => {
+    //     let maxLength = 10;
+    //     col.eachCell({ includeEmpty: true }, (cell) => {
+    //       const columnLength = cell.value ? cell.value.toString().length : 0;
+    //       if (columnLength > maxLength) maxLength = columnLength;
+    //     });
+    //     col.width = maxLength + 5;
+    //   });
     
-      // Write workbook
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(blob, `Productwise_SalesReport_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    //   // Write workbook
+    //   const buffer = await workbook.xlsx.writeBuffer();
+    //   const blob = new Blob([buffer], {
+    //     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    //   });
+    //   saveAs(blob, `Productwise_SalesReport_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    // };
+const exportToExcel = async (data) => {
+  if (!data || data.length === 0) {
+    alert("No data available to export");
+    return;
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("SalesReport");
+
+  // Define headers
+  const headers = [
+    "Product Name",
+    "UOM",
+    "SellPrice",
+    "InvoiceQuantity",
+    "InvoiceAmount",
+    "PurchaseOtherQuantity",
+    "PurchaseOtherAmount",
+  ];
+
+  worksheet.addRow(headers);
+
+  // Style header
+  worksheet.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF4F81BD" },
     };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+  });
+
+  // Add data rows
+  data.forEach((item) => {
+    worksheet.addRow([
+      item.ProductName,
+      item.UOM || "N/A",
+      Number(item.SellPrice) || 0,
+      Number(item.InvoiceQuantity) || 0,
+      Number(item.InvoiceAmount) || 0,
+      Number(item.PurchaseOtherQuantity) || 0,
+      Number(item.PurchaseOtherAmount) || 0,
+    ]);
+  });
+
+  // Auto-fit columns
+  worksheet.columns.forEach((col) => {
+    let maxLength = 10;
+    col.eachCell({ includeEmpty: true }, (cell) => {
+      const columnLength = cell.value ? cell.value.toString().length : 0;
+      if (columnLength > maxLength) maxLength = columnLength;
+    });
+    col.width = maxLength + 5;
+  });
+
+  // === Add Grand Total Row ===
+  const lastRow = worksheet.lastRow.number + 1;
+  const totalRow = worksheet.addRow([]);
+
+  totalRow.getCell(1).value = "Grand Total";
+  totalRow.getCell(1).font = { bold: true, size: 13 };
+  totalRow.getCell(1).alignment = { horizontal: "right" };
+
+  // Add SUM formulas
+  // Column 5 = InvoiceAmount (E), Column 7 = PurchaseOtherAmount (G)
+  totalRow.getCell(5).value = { formula: `SUM(E2:E${lastRow - 1})` };
+  totalRow.getCell(5).font = { bold: true };
+
+  totalRow.getCell(7).value = { formula: `SUM(G2:G${lastRow - 1})` };
+  totalRow.getCell(7).font = { bold: true };
+
+  // Apply styling to total row
+  totalRow.eachCell((cell) => {
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFFFE699" }, // light blue shade
+    };
+    cell.border = {
+      top: { style: "thin" },
+      bottom: { style: "thin" },
+    };
+  });
+
+  // Write workbook
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  saveAs(blob, `Productwise_SalesReport_${new Date().toISOString().slice(0, 10)}.xlsx`);
+};
+
 
      const columns = useMemo(() => {
             return [
@@ -383,7 +476,7 @@ const ProductwiseSales = () => {
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                                         </Typography>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                                         ProductWise   Sales Report 
+                                         ProductWise   Sales Report for  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
                                         </Typography>
                                     </DialogTitle>
                                     <DialogContent dividers>

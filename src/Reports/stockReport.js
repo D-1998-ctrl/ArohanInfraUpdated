@@ -179,7 +179,7 @@ const StockReport = () => {
             "PurchaseTotal",
             "InvoiceTotal",
             "Balance",
-            "Value",
+            // "Value",
 
         ];
 
@@ -200,14 +200,14 @@ const StockReport = () => {
         data.forEach((item) => {
             worksheet.addRow([
                 item.ProductName,
-                item.SellPrice,
-                item.OpeningBalance || 0,
-                item.InwardTotal || 0,
-                item.PurchaseTotal || 0,
-                item.InvoiceTotal || 0,
-                item.Balance || 0,
+                Number(item.SellPrice),
+                Number(item.OpeningBalance) || 0,
+                Number(item.InwardTotal) || 0,
+                Number(item.PurchaseTotal) || 0,
+                Number(item.InvoiceTotal) || 0,
+                Number(item.Balance) || 0,
 
-                item.Value || 0,
+                // item.Value || 0,
 
             ]);
         });
@@ -221,6 +221,39 @@ const StockReport = () => {
             });
             col.width = maxLength + 5;
         });
+
+
+
+
+/// // Add Grand Total row
+    const totalRowIndex = worksheet.lastRow.number + 2;
+    const totalRow = worksheet.getRow(totalRowIndex);
+    totalRow.getCell(3).value = "Grand Total";
+    totalRow.getCell(3).font = { bold: true, size: 14 };
+    totalRow.getCell(3).alignment = { horizontal: "right" };
+
+    totalRow.getCell(4).value = { formula: `SUM(D2:D${worksheet.lastRow.number - 2})` };
+     totalRow.getCell(5).value = { formula: `SUM(E2:E${worksheet.lastRow.number - 2})` };
+     totalRow.getCell(6).value = { formula: `SUM(F2:F${worksheet.lastRow.number - 2})` };
+
+    // Style Grand Total row
+    totalRow.eachCell((cell) => {
+        cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFFFE699" }, // Light yellow background
+        };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+        };
+    });
+
+
+
+
 
         // Write workbook
         const buffer = await workbook.xlsx.writeBuffer();
@@ -256,7 +289,7 @@ const StockReport = () => {
 
 
             // {
-            //     accessorKey: 'OrderDate.date',
+            //     accessorKey: 'OrderDate',
             //     header: 'Order Date',
             //     size: 50,
             //     Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
@@ -287,19 +320,19 @@ const StockReport = () => {
 
 
             {
-                accessorKey: 'Balance',
-                header: 'Balance',
+                accessorKey: 'ClosingBalance',
+                header: 'ClosingBalance',
                 size: 50,
             },
 
 
-            {
-                accessorKey: 'Value',
-                header: 'Value',
-                size: 50,
-                // Cell: ({ cell }) => cell.getValue() || 0,
-                Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
-            },
+            // {
+            //     accessorKey: 'Value',
+            //     header: 'Value',
+            //     size: 50,
+            //     // Cell: ({ cell }) => cell.getValue() || 0,
+            //     Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
+            // },
         ];
     }, []);
     const table = useMaterialReactTable({
@@ -405,7 +438,7 @@ const StockReport = () => {
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                                         </Typography>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                                            Stock Report Preview
+                                            Stock Report Preview for  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
                                         </Typography>
                                     </DialogTitle>
                                     <DialogContent dividers>

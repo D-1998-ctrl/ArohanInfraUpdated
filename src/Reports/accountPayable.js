@@ -1,9 +1,9 @@
- 
-import { useState ,useEffect,useMemo} from 'react';
+
+import { useState, useEffect, useMemo } from 'react';
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import {FormControl, Select, MenuItem, Dialog, DialogActions, DialogContent, DialogTitle, Box, Typography, Button } from '@mui/material';
+import { FormControl, Select, MenuItem, Dialog, DialogActions, DialogContent, DialogTitle, Box, Typography, Button } from '@mui/material';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -23,27 +23,27 @@ const AccountPayable = () => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [accountOption, setAccountOption] = useState('');
     const [selectedAccountOption, setSelectedAccountOption] = useState('');
-    
+
     //CUSTOMER ACCOUNTS
-   const fetchAccounts  = async () => {
-    try {
-      const response = await fetch(
-        "https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=Account&Colname=TypeCode&Colvalue=s"
-      );
-      const result = await response.json();
+    const fetchAccounts = async () => {
+        try {
+            const response = await fetch(
+                "https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=Account&Colname=TypeCode&Colvalue=s"
+            );
+            const result = await response.json();
 
-       console.log("grp info:", result);
+            console.log("grp info:", result);
 
-      const options = result.map((account) => ({
-        value: account.Id,
-        label: account.AccountName,
-      }));
+            const options = result.map((account) => ({
+                value: account.Id,
+                label: account.AccountName,
+            }));
 
-      setAccountOption(options);
-    } catch (error) {
-      console.error("Error fetching accounts:", error);
-    }
-  };
+            setAccountOption(options);
+        } catch (error) {
+            console.error("Error fetching accounts:", error);
+        }
+    };
 
     useEffect(() => {
         fetchAccounts();
@@ -171,67 +171,172 @@ const AccountPayable = () => {
         doc.save("Account_payable.pdf");
     };
 
-    const exportToExcel = async (data) => {
-        if (!data || data.length === 0) {
-            alert("No data available to export");
-            return;
-        }
+    // const exportToExcel = async (data) => {
+    //     if (!data || data.length === 0) {
+    //         alert("No data available to export");
+    //         return;
+    //     }
 
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet("SalesReport");
+    //     const workbook = new ExcelJS.Workbook();
+    //     const worksheet = workbook.addWorksheet("SalesReport");
 
-        // Define header row
-        const headers = [
-            "Date",
-            "DocNo",
-            "BillNo",
-            "Amount",
-            "Source",
+    //     // Define header row
+    //     const headers = [
+    //         "Date",
+    //         "DocNo",
+    //         "BillNo",
+    //         "Amount",
+    //         "Source",
 
-        ];
+    //     ];
 
-        worksheet.addRow(headers);
+    //     worksheet.addRow(headers);
 
-        // Apply header styling
-        worksheet.getRow(1).eachCell((cell) => {
-            cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; // white bold
-            cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "FF4F81BD" }, // blue background
-            };
-            cell.alignment = { horizontal: "center", vertical: "middle" };
-        });
+    //     // Apply header styling
+    //     worksheet.getRow(1).eachCell((cell) => {
+    //         cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; // white bold
+    //         cell.fill = {
+    //             type: "pattern",
+    //             pattern: "solid",
+    //             fgColor: { argb: "FF4F81BD" }, // blue background
+    //         };
+    //         cell.alignment = { horizontal: "center", vertical: "middle" };
+    //     });
 
-        // Add data rows
-        data.forEach((item) => {
-            worksheet.addRow([
-                item.Date,
-                item.DocNo,
-                item.BillNo || 0,
-                item.Amount || 0,
-                item.Source || 0,
+    //     // Add data rows
+    //     data.forEach((item) => {
+    //         worksheet.addRow([
+    //             item.Date,
+    //             item.DocNo,
+    //             item.BillNo || 0,
+    //             item.Amount || 0,
+    //             item.Source || 0,
 
-            ]);
-        });
+    //         ]);
+    //     });
 
-        // Auto-fit columns
-        worksheet.columns.forEach((col) => {
-            let maxLength = 10;
-            col.eachCell({ includeEmpty: true }, (cell) => {
-                const columnLength = cell.value ? cell.value.toString().length : 0;
-                if (columnLength > maxLength) maxLength = columnLength;
-            });
-            col.width = maxLength + 5;
-        });
+    //     // Auto-fit columns
+    //     worksheet.columns.forEach((col) => {
+    //         let maxLength = 10;
+    //         col.eachCell({ includeEmpty: true }, (cell) => {
+    //             const columnLength = cell.value ? cell.value.toString().length : 0;
+    //             if (columnLength > maxLength) maxLength = columnLength;
+    //         });
+    //         col.width = maxLength + 5;
+    //     });
 
-        // Write workbook
-        const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-        saveAs(blob, `AccountPayable_Report.xlsx`);
+    //     // Write workbook
+    //     const buffer = await workbook.xlsx.writeBuffer();
+    //     const blob = new Blob([buffer], {
+    //         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    //     });
+    //     saveAs(blob, `AccountPayable_Report.xlsx`);
+    // };
+const exportToExcel = async (data) => {
+  if (!data || data.length === 0) {
+    alert("No data available to export");
+    return;
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("AccountReceivable");
+
+  // Updated header row
+  const headers = [
+    "Date",
+    "DocNo",
+    "BillNo",
+    "Credit Amount",
+    "Debit Amount",
+    "Source",
+    "Closing Balance",
+  ];
+
+  worksheet.addRow(headers);
+
+  // Style header
+  worksheet.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF4F81BD" },
     };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+  });
+
+  // Add data rows
+  data.forEach((item) => {
+    let creditAmount = 0;
+    let debitAmount = 0;
+
+    // 👇 segregate Credit/Debit
+    if (item.Source?.toLowerCase() === "credit") {
+      creditAmount = Number(item.Amount) || 0;
+    } else if (item.Source?.toLowerCase() === "debit") {
+      debitAmount = Number(item.Amount) || 0;
+    }
+
+    const closingBal = debitAmount - creditAmount; // 👈 Formula applied per row
+
+    worksheet.addRow([
+      item.Date || "",
+      item.DocNo || "",
+      item.BillNo || "",
+      creditAmount,
+      debitAmount,
+      item.Source || "",
+      closingBal, // 👈 Inserted here
+    ]);
+  });
+
+  // Auto-fit columns
+  worksheet.columns.forEach((col) => {
+    let maxLength = 10;
+    col.eachCell({ includeEmpty: true }, (cell) => {
+      const columnLength = cell.value ? cell.value.toString().length : 0;
+      if (columnLength > maxLength) maxLength = columnLength;
+    });
+    col.width = maxLength + 5;
+  });
+
+  // Add Grand Total row
+  const totalRowIndex = worksheet.lastRow.number + 2;
+  const totalRow = worksheet.getRow(totalRowIndex);
+  totalRow.getCell(3).value = "Grand Total";
+  totalRow.getCell(3).font = { bold: true, size: 14 };
+  totalRow.getCell(3).alignment = { horizontal: "right" };
+
+  // Calculate totals dynamically based on data length
+  const dataStartRow = 2;
+  const dataEndRow = worksheet.lastRow.number - 2; // Adjust for totals
+
+  totalRow.getCell(4).value = { formula: `SUM(D${dataStartRow}:D${dataEndRow})` };
+  totalRow.getCell(5).value = { formula: `SUM(E${dataStartRow}:E${dataEndRow})` };
+  totalRow.getCell(7).value = { formula: `E${totalRowIndex} - D${totalRowIndex}` }; // 👈 Closing Bal total
+
+  // Style Grand Total row
+  totalRow.eachCell((cell) => {
+    cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFFFE699" }, // Light yellow background
+    };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+    cell.border = {
+      top: { style: "thin" },
+      bottom: { style: "thin" },
+    };
+  });
+
+  // Save workbook
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  saveAs(blob, `AccountPayable _Report.xlsx`);
+};
 
 
     const columns = useMemo(() => {
@@ -259,7 +364,7 @@ const AccountPayable = () => {
                 Cell: ({ cell }) => cell.getValue() || "-",
             },
 
-    
+
             {
                 accessorKey: 'Credit',
                 header: 'Credit Amount',
@@ -321,7 +426,7 @@ const AccountPayable = () => {
             , 0);
     }, [salesData]);
 
-   
+
     const grandClosingBalTotal = useMemo(() => {
         return salesData?.reduce((acc, row) => {
             const debit = row.Source === 'Debit' ? parseFloat(row.Amount) || 0 : 0;
@@ -332,7 +437,7 @@ const AccountPayable = () => {
 
     return (
         <Box>
-            
+
             <Box textAlign={'center'}>
                 <Typography sx={{ color: 'var(--complementary-color)', }} variant='h4'><b>Account Payable</b></Typography>
             </Box>
@@ -341,7 +446,7 @@ const AccountPayable = () => {
 
                 <Box >
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <Box sx={{ display: 'flex', gap:10,  }}>
+                        <Box sx={{ display: 'flex', gap: 10, }}>
 
                             <Box >
                                 <Typography>From Date</Typography>
@@ -350,7 +455,7 @@ const AccountPayable = () => {
                                     format="dd-MM-yyyy"
                                     onChange={(newValue) => setFromDate(newValue)}
                                     slotProps={{
-                                        textField: { size: "small",  },
+                                        textField: { size: "small", },
                                     }}
                                 />
                             </Box>
@@ -364,30 +469,30 @@ const AccountPayable = () => {
                                     format="dd-MM-yyyy"
                                     onChange={(newValue) => setToDate(newValue)}
                                     slotProps={{
-                                        textField: { size: "small",  },
+                                        textField: { size: "small", },
                                     }}
                                 />
                             </Box>
 
 
                             <Box sx={{ width: '300px' }}>
-                                <Typography>Customers</Typography>
+                                <Typography>Supplier</Typography>
                                 <FormControl fullWidth size="small" variant="standard"
                                     sx={{
                                         '& .MuiInput-underline:after': {
                                             borderBottomWidth: 1.5,
                                             borderBottomColor: '#44ad74',
-                                          
+
                                         }, mt: 1
                                     }}
 
                                     focused>
                                     <Select
-                                   
+
                                         value={selectedAccountOption}
                                         onChange={(event) => setSelectedAccountOption(event.target.value)}
                                     >
-                                        
+
                                         {accountOption.length > 0 ? (
                                             accountOption.map((option) => (
                                                 <MenuItem key={option.value} value={option.value}>
@@ -397,14 +502,14 @@ const AccountPayable = () => {
                                         ) : (
                                             <MenuItem disabled>No options available</MenuItem>
                                         )}
-                                        
+
                                     </Select>
                                 </FormControl>
                             </Box>
 
 
 
-                            
+
                         </Box>
 
 
@@ -448,8 +553,10 @@ const AccountPayable = () => {
                                         <Typography sx={{ mt: 1 }}>
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                                         </Typography>
-                                        <Typography  sx={{ fontWeight: 'bold', mt: 1 }}>
-                                         Account Payable
+                                        <Typography sx={{ fontWeight: 'bold', mt: 1 }}>
+                                            Account Payable  form  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'} for {selectedAccountOption
+                                                ? accountOption.find((option) => option.value === selectedAccountOption)?.label || '-'
+                                                : '-'}
                                         </Typography>
                                     </DialogTitle>
                                     <DialogContent dividers>
@@ -490,7 +597,7 @@ const AccountPayable = () => {
                                                         </Table>
                                                     </TableContainer> */}
 
-                                                     <Box>
+                                                    <Box>
                                                         <MaterialReactTable table={table}
                                                             enableColumnResizing
                                                             muiTableHeadCellProps={{
@@ -513,36 +620,36 @@ const AccountPayable = () => {
                                         <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
                                     </DialogActions> */}
 
-                                               <DialogActions sx={{ p: 0 }}>
-                                                                            <Box
-                                                                                display="flex"
-                                                                                justifyContent="space-between"
-                                                                                alignItems="center"
-                                                                                width="100%"
-                                                                                sx={{ borderTop: "2px solid #ddd", backgroundColor: "#f8f9fa", p: 2 }}
-                                                                            >
-                                                                                {/* ✅ Left side: Buttons */}
-                                                                                <Box display="flex" gap={2}>
-                                                                                    <Button onClick={generatePDF} color="primary">
-                                                                                        <PrintIcon sx={{ fontSize: 35 }} />
-                                                                                    </Button>
-                                                                                    <Button
-                                                                                        variant="contained"
-                                                                                        endIcon={<FileDownloadIcon />}
-                                                                                        onClick={() => exportToExcel(salesData)}
-                                                                                    >
-                                                                                        Excel Data
-                                                                                    </Button>
-                                                                                    <Button
-                                                                                        variant="contained"
-                                                                                        onClick={() => setPreviewOpen(false)}
-                                                                                        color="primary"
-                                                                                    >
-                                                                                        Close
-                                                                                    </Button>
-                                                                                </Box>
-                                    
-                                                                                {/* ✅ Right side: Grand Total */}
+                                    <DialogActions sx={{ p: 0 }}>
+                                        <Box
+                                            display="flex"
+                                            justifyContent="space-between"
+                                            alignItems="center"
+                                            width="100%"
+                                            sx={{ borderTop: "2px solid #ddd", backgroundColor: "#f8f9fa", p: 2 }}
+                                        >
+                                            {/* ✅ Left side: Buttons */}
+                                            <Box display="flex" gap={2}>
+                                                <Button onClick={generatePDF} color="primary">
+                                                    <PrintIcon sx={{ fontSize: 35 }} />
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    endIcon={<FileDownloadIcon />}
+                                                    onClick={() => exportToExcel(salesData)}
+                                                >
+                                                    Excel Data
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={() => setPreviewOpen(false)}
+                                                    color="primary"
+                                                >
+                                                    Close
+                                                </Button>
+                                            </Box>
+
+                                            {/* ✅ Right side: Grand Total */}
                                             <Box display="flex" alignItems="center" fontWeight="bold" gap={2}>
                                                 <Box display={'flex'}>
                                                     <Typography variant="h6" sx={{ mr: 2 }}>
@@ -554,7 +661,7 @@ const AccountPayable = () => {
                                                 </Box>
 
 
-                                                  <Box display={'flex'}>
+                                                <Box display={'flex'}>
                                                     <Typography variant="h6" sx={{ mr: 2 }}>
                                                         <b> Debit Total:</b>
                                                     </Typography>
@@ -563,7 +670,7 @@ const AccountPayable = () => {
                                                     </Typography>
                                                 </Box>
 
-                                              
+
                                                 <Box display={'flex'}>
                                                     <Typography variant="h6" sx={{ mr: 2 }}>
                                                         <b>Closing Balance:</b>
@@ -572,7 +679,7 @@ const AccountPayable = () => {
                                                         <b> {grandClosingBalTotal.toLocaleString("en-IN")} </b>
                                                     </Typography>
                                                 </Box>
-                                                
+
 
                                             </Box>
                                         </Box>

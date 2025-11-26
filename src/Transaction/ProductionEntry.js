@@ -3699,6 +3699,8 @@ const ProductionEntry = () => {
         setSelectedMachine('');
         SetMachineStartTime('');
         SetMachineEndTime('');
+        setupdateMachineStartTime('');
+        setupdatemachineEndtime('')
         setSelectedOillSeed('');
         setStorage('');
         setBrandName('');
@@ -3752,7 +3754,7 @@ const ProductionEntry = () => {
             requestOptions
         )
             .then((response) => {
-                // console.log("API Response:", response.data);
+                 console.log("API Response:", response.data);
                 toast.success("Production Entry created successfully");
                 handleClearTemplate();
                 handleDrawerClose()

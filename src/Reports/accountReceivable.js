@@ -180,67 +180,180 @@ const getSalesReport = () => {
     };
 
 
-    const exportToExcel = async (data) => {
-      if (!data || data.length === 0) {
-        alert("No data available to export");
-        return;
-      }
+    // const exportToExcel = async (data) => {
+    //   if (!data || data.length === 0) {
+    //     alert("No data available to export");
+    //     return;
+    //   }
     
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("SalesReport");
+    //   const workbook = new ExcelJS.Workbook();
+    //   const worksheet = workbook.addWorksheet("SalesReport");
     
-      // Define header row
-      const headers = [
-        "Date",
-        "DocNo",
-        "Contact",
-        "Amount",
-        "Source",
+    //   // Define header row
+    //   const headers = [
+    //     "Date",
+    //     "DocNo",
+    //     "Contact",
+    //     "Amount",
+    //     "Source",
         
-      ];
+    //   ];
     
-      worksheet.addRow(headers);
+    //   worksheet.addRow(headers);
     
-      // Apply header styling
-      worksheet.getRow(1).eachCell((cell) => {
-        cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; // white bold
-        cell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: "FF4F81BD" }, // blue background
-        };
-        cell.alignment = { horizontal: "center", vertical: "middle" };
-      });
+    //   // Apply header styling
+    //   worksheet.getRow(1).eachCell((cell) => {
+    //     cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; // white bold
+    //     cell.fill = {
+    //       type: "pattern",
+    //       pattern: "solid",
+    //       fgColor: { argb: "FF4F81BD" }, // blue background
+    //     };
+    //     cell.alignment = { horizontal: "center", vertical: "middle" };
+    //   });
     
-      // Add data rows
-      data.forEach((item) => {
-        worksheet.addRow([
-          item.Date,
-          item.DocNo,
-          item.Contact || 0,
-          item.Amount || 0,
-          item.Source || 0,
+    //   // Add data rows
+    //   data.forEach((item) => {
+    //     worksheet.addRow([
+    //       item.Date,
+    //       item.DocNo,
+    //       item.Contact || 0,
+    //       item.Amount || 0,
+    //       item.Source || 0,
          
-        ]);
-      });
+    //     ]);
+    //   });
     
-      // Auto-fit columns
-      worksheet.columns.forEach((col) => {
-        let maxLength = 10;
-        col.eachCell({ includeEmpty: true }, (cell) => {
-          const columnLength = cell.value ? cell.value.toString().length : 0;
-          if (columnLength > maxLength) maxLength = columnLength;
-        });
-        col.width = maxLength + 5;
-      });
+    //   // Auto-fit columns
+    //   worksheet.columns.forEach((col) => {
+    //     let maxLength = 10;
+    //     col.eachCell({ includeEmpty: true }, (cell) => {
+    //       const columnLength = cell.value ? cell.value.toString().length : 0;
+    //       if (columnLength > maxLength) maxLength = columnLength;
+    //     });
+    //     col.width = maxLength + 5;
+    //   });
     
-      // Write workbook
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-      saveAs(blob, `AccountReceivable_Report.xlsx`);
+    //   // Write workbook
+    //   const buffer = await workbook.xlsx.writeBuffer();
+    //   const blob = new Blob([buffer], {
+    //     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    //   });
+    //   saveAs(blob, `AccountReceivable_Report.xlsx`);
+    // };
+
+
+
+
+
+
+const exportToExcel = async (data) => {
+  if (!data || data.length === 0) {
+    alert("No data available to export");
+    return;
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("AccountReceivable");
+
+  // Updated header row
+  const headers = [
+    "Date",
+    "DocNo",
+    "Contact",
+    "Credit Amount",
+    "Debit Amount",
+    "Source",
+    "Closing Balance", // 👈 Added this new column
+  ];
+
+  worksheet.addRow(headers);
+
+  // Style header
+  worksheet.getRow(1).eachCell((cell) => {
+    cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF4F81BD" },
     };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+  });
+
+  // Add data rows
+  data.forEach((item) => {
+    let creditAmount = 0;
+    let debitAmount = 0;
+
+    // 👇 segregate Credit/Debit
+    if (item.Source?.toLowerCase() === "credit") {
+      creditAmount = Number(item.Amount) || 0;
+    } else if (item.Source?.toLowerCase() === "debit") {
+      debitAmount = Number(item.Amount) || 0;
+    }
+
+    const closingBal = debitAmount - creditAmount; // 👈 Formula applied per row
+
+    worksheet.addRow([
+      item.Date || "",
+      item.DocNo || "",
+      item.Contact || "",
+      creditAmount,
+      debitAmount,
+      item.Source || "",
+      closingBal, // 👈 Inserted here
+    ]);
+  });
+
+  // Auto-fit columns
+  worksheet.columns.forEach((col) => {
+    let maxLength = 10;
+    col.eachCell({ includeEmpty: true }, (cell) => {
+      const columnLength = cell.value ? cell.value.toString().length : 0;
+      if (columnLength > maxLength) maxLength = columnLength;
+    });
+    col.width = maxLength + 5;
+  });
+
+  // Add Grand Total row
+  const totalRowIndex = worksheet.lastRow.number + 2;
+  const totalRow = worksheet.getRow(totalRowIndex);
+  totalRow.getCell(3).value = "Grand Total";
+  totalRow.getCell(3).font = { bold: true, size: 14 };
+  totalRow.getCell(3).alignment = { horizontal: "right" };
+
+  // Calculate totals dynamically based on data length
+  const dataStartRow = 2;
+  const dataEndRow = worksheet.lastRow.number - 2; // Adjust for totals
+
+  totalRow.getCell(4).value = { formula: `SUM(D${dataStartRow}:D${dataEndRow})` };
+  totalRow.getCell(5).value = { formula: `SUM(E${dataStartRow}:E${dataEndRow})` };
+  totalRow.getCell(7).value = { formula: `E${totalRowIndex} - D${totalRowIndex}` }; // 👈 Closing Bal total
+
+  // Style Grand Total row
+  totalRow.eachCell((cell) => {
+    cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
+    cell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFFFE699" }, // Light yellow background
+    };
+    cell.alignment = { horizontal: "center", vertical: "middle" };
+    cell.border = {
+      top: { style: "thin" },
+      bottom: { style: "thin" },
+    };
+  });
+
+  // Save workbook
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  saveAs(blob, `AccountReceivable_Report.xlsx`);
+};
+
+
 
 
      const columns = useMemo(() => {
@@ -473,8 +586,10 @@ const getSalesReport = () => {
                                         <Typography sx={{ mt: 1 }}>
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                                         </Typography>
-                                        <Typography  sx={{ fontWeight: 'bold', mt: 1 }}>
-                                            Account Receivable
+                                        <Typography sx={{ fontWeight: 'bold', mt: 1 }}>
+                                            Account Receivable form  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'} For  {selectedAccountOption
+                                                ? (selectedAccountOption.label)
+                                                : '-'}
                                         </Typography>
                                     </DialogTitle>
                                     <DialogContent dividers>

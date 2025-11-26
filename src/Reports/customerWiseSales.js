@@ -208,14 +208,14 @@ const CustomerWiseSales = () => {
                 item.ContactNo,
                 item.ProductName || "N/A",
                 item.Rate || 0,
-                item["Ttl qtd"] || "N/A",
-                item["Ttl Amt"] || 0,
-                item["Ttl CGST Amt"] || 0,
-                item["Ttl SGST Amt"] || 0,
-                item["Ttl IGST Amt"] || 0,
+               Number( item["Ttl qtd"]) || "N/A",
+                Number(item["Ttl Amt"]) || 0,
+                Number(item["Ttl CGST Amt"]) || 0,
+                Number(item["Ttl SGST Amt"]) || 0,
+                Number(item["Ttl IGST Amt"]) || 0,
                 item.PaymentMode || 0,
-                item.Transport || 0,
-                item["Product Subtotal"] || 0,
+                Number(item.Transport) || 0,
+                Number(item["Product Subtotal"]) || 0,
 
 
                 item.Total || 0,
@@ -231,6 +231,37 @@ const CustomerWiseSales = () => {
             });
             col.width = maxLength + 5;
         });
+
+/// // Add Grand Total row
+    const totalRowIndex = worksheet.lastRow.number + 2;
+    const totalRow = worksheet.getRow(totalRowIndex);
+    totalRow.getCell(11).value = "Grand Total";
+    totalRow.getCell(11).font = { bold: true, size: 14 };
+    totalRow.getCell(11).alignment = { horizontal: "right" };
+
+    totalRow.getCell(12).value = { formula: `SUM(L2:L${worksheet.lastRow.number - 2})` };
+    // totalRow.getCell(13).value = { formula: `SUM(M2:M${worksheet.lastRow.number - 2})` };
+
+    // Style Grand Total row
+    totalRow.eachCell((cell) => {
+        cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFFFE699" }, // Light yellow background
+        };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+        };
+    });
+
+
+
+
+
+
 
         // Write workbook
         const buffer = await workbook.xlsx.writeBuffer();
@@ -270,7 +301,7 @@ const CustomerWiseSales = () => {
                 accessorKey: 'Rate',
                 header: 'Rate',
                 size: 50,
-                Cell: ({ cell }) => cell.getValue() || 0,
+                Cell: ({ cell }) =>Number( cell.getValue() || 0).toFixed(2),
 
             },
 
@@ -285,6 +316,7 @@ const CustomerWiseSales = () => {
             {
                 accessorKey: ["Ttl Amt"],
                 header: 'Amount',
+                 Cell: ({ cell }) =>Number( cell.getValue() || 0).toFixed(2),
                 size: 50,
             },
 
@@ -292,15 +324,16 @@ const CustomerWiseSales = () => {
             {
                 accessorKey: ["Ttl CGST Amt"],
                 header: 'CGST',
+                 
                 size: 50,
-                Cell: ({ cell }) => cell.getValue() || 0,
+              Cell: ({ cell }) =>Number( cell.getValue() || 0).toFixed(2),
             },
 
             {
                 accessorKey: ["Ttl SGST Amt"],
                 header: 'SGST',
                 size: 50,
-                Cell: ({ cell }) => cell.getValue() || 0,
+                Cell: ({ cell }) =>Number( cell.getValue() || 0).toFixed(2),
             },
 
 
@@ -308,7 +341,7 @@ const CustomerWiseSales = () => {
                 accessorKey: ["Ttl IGST Amt"],
                 header: 'IGST',
                 size: 50,
-                Cell: ({ cell }) => cell.getValue() || 0,
+               Cell: ({ cell }) =>Number( cell.getValue() || 0).toFixed(2),
             },
 
 
@@ -447,7 +480,7 @@ const CustomerWiseSales = () => {
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                                         </Typography>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                                            Customerwise Sales Report
+                                            Customerwise Sales Report for  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
                                         </Typography>
                                     </DialogTitle>
                                     <DialogContent dividers>

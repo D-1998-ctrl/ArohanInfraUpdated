@@ -186,10 +186,10 @@
 //     const fetchReceiptdetails = async (idwiseData) => {
 //         try {
 //             const response = await axios.get(
-           
+
 //                 `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=VoucherDetail&Colname=VoucherId&Colvalue=${idwiseData}`
 //             );
-            
+
 //             //console.log('fetchReceiptdetails', response.data)
 //             Receiptdetails(response.data);
 
@@ -437,12 +437,12 @@
 
 //     const handleEdit = (rowData) => {
 //       //  console.log("This row has been clicked:", rowData);
-        
+
 //      //   console.log("rowData.Id:", rowData.Id);
 //         setRowId(rowData.Id)
 //         setIsDrawerOpen(true);
 //         setIsEditing(!!rowData.Id);
-        
+
 
 //         setReceiptNo(rowData.VoucherNo)
 //         //receipt date
@@ -952,7 +952,7 @@
 //     //table
 
 //     const [pageNo, setPageNo] = useState(1)
-   
+
 
 //     const [totalPages, setTotalPages] = useState(1);
 //     const fetchData = async () => {
@@ -993,7 +993,7 @@
 //     const fetchReceiptdetails = async (idwiseData) => {
 //         try {
 //             const response = await axios.get(
-           
+
 //                 `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=VoucherDetail&Colname=VoucherId&Colvalue=${idwiseData}`
 //             );
 //             console.log('fetchReceiptdetails', response.data)
@@ -1199,13 +1199,13 @@
 //                             >
 //                                 Edit
 //                             </Button>
-            
+
 //                         {/* <Button
 //                           variant="contained"
 //                           sx={{ background: 'var(--complementary-color)' }}
 //                           size="small"
 //                           onClick={() => {
-                        
+
 //                             setPreviewData({ ...row.original});
 //                             setPreviewOpen(true);
 //                             console.log('previewdata', row.original)
@@ -1316,12 +1316,12 @@
 
 //     const handleEdit = (rowData) => {
 //       //  console.log("This row has been clicked:", rowData);
-        
+
 //      //   console.log("rowData.Id:", rowData.Id);
 //         setRowId(rowData.Id)
 //         setIsDrawerOpen(true);
 //         setIsEditing(!!rowData.Id);
-        
+
 
 //         setReceiptNo(rowData.VoucherNo)
 //         //receipt date
@@ -1510,7 +1510,7 @@
 
 
 
-    
+
 
 
 //     return (
@@ -1570,7 +1570,7 @@
 
 //                                 <Typography mt={2} variant="subtitle1"> <b>Detail 1</b></Typography>
 //                                  <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={2}>
-                                  
+
 
 //                                     <Typography>
 //                                         <strong>Account:</strong>{" "}
@@ -1592,11 +1592,11 @@
 //                                     <Typography><strong>Cheque/DD:</strong> {previewData.detail1?.DOrC}</Typography>
 //                                  </Box>
 
-                                
-                                
 
-                                  
-                                    
+
+
+
+
 
 //                                 <Divider sx={{ my: 2 }} />
 
@@ -1891,7 +1891,7 @@
 // }
 // export default Receipt
 
-import  { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, Autocomplete, FormControl, Select, MenuItem, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
@@ -1943,7 +1943,7 @@ const Receipt = () => {
     const [chequeNo, setChequeNo] = useState();
     const [chequeDate, setChequeDate] = useState(null);
     const [narration, setNarration] = useState('');
-     const [transactionId , setTransactionId] = useState('');
+    const [transactionId, setTransactionId] = useState('');
     //yearId and userId
     const [userId, setUserId] = useState('')
     const [yearid, setYearId] = useState('');
@@ -1954,7 +1954,7 @@ const Receipt = () => {
 
         if (storedUserId) {
             setUserId(storedUserId);
-        //  console.log('storedUserId', storedUserId);
+            //  console.log('storedUserId', storedUserId);
         } else {
             toast.error("User is not logged in.");
         }
@@ -1981,7 +1981,7 @@ const Receipt = () => {
             );
             const result = await response.json();
 
-          //  console.log("Branch info:", result);
+            //  console.log("Branch info:", result);
 
             const options = result.map((branch) => ({
                 value: branch.Id,
@@ -2050,7 +2050,7 @@ const Receipt = () => {
     //table
 
     const [pageNo, setPageNo] = useState(1)
-   
+
 
     const [totalPages, setTotalPages] = useState(1);
     const fetchData = async () => {
@@ -2091,7 +2091,7 @@ const Receipt = () => {
     const fetchReceiptdetails = async (idwiseData) => {
         try {
             const response = await axios.get(
-           
+
                 `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=VoucherDetail&Colname=VoucherId&Colvalue=${idwiseData}`
             );
             // console.log('fetchReceiptdetails', response.data)
@@ -2100,16 +2100,16 @@ const Receipt = () => {
         } catch (error) { }
     };
 
-       //map Receiptdetails
-        function Receiptdetails(data) {
+    //map Receiptdetails
+    function Receiptdetails(data) {
         let detail1 = data[0]
-       // console.log('detail1', detail1)
+        // console.log('detail1', detail1)
         setSelectedBranchOption(detail1.AccountId);
         setAmount(detail1.Amount);
         setChequeOrDd(detail1.DOrC)
         setSelectedBankOption(detail1.BankName);
         setDetailId(detail1.Id)
-         setTransactionId(detail1.TransactionId)
+        setTransactionId(detail1.TransactionId)
         let detail2 = data[1]
         //console.log('detail2', detail2)
         setBankName(detail2.BankName);
@@ -2232,115 +2232,115 @@ const Receipt = () => {
     //     }
     // };
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
-    // Use receiptDate as chequeDate if chequeDate is not provided
-    const formattedchequedate = chequeDate ? moment(chequeDate).format("YYYY-MM-DD") : formattedVoucherdate;
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
+        // Use receiptDate as chequeDate if chequeDate is not provided
+        const formattedchequedate = chequeDate ? moment(chequeDate).format("YYYY-MM-DD") : formattedVoucherdate;
 
-    const headerData = {
-        Id: rowId,
-        VoucherType: "RE",
-        VoucherNo: receiptNo ? receiptNo : null,
-        VoucherDate: formattedVoucherdate,
-        ChequeNo: chequeNo||null,
-        Mode: selectedCashorbank||null,
-        ChequeDate: formattedchequedate,  // This will use the formatted value we created above
-        RefNo: "RefNo",
-        Narration: narration||null,
-        CreatedBy: !isEditing ? userId : undefined,
-        UpdatedBy: isEditing ? userId : undefined,
+        const headerData = {
+            Id: rowId,
+            VoucherType: "RE",
+            VoucherNo: receiptNo ? receiptNo : null,
+            VoucherDate: formattedVoucherdate,
+            ChequeNo: chequeNo || null,
+            Mode: selectedCashorbank || null,
+            ChequeDate: formattedchequedate,  // This will use the formatted value we created above
+            RefNo: "RefNo",
+            Narration: narration || null,
+            CreatedBy: !isEditing ? userId : undefined,
+            UpdatedBy: isEditing ? userId : undefined,
+        };
+
+        try {
+            const voucherurl = isEditing
+                ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
+                : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
+
+            const response = await axios.post(voucherurl, headerData, {
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            });
+
+            const voucherId = isEditing ? rowId : parseInt(response.data.ID, 10);
+
+            // No need to re-format these dates again, we can reuse the variables
+            // const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
+            // const formattedchequedate = moment(chequeDate).format("YYYY-MM-DD");
+
+            const detailsData = [
+                {
+                    Id: isEditing ? detailId : null,
+                    VoucherId: voucherId,
+                    VoucherType: "RE",
+                    SRN: 1,
+                    VoucherNo: receiptNo ? receiptNo : null,
+                    VoucherDate: formattedVoucherdate,
+                    AccountId: parseInt(selectedBranchOption, 10) || null,
+                    Amount: parseFloat(amount) || null,
+                    DOrC: "D",
+                    Narration: narration || null,
+                    CostCenterId: 1,
+                    ChequeNo: chequeNo || null,
+                    ChequeDate: formattedchequedate,  // This will use receiptDate if chequeDate wasn't provided
+                    ChequeAmount: 0,
+                    MICRCode: 1,
+                    BankName: selectedBankOption || null,
+                    BankBranch: null,
+                    TransactionId: transactionId || null,
+                    CreatedBy: !isEditing ? userId : undefined,
+                    UpdatedBy: isEditing ? userId : undefined,
+                },
+                {
+                    Id: isEditing ? detailId2 : null,
+                    VoucherId: voucherId,
+                    VoucherType: "RE",
+                    SRN: 2,
+                    VoucherNo: receiptNo ? receiptNo : null,
+                    VoucherDate: formattedVoucherdate,
+                    AccountId: parseInt(selectedBranchOption, 10) || null,
+                    Amount: parseFloat(amount),
+                    DOrC: "C",
+                    Narration: narration || null,
+                    CostCenterId: 1,
+                    ChequeNo: chequeNo || 0,
+                    ChequeDate: formattedchequedate,  // This will use receiptDate if chequeDate wasn't provided
+                    ChequeAmount: 500 || 0,
+                    MICRCode: 1,
+                    BankName: bankName || null,
+                    TransactionId: transactionId || null,
+                    BankBranch: null,
+                    CreatedBy: !isEditing ? userId : undefined,
+                    UpdatedBy: isEditing ? userId : undefined,
+                },
+            ];
+
+            const voucherdetailurl = isEditing
+                ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
+                : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
+
+            await axios.post(voucherdetailurl, qs.stringify(detailsData[0]), {
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            });
+
+            await axios.post(voucherdetailurl, qs.stringify(detailsData[1]), {
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            });
+
+            toast.success(
+                isEditing
+                    ? "Receipt Voucher updated successfully!"
+                    : "Receipt Voucher Created successfully!"
+            );
+            resetForm();
+            fetchData();
+            setIsDrawerOpen(false);
+        } catch (error) {
+            console.error("Error saving record:", error);
+            // toast.error('Error saving record!');
+        }
     };
-
-    try {
-        const voucherurl = isEditing
-            ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
-            : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
-
-        const response = await axios.post(voucherurl, headerData, {
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        });
-
-        const voucherId = isEditing ? rowId : parseInt(response.data.ID, 10);
-        
-        // No need to re-format these dates again, we can reuse the variables
-        // const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
-        // const formattedchequedate = moment(chequeDate).format("YYYY-MM-DD");
-
-        const detailsData = [
-            {
-                Id: isEditing ? detailId : null,
-                VoucherId: voucherId,
-                VoucherType: "RE",
-                SRN: 1,
-                VoucherNo: receiptNo ? receiptNo : null,
-                VoucherDate: formattedVoucherdate,
-                AccountId: parseInt(selectedBranchOption, 10)||null,
-                Amount: parseFloat(amount)||null,
-                DOrC: "D",
-                Narration: narration||null,
-                CostCenterId: 1,
-                ChequeNo: chequeNo||null,
-                ChequeDate: formattedchequedate,  // This will use receiptDate if chequeDate wasn't provided
-                ChequeAmount: 0,
-                MICRCode: 1,
-                BankName: selectedBankOption||null,
-                BankBranch: null,
-                TransactionId:transactionId||null,
-                CreatedBy: !isEditing ? userId : undefined,
-                UpdatedBy: isEditing ? userId : undefined,
-            },
-            { 
-                Id: isEditing ? detailId2 : null,
-                VoucherId: voucherId,
-                VoucherType: "RE",
-                SRN: 2,
-                VoucherNo: receiptNo ? receiptNo : null,
-                VoucherDate: formattedVoucherdate,
-                AccountId: parseInt(selectedBranchOption, 10)||null,
-                Amount: parseFloat(amount),
-                DOrC: "C",
-                Narration: narration||null,
-                CostCenterId: 1,
-                ChequeNo: chequeNo ||0,
-                ChequeDate: formattedchequedate,  // This will use receiptDate if chequeDate wasn't provided
-                ChequeAmount: 500 ||0,
-                MICRCode: 1,
-                BankName: bankName||null,
-                TransactionId:transactionId||null,
-                BankBranch: null,
-                CreatedBy: !isEditing ? userId : undefined,
-                UpdatedBy: isEditing ? userId : undefined,
-            },
-        ];
-
-        const voucherdetailurl = isEditing
-            ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
-            : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
-
-        await axios.post(voucherdetailurl, qs.stringify(detailsData[0]), {
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        });
-
-        await axios.post(voucherdetailurl, qs.stringify(detailsData[1]), {
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        });
-
-        toast.success(
-            isEditing
-                ? "Receipt Voucher updated successfully!"
-                : "Receipt Voucher Created successfully!"
-        );
-        resetForm();
-        fetchData();
-        setIsDrawerOpen(false);
-    } catch (error) {
-        console.error("Error saving record:", error);
-        // toast.error('Error saving record!');
-    }
-};
-//
- //for preview
+    //
+    //for preview
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewData, setPreviewData] = useState(null);
 
@@ -2386,23 +2386,23 @@ const handleSubmit = async (e) => {
             },
 
 
-              {
-                    header: 'Actions',
-                    size: 200,
-                    Cell: ({ row }) => (
-                      <Box display="flex" gap={1}>
+            {
+                header: 'Actions',
+                size: 200,
+                Cell: ({ row }) => (
+                    <Box display="flex" gap={1}>
                         <Button
-                          sx={{ background: 'var(--primary-color)' }}
-                          variant="contained"
-                          size="small"
-                                onClick={() => {
-                                    // setCurrentRow(row);
-                                    handleEdit(row.original);
-                                }}
-                            >
-                                Edit
-                            </Button>
-            
+                            sx={{ background: 'var(--primary-color)' }}
+                            variant="contained"
+                            size="small"
+                            onClick={() => {
+                                // setCurrentRow(row);
+                                handleEdit(row.original);
+                            }}
+                        >
+                            Edit
+                        </Button>
+
                         {/* <Button
                           variant="contained"
                           sx={{ background: 'var(--complementary-color)' }}
@@ -2416,44 +2416,44 @@ const handleSubmit = async (e) => {
                         >
                           Preview
                         </Button> */}
-                            <Button
-                                variant="contained"
-                                sx={{ background: 'var(--complementary-color)' }}
-                                size="small"
-                                onClick={async () => {
-                                    try {
-                                        const voucher = row.original;
-                                        // 1. Set master voucher data
-                                        setPreviewData({ ...voucher });
+                        <Button
+                            variant="contained"
+                            sx={{ background: 'var(--complementary-color)' }}
+                            size="small"
+                            onClick={async () => {
+                                try {
+                                    const voucher = row.original;
+                                    // 1. Set master voucher data
+                                    setPreviewData({ ...voucher });
 
-                                        // 2. Fetch voucher detail data
-                                        const response = await axios.get(
-                                            `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=VoucherDetail&Colname=VoucherId&Colvalue=${voucher.Id}`
-                                        );
+                                    // 2. Fetch voucher detail data
+                                    const response = await axios.get(
+                                        `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=VoucherDetail&Colname=VoucherId&Colvalue=${voucher.Id}`
+                                    );
 
-                                        const details = response.data;
+                                    const details = response.data;
 
-                                        // 3. Merge detail data with master data
-                                        setPreviewData((prev) => ({
-                                            ...prev,
-                                            detail1: details[0] || {},
-                                            detail2: details[1] || {},
-                                        }));
+                                    // 3. Merge detail data with master data
+                                    setPreviewData((prev) => ({
+                                        ...prev,
+                                        detail1: details[0] || {},
+                                        detail2: details[1] || {},
+                                    }));
+                                  
+                                    // 4. Open preview
+                                    setPreviewOpen(true);
 
-                                        // 4. Open preview
-                                        setPreviewOpen(true);
+                                } catch (error) {
+                                    console.error('Error fetching details:', error);
+                                }
+                            }}
+                        >
+                            Preview
+                        </Button>
 
-                                    } catch (error) {
-                                        console.error('Error fetching details:', error);
-                                    }
-                                }}
-                            >
-                                Preview
-                            </Button>
-
-                      </Box>
-                    ),
-                  },
+                    </Box>
+                ),
+            },
 
         ];
     }, [pageNo]);
@@ -2518,14 +2518,14 @@ const handleSubmit = async (e) => {
     });
 
     const handleEdit = (rowData) => {
-    //    console.log("This row has been clicked:", rowData);
-        
+        //    console.log("This row has been clicked:", rowData);
+
         // console.log("rowData.Id:", rowData.Id);
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
         setIsEditing(!!rowData.Id);
-        setSelectedCashorbank(rowData.Mode)    
-         setNarration(rowData.Narration)
+        setSelectedCashorbank(rowData.Mode)
+        setNarration(rowData.Narration)
         setReceiptNo(rowData.VoucherNo)
         //receipt date
         const dateStr = rowData.VoucherDate.date.split(" ")[0];
@@ -2714,7 +2714,7 @@ const handleSubmit = async (e) => {
 
 
 
-    
+
 
 
     return (
@@ -2755,7 +2755,7 @@ const handleSubmit = async (e) => {
                         <Typography sx={{ mt: 1 }}>
                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                         </Typography>
-                        <Typography  mt={1} ><b>Receipt Voucher Preview</b>  </Typography>
+                        <Typography mt={1} ><b>Receipt Voucher Preview</b>  </Typography>
                     </DialogTitle>
 
                     <DialogContent dividers>
@@ -2764,20 +2764,21 @@ const handleSubmit = async (e) => {
                                 <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={2}>
                                     <Box><Typography><strong>Voucher No:</strong> {previewData.VoucherNo}</Typography></Box>
                                     <Box><Typography><strong>Voucher Date:</strong>{" "} {new Date(previewData.VoucherDate.date).toLocaleDateString()}</Typography></Box>
-                                    
-<Box><Typography><strong>Mode:</strong>{previewData.Mode}</Typography></Box>
 
+                                    <Box><Typography><strong>Mode:</strong>{previewData.Mode}</Typography></Box>
+                                     
+                                    
 
                                     <Box><Typography><strong>Cheque No:</strong> {previewData.ChequeNo}</Typography></Box>
 
                                     <Box><Typography><strong>Cheque Date:</strong> {" "} {new Date(previewData.ChequeDate.date).toLocaleDateString()}</Typography></Box>
                                 </Box>
 
-                               <Divider sx={{mt:2}}/>
+                                <Divider sx={{ mt: 2 }} />
 
                                 <Typography mt={2} variant="subtitle1"> <b>Detail 1</b></Typography>
-                                 <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={2}>
-                                  
+                                <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={2}>
+
 
                                     <Typography>
                                         <strong>Account:</strong>{" "}
@@ -2796,10 +2797,13 @@ const handleSubmit = async (e) => {
                                                 ?.label || 'N/A'
                                         }
                                     </Typography>
-                                    <Typography><strong>Cheque/DD:</strong> {previewData.detail1?.DOrC}</Typography>
-                                 </Box>
 
-                                
+                                    <Typography><strong>TransactionId
+                                        :</strong>{previewData.detail1?.TransactionId}</Typography>
+                                    <Typography><strong>Cheque/DD:</strong> {previewData.detail1?.DOrC}</Typography>
+                                </Box>
+
+
                                 <Divider sx={{ my: 2 }} />
 
                                 <Typography variant="subtitle1"><b>Detail 2</b></Typography>
@@ -2811,7 +2815,7 @@ const handleSubmit = async (e) => {
                         )}
                     </DialogContent>
                     <DialogActions>
-                         <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{fontSize:35}}/></Button>
+                        <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{ fontSize: 35 }} /></Button>
                         <Button onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
                     </DialogActions>
                 </Dialog>
@@ -2887,7 +2891,7 @@ const handleSubmit = async (e) => {
                             </Box>
 
 
-                            {/* <Box display={'flex'} gap={2} alignItems={'center'} mt={2}>
+                            <Box display={'flex'} gap={2} alignItems={'center'} mt={2}>
                                 <Box flex={1}>
                                     <Typography variant="body2">Party Name</Typography>
                                     <Autocomplete
@@ -2913,7 +2917,7 @@ const handleSubmit = async (e) => {
                                         )}
                                     />
 
-                               
+
                                 </Box>
 
 
@@ -2958,7 +2962,7 @@ const handleSubmit = async (e) => {
                                 </Box>
 
 
-                                    <Box flex={1}>
+                                <Box flex={1}>
                                     <Typography variant="body2">Narration</Typography>
                                     <TextField
                                         variant="standard"
@@ -2979,6 +2983,25 @@ const handleSubmit = async (e) => {
                             <Divider sx={{ mt: 2 }} />
 
                             <Box display={'flex'} gap={2} alignItems={'center'} mt={1} p={1}>
+                                <Box flex={1}>
+                                    <Typography variant="body2">Transaction ID</Typography>
+                                    <TextField
+                                        variant="standard"
+                                        sx={{
+                                            '& .MuiInput-underline:after': {
+                                                borderBottomWidth: 1.5,
+                                                borderBottomColor: '#44ad74',
+                                            }, mt: 1
+                                        }}
+                                        focused
+                                        value={transactionId} // You'll need to add this state
+                                        onChange={(e) => setTransactionId(e.target.value)} // And this setter
+                                        size="small" margin="none" placeholder='TransactionID' fullWidth
+                                    />
+                                </Box>
+
+
+
                                 <Box>
                                     <Typography variant="body2">Cheque/DD</Typography>
                                     <FormControl component="fieldset">
@@ -3042,8 +3065,8 @@ const handleSubmit = async (e) => {
 
 
                             </Box>
-                            <Divider sx={{ mt: 2 }} /> */}
-    {selectedCashorbank === "cash" && (
+                            <Divider sx={{ mt: 2 }} />
+                            {/* {selectedCashorbank === "cash" && (
                 <Box mt={2}>
                     <Typography variant="body2">Amount</Typography>
                     <TextField
@@ -3060,10 +3083,10 @@ const handleSubmit = async (e) => {
                         size="small" margin="none" placeholder='Amount' fullWidth
                     />
                 </Box>
-            )}
+            )} */}
 
-            {/* Bank Section - Shows when bank is selected */}
-                            {selectedCashorbank === "bank" && (
+                            {/* Bank Section - Shows when bank is selected */}
+                            {/* {selectedCashorbank === "bank" && (
                                 <>
                                     <Box display={'flex'} gap={2} alignItems={'center'} mt={2}>
                                         <Box flex={1}>
@@ -3214,10 +3237,10 @@ const handleSubmit = async (e) => {
 
                                    <Divider sx={{ mt: 2 }} />
                                 </>
-                            )}
+                            )} */}
 
                             {/* MBB Receipt Section - Shows when MBB is selected */}
-                            {selectedCashorbank === "online" && (
+                            {/* {selectedCashorbank === "online" && (
                                 <Box display={'flex'} gap={2} alignItems={'center'} mt={2}>
                                     <Box flex={1}>
                                         <Typography variant="body2">Transaction ID</Typography>
@@ -3252,7 +3275,7 @@ const handleSubmit = async (e) => {
                                         />
                                     </Box>
                                 </Box>
-                            )}
+                            )} */}
 
                         </LocalizationProvider>
                     </Box>

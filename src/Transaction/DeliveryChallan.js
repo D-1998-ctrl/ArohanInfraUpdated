@@ -63,7 +63,7 @@ const DeliveryChallan = () => {
         setRowId('')
         setIsDrawerOpen(true);
         setIsEditing(false);       
-        // console.log(rowId)
+      console.log(rowId)
     };
 
     const handleDrawerClose = () => {
@@ -84,31 +84,32 @@ const DeliveryChallan = () => {
     // };
 
 
-const [totalPages, setTotalPages] = useState(1);
-const [pageNo, setPageNo] = useState(1)
+    const [totalPages, setTotalPages] = useState(1);
+    const [pageNo, setPageNo] = useState(1)
     const fetchInwardHeader = async () => {
         const requestOptions = {
-          method: "GET",
-          redirect: "follow"
+            method: "GET",
+            redirect: "follow"
         };
-    
+
         try {
-          const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=DeliveryChallanHeader&PageNo=${pageNo}`, requestOptions);
-          const result = await response.json();
-    
-           //console.log("Fetched result:", result.data);
-    
-           setChallanheaders(result.data);
-          setTotalPages(result.total_pages)
-    
+            const response = await fetch(`https://arohanagroapi.microtechsolutions.net.in/php/get/gettblpage.php?Table=DeliveryChallanHeader&PageNo=${pageNo}`, requestOptions);
+            const result = await response.json();
+
+            console.log("Fetched result:", result.data);
+
+            setChallanheaders(result.data);
+            setTotalPages(result.total_pages)
+
         } catch (error) {
-          console.error(error);
+            console.error(error);
         }
-      };
+    };
 
   useEffect(() => {
     fetchInwardHeader();
   }, [pageNo]);
+
     //  api to call fetchInwarddetails
     const fetchInwarddetails = async () => {
         try {
@@ -116,16 +117,22 @@ const [pageNo, setPageNo] = useState(1)
                 "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=DeliveryChallanDetail"
             );
             setChallandetails(response.data);
-            // console.log('detail', response.data)
+            console.log('detail', response.data)
         } catch (error) { }
     };
 
-    useEffect(() => {
-         fetchInwardHeader();
-        fetchInwarddetails();
-        fetchLocation();
-        fetchProduct();
-    }, );
+    // useEffect(() => {
+    //      fetchInwardHeader();
+    //     fetchInwarddetails();
+    //     fetchLocation();
+    //     fetchProduct();
+    // }, );
+useEffect(() => {
+    fetchInwardHeader();
+    fetchInwarddetails();
+    fetchLocation();
+    fetchProduct();
+}, []);  
 
 
 
@@ -194,13 +201,15 @@ const [pageNo, setPageNo] = useState(1)
                                   (item) => item.value.toString() === detail.ProductId?.toString()
                                 );
                                 return {
-                                  ...detail,
-                                  ProductName: matchedMaterial?.label || "Unknown",
+                                    ...detail,
+                                    ProductName: matchedMaterial?.label || "Unknown",
+                                    BatchNo: detail.BatchNo || "0",
+                                    BatchDate: detail.BatchDate?.date.split(" ")[0]
                                 };
                               });
                             setPreviewData({ ...row.original, invdetail });
                             setPreviewOpen(true);
-                            // console.log('previewdata',row.original)
+                            console.log('previewdata',row.original)
                           }}
                         >
                           Preview
@@ -212,7 +221,7 @@ const [pageNo, setPageNo] = useState(1)
 
     //for get data in main table and form
     const handleSubmit = (rowData) => {
-        // console.log("This row has been clicked:", rowData);
+        console.log("This row has been clicked:", rowData);
 
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
@@ -221,10 +230,10 @@ const [pageNo, setPageNo] = useState(1)
         setChallanDate(rowData.ChallanDate?.date.split(" ")[0])
         setVehicleNo(rowData.VehicleNo)
         setSelectedLocation(rowData.StoreLocation);
-        //console.log("storelocation", rowData.StoreLocation);
+        console.log("storelocation", rowData.StoreLocation);
         const inwdetail = challandetails.filter(
             (detail) => detail.ChallanId === rowData.Id);
-        // console.log('invdetail', inwdetail)
+        console.log('invdetail', inwdetail)
 
         const mappedRows = inwdetail.map((detail) => ({
             Id: detail.Id,
@@ -237,7 +246,7 @@ const [pageNo, setPageNo] = useState(1)
             Amount: parseFloat(detail.Amount) || 0,
         }));
 
-    //  console.log('mappedRows', mappedRows)
+     console.log('mappedRows', mappedRows)
         setRows(mappedRows);
     };
 
@@ -332,7 +341,7 @@ const [pageNo, setPageNo] = useState(1)
         )
             .then((response) => response.json())
             .then((result) => {
-                // console.log("API Response:", result); // Debugging log
+                console.log("API Response:", result); // Debugging log
 
 
                 const storelocationOptions = result.map((storelocation) => ({
@@ -384,11 +393,10 @@ const [pageNo, setPageNo] = useState(1)
             const response = await axios.get(
                 'https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=productmaster',
             );
-            // console.log(response.data);
+            console.log(response.data);
             processMaterialData(response.data)
         } catch (error) {
             console.error(error);
-
         }
     };
 
@@ -402,7 +410,7 @@ const [pageNo, setPageNo] = useState(1)
                 purchaseRate: product?.SellPrice,
             }));
 
-            //console.log('options', productsOptions)
+            console.log('options', productsOptions)
             setProductOptions(productsOptions);
         }
     };
@@ -441,7 +449,7 @@ const [pageNo, setPageNo] = useState(1)
             BatchDate: batchDate,
         };
 
-        //console.log("newRow", newRow);
+        console.log("newRow", newRow);
         // Update rows state and ensure the new row is added to the table
         setRows((prevRows) => [...prevRows, newRow]);
     };
@@ -537,22 +545,22 @@ const [pageNo, setPageNo] = useState(1)
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 }
             );
-           // console.log('postinwardheaders', response.data)
+           console.log('postinwardheaders', response.data)
 
             let InwardId = rowId ? rowId : parseInt(response.data.ID, 10);
         
-           // console.log("rows", rows);
+           console.log("rows", rows);
 
             for (const row of rows) {
 
                 const formattedBatchDate = moment(row.BatchDate).format("YYYY-MM-DD");
-                //console.log('b date', formattedBatchDate)
+                console.log('b date', formattedBatchDate)
 
                 const rowData = {
                     Id: parseInt(row.Id, 10),
                     ChallanId: parseInt(InwardId, 10),
                     ProductId: parseInt(row.ProductId, 10),
-                    BatchNo: parseInt(row.BatchNo),
+                    BatchNo: row.BatchNo,
                     BatchDate: formattedBatchDate,
                     Quantity: parseFloat(row.Quantity),
                     Rate: parseFloat(row.Rate),
@@ -576,7 +584,7 @@ const [pageNo, setPageNo] = useState(1)
                             },
                         }
                     );
-                 //   console.log("Response:", response);
+                   console.log("Response:", response);
                 } catch (error) {
                     console.error("Error:", error);
                 }
@@ -638,12 +646,12 @@ const [pageNo, setPageNo] = useState(1)
         fetch(`https://arohanagroapi.microtechsolutions.net.in/php/delete/deletetable.php?Table=DeliveryChallanHeader&Id=${rowId}`, requestOptions)
             .then((response) => response.text())
             .then((result) => {
-               // console.log(result);
+               console.log(result);
                 setOpen(false);
                 handleDrawerClose();
                 fetchInwardHeader();
                 toast.success(
-                    "Inword At Store for  Deleted successfully!"
+                    "Delivery Challan Deleted successfully!"
                 );
             })
             .catch((error) => console.error(error));
@@ -789,7 +797,8 @@ const [pageNo, setPageNo] = useState(1)
         // Prepare rows
         const purchaseRows = previewData.invdetail.map((item, idx) => {
             const name = productOptions.find(opt => opt.value.toString() === item.ProductId?.toString())?.label || 'Unknown';
-            return [item.SerialNo || idx + 1, name, item.Quantity, item.Rate, item.Amount];
+            return [item.SerialNo || idx + 1, item.BatchNo || "",
+    item.BatchDate ? new Date(item.BatchDate).toLocaleDateString() : "", name, item.Quantity, item.Rate, item.Amount];
         });
 
         // Full-width table
@@ -803,7 +812,7 @@ const [pageNo, setPageNo] = useState(1)
         //     headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" }
         //   });
         autoTable(doc, {
-            head: [["S.No", "Material", "Quantity(Lit)", "Rate", "Amount (Rs)"]],
+            head: [["S.No","Batch No", "Batch Date", "Material", "Quantity(Lit)", "Rate", "Amount (Rs)"]],
             body: purchaseRows,
             startY: finalY + 5,
             margin: { left: 10, right: 10 },
@@ -889,7 +898,8 @@ const [pageNo, setPageNo] = useState(1)
                                                     <Table size="small" >
                                                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                                                             <TableRow>
-
+                                                                <TableCell><strong>Batch No</strong></TableCell>
+                                                                <TableCell><strong>Batch Date</strong></TableCell>
                                                                 <TableCell><strong>Material</strong></TableCell>
                                                                 <TableCell><strong>Quantity(Lit)</strong></TableCell>
                                                                 <TableCell><strong>Rate</strong></TableCell>
@@ -904,6 +914,8 @@ const [pageNo, setPageNo] = useState(1)
 
                                                                 return (
                                                                     <TableRow key={index}>
+                                                                        <TableCell>{item.BatchNo}</TableCell>
+                                                                        <TableCell>{item.BatchDate}</TableCell>
                                                                         <TableCell>{ProductName}</TableCell>
                                                                         <TableCell>{item.Quantity}</TableCell>
                                                                         <TableCell>{item.Rate}</TableCell>

@@ -179,15 +179,45 @@ const ProductGroupwiseStock = () => {
       worksheet.addRow([
         item.ProductGroupId,
         item.GroupName,
-        item.TotalInvoiceQuantity || "N/A",
-        item.TotalInvoiceAmount || "N/A",
-        item.TotalPurchaseOtherQuantity || "N/A",
-        item.TotalPurchaseOtherAmount || 0,
-        item.TotalUniqueProducts || 0,
-
-
+        Number(item.TotalInvoiceQuantity) || "N/A",
+        Number(item.TotalInvoiceAmount) || "N/A",
+        Number(item.TotalPurchaseOtherQuantity) || "N/A",
+        Number(item.TotalPurchaseOtherAmount) || 0,
+        Number(item.TotalUniqueProducts) || 0,
       ]);
     });
+
+
+    /// // Add Grand Total row
+    const totalRowIndex = worksheet.lastRow.number + 2;
+    const totalRow = worksheet.getRow(totalRowIndex);
+    totalRow.getCell(3).value = "Grand Total";
+    totalRow.getCell(3).font = { bold: true, size: 14 };
+    totalRow.getCell(3).alignment = { horizontal: "right" };
+
+    totalRow.getCell(4).value = { formula: `SUM(D2:D${worksheet.lastRow.number - 2})` };
+     totalRow.getCell(6).value = { formula: `SUM(F2:F${worksheet.lastRow.number - 2})` };
+
+    // Style Grand Total row
+    totalRow.eachCell((cell) => {
+        cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFFFE699" }, // Light yellow background
+        };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+        };
+    });
+
+
+
+
+
+
 
     // Auto-fit columns
     worksheet.columns.forEach((col) => {
@@ -362,7 +392,7 @@ const ProductGroupwiseStock = () => {
                       Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                     </Typography>
                     <Typography sx={{ fontWeight: 'bold', mt: 1 }}>
-                      Product Groupwise Stock Report Preview
+                      Product Groupwise Stock Report Preview for  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
                     </Typography>
                   </DialogTitle>
                   <DialogContent dividers>

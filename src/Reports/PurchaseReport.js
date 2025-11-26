@@ -376,23 +376,23 @@ const generatePDF = () => {
                 item.OrderNo || "N/A",
                 item.OrderDate || "N/A",
                 item.AccountName || "N/A",
-                item.Quantity || 0,
-                item.Rate || 0,
-                item.Amount || 0,
-                item.CGSTPercentage || 0,
-                item["Product CGST AMT"] || 0,
-                item.SGSTPercentage || 0,
-                item["Product SGST AMT"] || 0,
-                item.IGSTPercentage || 0,
-                item["Product IGST AMT"] || 0,
+                Number(item.Quantity) || 0,
+                Number(item.Rate) || 0,
+                Number(item.Amount) || 0,
+                Number(item.CGSTPercentage) || 0,
+                Number(item["Product CGST AMT"]) || 0,
+                Number(item.SGSTPercentage) || 0,
+                Number(item["Product SGST AMT"]) || 0,
+                Number(item.IGSTPercentage) || 0,
+                Number(item["Product IGST AMT"]) || 0,
                 //
-                item["Product Subtotal"] || 0,
-                item["Total Invoice CGST Amt"] || 0,
-                item["Total Invoice SGST Amt"] || 0,
-                item["Total Invoice IGST Amt"] || 0,
-                item["Total Invoice Subtotal"] || 0,
-                item.Transport ||0,
-                item["Total amt"] || 0,
+                Number(item["Product Subtotal"]) || 0,
+                Number(item["Total Invoice CGST Amt"]) || 0,
+                Number(item["Total Invoice SGST Amt"]) || 0,
+                Number(item["Total Invoice IGST Amt"]) || 0,
+                Number(item["Total Invoice Subtotal"] )|| 0,
+                Number(item.Transport) ||0,
+                Number(item["Total amt"]) || 0,
             ]);
         });
 
@@ -405,6 +405,38 @@ const generatePDF = () => {
             });
             col.width = maxLength + 5;
         });
+
+
+    // Add Grand Total row
+    const totalRowIndex = worksheet.lastRow.number + 2;
+    const totalRow = worksheet.getRow(totalRowIndex);
+    totalRow.getCell(20).value = "Grand Total";
+    totalRow.getCell(20).font = { bold: true, size: 14 };
+    totalRow.getCell(20).alignment = { horizontal: "right" };
+
+    totalRow.getCell(21).value = { formula: `SUM(U2:U${worksheet.lastRow.number - 2})` };
+    // totalRow.getCell(13).value = { formula: `SUM(M2:M${worksheet.lastRow.number - 2})` };
+
+    // Style Grand Total row
+    totalRow.eachCell((cell) => {
+        cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFFFE699" }, // Light yellow background
+        };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+        };
+    });
+
+
+
+
+
+
 
         // Write workbook
         const buffer = await workbook.xlsx.writeBuffer();
@@ -666,7 +698,7 @@ const generatePDF = () => {
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                                         </Typography>
                                         <Typography sx={{ fontWeight: 'bold', mt: 1 }}>
-                                            Purchase Report Preview
+                                            Purchase Report Preview for  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
                                         </Typography>
                                     </DialogTitle>
                                     <DialogContent dividers>

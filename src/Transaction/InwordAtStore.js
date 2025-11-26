@@ -1,6 +1,6 @@
 
-import  { useMemo, useState, useEffect } from 'react'
-import {FormHelperText , Grid, TableBody, Autocomplete, TableCell, TableContainer, TableHead, TableRow, Paper, Table, TableFooter, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
+import { useMemo, useState, useEffect } from 'react'
+import { FormHelperText, Grid, TableBody, Autocomplete, TableCell, TableContainer, TableHead, TableRow, Paper, Table, TableFooter, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, useMediaQuery, Box, Button, IconButton, Typography, TextField, Drawer, Divider, FormControl, Select, MenuItem, Menu } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { MaterialReactTable, } from 'material-react-table';
 import { DatePicker } from "@mui/x-date-pickers";
@@ -203,6 +203,7 @@ const InwordAtStore = () => {
                             size="small"
                             onClick={() => {
                                 const invdetail = inwarddetails
+
                                     .filter((detail) => detail.InwardId === row.original.Id)
                                     .map((detail) => {
                                         const matchedMaterial = productOptions.find(
@@ -211,6 +212,8 @@ const InwordAtStore = () => {
                                         return {
                                             ...detail,
                                             ProductName: matchedMaterial?.label || "Unknown",
+                                            BatchNo: detail.BatchNo || "0",
+                                            BatchDate: detail.BatchDate?.date.split(" ")[0]
                                         };
                                     });
                                 setPreviewData({ ...row.original, invdetail });
@@ -226,6 +229,7 @@ const InwordAtStore = () => {
 
         ];
     }, [inwardheaders]);
+
 
     //for get data in main table and form
     const handleSubmit = (rowData) => {
@@ -472,20 +476,20 @@ const InwordAtStore = () => {
             alert("Please select an Product before adding or saving the row.");
             return;
         }
-        if(!batchNo){
-           alert("Please select an Batch No before adding or saving the row.");
-            return;  
+        if (!batchNo) {
+            alert("Please select an Batch No before adding or saving the row.");
+            return;
         }
 
-          if(!batchDate){
-           alert("Please select an Batch Date before adding or saving the row.");
-            return;  
+        if (!batchDate) {
+            alert("Please select an Batch Date before adding or saving the row.");
+            return;
         }
 
         if (!quentity) {
-        alert("Please select Quantity before adding or saving the row. ");
-        return;
-    }
+            alert("Please select Quantity before adding or saving the row. ");
+            return;
+        }
 
         if (editingRow !== null) {
             // Update the existing row
@@ -575,7 +579,7 @@ const InwordAtStore = () => {
                     Id: parseInt(row.Id, 10),
                     InwardId: parseInt(InwardId, 10),
                     ProductId: parseInt(row.ProductId, 10),
-                    BatchNo: parseInt(row.BatchNo),
+                    BatchNo: row.BatchNo,
                     BatchDate: formattedBatchDate,
                     Quantity: parseFloat(row.Quantity),
                     Rate: parseFloat(row.Rate),
@@ -677,8 +681,8 @@ const InwordAtStore = () => {
     const [errors, setErrors] = useState({
         inwordDate: '',
         selectedLocation: '',
-        challanNo:'',
-        challanDate:'',
+        challanNo: '',
+        challanDate: '',
     })
 
 
@@ -716,7 +720,7 @@ const InwordAtStore = () => {
             }
         };
 
-         if (!challanNo) {
+        if (!challanNo) {
             newErrors.challanNo = 'challanNo is required';
             isValid = false;
         }
@@ -833,7 +837,8 @@ const InwordAtStore = () => {
         // Prepare rows
         const purchaseRows = previewData.invdetail.map((item, idx) => {
             const name = productOptions.find(opt => opt.value.toString() === item.ProductId?.toString())?.label || 'Unknown';
-            return [item.SerialNo || idx + 1, name, item.Quantity, item.Rate, item.Amount];
+            return [item.SerialNo || idx + 1, item.BatchNo || "",
+            item.BatchDate ? new Date(item.BatchDate).toLocaleDateString() : "", name, item.Quantity, item.Rate, item.Amount];
         });
 
         // Full-width table
@@ -847,7 +852,7 @@ const InwordAtStore = () => {
         //     headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" }
         //   });
         autoTable(doc, {
-            head: [["S.No", "Material", "Quantity(Lit)", "Rate", "Amount (Rs)"]],
+            head: [["S.No", "Batch No", "Batch Date", "Material", "Quantity(Lit)", "Rate", "Amount (Rs)"]],
             body: purchaseRows,
             startY: finalY + 5,
             margin: { left: 10, right: 10 },
@@ -865,7 +870,7 @@ const InwordAtStore = () => {
         doc.text("Total", 140, afterTableY);
         doc.text(`${previewData.Total}`, 175, afterTableY, { align: "right" });
         // Save
-        doc.save("Challan_Preview.pdf");
+        doc.save("Inword_Preview.pdf");
     };
 
     return (
@@ -942,7 +947,8 @@ const InwordAtStore = () => {
                                                     <Table size="small" >
                                                         <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                                                             <TableRow>
-
+                                                                <TableCell><strong>Batch No</strong></TableCell>
+                                                                <TableCell><strong>Batch Date</strong></TableCell>
                                                                 <TableCell><strong>Material</strong></TableCell>
                                                                 <TableCell><strong>Quantity(Lit)</strong></TableCell>
                                                                 <TableCell><strong>Rate</strong></TableCell>
@@ -957,6 +963,8 @@ const InwordAtStore = () => {
 
                                                                 return (
                                                                     <TableRow key={index}>
+                                                                        <TableCell>{item.BatchNo}</TableCell>
+                                                                        <TableCell>{item.BatchDate}</TableCell>
                                                                         <TableCell>{ProductName}</TableCell>
                                                                         <TableCell>{item.Quantity}</TableCell>
                                                                         <TableCell>{item.Rate}</TableCell>
@@ -1138,7 +1146,7 @@ const InwordAtStore = () => {
                                                     setErrors({ ...errors, challanNo: '' }); // clear error if any
                                                 }
                                             }}
-                                            error={!!errors.challanNo} 
+                                            error={!!errors.challanNo}
                                             helperText={errors.challanNo || ''}
                                             size="small" fullWidth />
                                     </Box>
@@ -1155,7 +1163,7 @@ const InwordAtStore = () => {
                                                 onChange={(newValue) => { setChallanDate(newValue); setErrors({ ...errors, challanDate: undefined }) }}
                                                 // onChange={(newValue) => setChallanDate(newValue)}
                                                 slotProps={{
-                                                    textField: { size: "small", fullWidth: true,error: !!errors.challanDate, helperText: errors.challanDate },
+                                                    textField: { size: "small", fullWidth: true, error: !!errors.challanDate, helperText: errors.challanDate },
                                                 }}
                                                 renderInput={(params) => <TextField />}
                                             />

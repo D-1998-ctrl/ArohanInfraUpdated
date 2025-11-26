@@ -33,6 +33,7 @@ import AccountReceivable from './Reports/accountReceivable';
 import AccountPayable from './Reports/accountPayable';
 import PurchaseReport from './Reports/PurchaseReport';
 import ProductGroupwiseStock from './Reports/ProductGroupwiseStock';
+import ProductionReport from './Reports/ProductionReport';
 
 function App() {
   return (
@@ -70,7 +71,7 @@ function App() {
           <Route path="/accountpayable" element={<AccountPayable />} />
           <Route path="/purchasereport" element={<PurchaseReport />} />
            <Route path="/product-group-wise-Stock" element={<ProductGroupwiseStock />} />
-          
+           <Route path="/productionReport" element={<ProductionReport/>} />
 
           <Route path="/commonpage" element={<Commonpage/>} />
         </Route>
