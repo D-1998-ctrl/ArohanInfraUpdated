@@ -424,7 +424,7 @@ const StockReport = () => {
 
 
                 {/* table */}
-                {showTable && stockData.length > 0 && (
+                {/* {showTable && stockData.length > 0 && ( */}
                     <>
                         {showTable && stockData.length > 0 && (
                             <>
@@ -576,7 +576,7 @@ const StockReport = () => {
                             </>
                         )}
                     </>
-                )}
+                {/* )} */}
             </Box >
         </Box >
     );

@@ -177,6 +177,12 @@ export const menuItems = [
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
   
+
+       {
+        title: "  Stock Report For Row Material",
+        path: "/stockreportforrowmaterial ",
+        icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
+      },
     ],
   },
 

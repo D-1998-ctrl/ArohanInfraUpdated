@@ -432,12 +432,6 @@ const generatePDF = () => {
         };
     });
 
-
-
-
-
-
-
         // Write workbook
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], {
@@ -684,7 +678,7 @@ const generatePDF = () => {
 
 
                 {/* table */}
-                {showTable && salesData.length > 0 && (
+                {/* {showTable && salesData.length > 0 && ( */}
                     <>
                         {showTable && salesData.length > 0 && (
                             <>
@@ -767,7 +761,7 @@ const generatePDF = () => {
                             </>
                         )}
                     </>
-                )}
+                {/* )} */}
             </Box >
         </Box >
     );

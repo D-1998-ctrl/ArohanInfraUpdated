@@ -16,6 +16,7 @@ import CloseIcon from '@mui/icons-material/Close';
 const Settings = () => {
 
 
+
     //Integration
 
     const [companyName, setCompanyName] = useState("");

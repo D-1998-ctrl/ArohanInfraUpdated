@@ -2385,6 +2385,21 @@ const Receipt = () => {
                 Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
             },
 
+            {
+                accessorKey: 'AccountName',
+                header: 'Party Name',
+                size: 150,
+
+            },
+
+            {
+                accessorKey: 'Amount',
+                header: 'Amount',
+                size: 150,
+
+            },
+
+
 
             {
                 header: 'Actions',
@@ -2439,7 +2454,7 @@ const Receipt = () => {
                                         detail1: details[0] || {},
                                         detail2: details[1] || {},
                                     }));
-                                  
+
                                     // 4. Open preview
                                     setPreviewOpen(true);
 
@@ -2518,9 +2533,14 @@ const Receipt = () => {
     });
 
     const handleEdit = (rowData) => {
-        //    console.log("This row has been clicked:", rowData);
+        console.log("This row has been clicked:", rowData);
+        console.log("rowData.Id:", rowData.Id);
+        console.log('ReceiptDate', rowData.VoucherDate)
+        console.log('ReceiptDatetype', typeof rowData.VoucherDate)
 
-        // console.log("rowData.Id:", rowData.Id);
+        console.log('ChequeDate',rowData.ChequeDate)
+      console.log('ChequeDatetype',typeof rowData.ChequeDate)
+
         setRowId(rowData.Id)
         setIsDrawerOpen(true);
         setIsEditing(!!rowData.Id);
@@ -2532,6 +2552,12 @@ const Receipt = () => {
         const [year, month, day] = dateStr.split("-").map(Number); // Convert to numbers
         const formattedDate = `${year}-${month}-${day}`;
         setReceiptDate(formattedDate);
+
+        // const receiptDateStr = rowData.VoucherDate ? rowData.VoucherDate.split(" ")[0] : "";
+        // console.log("Setting receipt date to:", receiptDateStr);
+        // setReceiptDate(receiptDateStr);
+
+
         setChequeNo(rowData.ChequeNo);
         //Cheque date
         const dateStrc = rowData.ChequeDate.date.split(" ")[0];
@@ -2553,6 +2579,7 @@ const Receipt = () => {
         setChequeNo('');
         setSelectedCashorbank('');
         setNarration('')
+        setTransactionId('')
     };
 
 
@@ -2766,8 +2793,8 @@ const Receipt = () => {
                                     <Box><Typography><strong>Voucher Date:</strong>{" "} {new Date(previewData.VoucherDate.date).toLocaleDateString()}</Typography></Box>
 
                                     <Box><Typography><strong>Mode:</strong>{previewData.Mode}</Typography></Box>
-                                     
-                                    
+
+
 
                                     <Box><Typography><strong>Cheque No:</strong> {previewData.ChequeNo}</Typography></Box>
 

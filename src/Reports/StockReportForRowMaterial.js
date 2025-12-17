@@ -11,20 +11,19 @@ import logonew from '../imgs/logo_white.png'
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import moment from 'moment';
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
 
 
-const ProductionReport = () => {
+const StockReportForRowMaterial = () => {
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
-    const [productionData, setProductionData] = useState([]);
+    const [rawMaterialReportData, setRawMaterialReportData] = useState([]);
     const [showTable, setShowTable] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
 
 
-    const getProductionReport = () => {
+    const getRawMaterialReport = () => {
         // Format dates to 'YYYY-MM-DD' using split
         const formatDate = (date) => {
             if (!date) return '';
@@ -32,7 +31,7 @@ const ProductionReport = () => {
         };
         const formattedFromDate = formatDate(fromDate);
         const formattedToDate = formatDate(toDate);
-        const url = `https://arohanagroapi.microtechsolutions.net.in/php/get/getproductionreport.php?FromDate=${formattedFromDate}&ToDate=${formattedToDate}`;
+        const url = `https://arohanagroapi.microtechsolutions.net.in/php/get/getstockreportrawmaterial.php?FromDate=${formattedFromDate}&ToDate=${formattedToDate}`;
         console.log("URL:", url);
 
         const requestOptions = {
@@ -44,25 +43,25 @@ const ProductionReport = () => {
             .then((response) => response.json())
             .then(data => {
                  console.log('data', data)
-                setProductionData(data);
+                setRawMaterialReportData(data);
                 setShowTable(true);
                 setPreviewOpen(true)
             })
             .catch((error) => console.error(error));
     };
 
-    const handleGetProductionReport = () => {
+    const handlegetRawMaterialReport = () => {
         if (!fromDate || !toDate) {
             alert("Please select both From Date and To Date.");
             return;
         }
-        getProductionReport();
+        getRawMaterialReport();
     };
 
 
     const generatePDF = () => {
         const doc = new jsPDF();
-        if (!productionData) return;
+        if (!rawMaterialReportData) return;
 
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
@@ -88,7 +87,7 @@ const ProductionReport = () => {
         y += 9;
 
         doc.setFontSize(16);
-        doc.text("Production Report Preview", pageWidth / 2, y, { align: "center" });
+        doc.text("Stock report for row material", pageWidth / 2, y, { align: "center" });
         y += 6;
         doc.setLineWidth(0.5);
         doc.line(10, y, 200, y);
@@ -96,32 +95,22 @@ const ProductionReport = () => {
 
         // Table headers
         const tableHeaders = [
-            "Prod No", "Prod Date", "Operator",
-            "Machine", "Start Time", "End Time", "Product",
-            "Storage", "Brand Name", "BatchNo", "Weight",
-            "Oil Prod", "Percentage","Oil Ltr"
+            "Material Name", "Opening Bal", "Quenty",
+            "Weight", "Closing Bal"
         ];
 
         // Table data
-        const tableData = productionData.map((item) => [
-            item.ProductionNo,
-            item.ProductionDate,
-            item.Operator,
-            item.Machine,
-            item.MachineStartTime ,
-            item.MachineEndTime,
-            item.Product ,
-            item.Storage ,
-            item.BrandName ,
-            item.BatchNo ,
+        const tableData = rawMaterialReportData.map((item) => [
+            item.MaterialName,
+            item['Opening Bal'],
+            item.Qty,
             item.Weight,
-            item.OilProduced,
-            item.Percentage,
-            item.OilInLitre
+            item['Closing Bal'] ,
+          
         ]);
 
         // Calculate grand total
-        // const grandTotal = productionData?.reduce((acc, row) => acc + (Number(row["Product Subtotal"]) || 0), 0);
+         const grandTotal = rawMaterialReportData?.reduce((acc, row) => acc + (Number(row["Closing Bal"]) || 0), 0);
 
         autoTable(doc, {
             head: [tableHeaders],
@@ -131,15 +120,16 @@ const ProductionReport = () => {
             theme: "grid",
             styles: { fontSize: 8, cellPadding: 1.5 },
             headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" },
-            // foot: [
-            //     [
-            //         { content: "Grand Total", colSpan: 11, styles: { halign: "right", fontStyle: "bold" } },
-            //         { content: grandTotal.toFixed(2), colSpan: 2, styles: { halign: "right", fontStyle: "bold" } }
-            //     ]
-            // ]
+           
+            foot: [
+                [
+                    { content: "Grand Total (Closing Bal)", colSpan: 4, styles: { halign: "right", fontStyle: "bold" } },
+                     { content: grandTotal.toFixed(2), colSpan: 1, styles: { halign: "right", fontStyle: "bold" } }
+                ]
+            ]
         });
 
-        doc.save("Production_Report_Preview.pdf");
+        doc.save("stockreport_for_row_material.pdf");
     };
 
 
@@ -155,20 +145,11 @@ const ProductionReport = () => {
 
         // Define header row
         const headers = [
-            "Production No",
-            "Production Date",
-            "Operator",
-            "Machine",
-            "Machine Start Time",
-            "Machine End Time",
-            "Product",
-            "Storage",
-            "Brand Name",
-            "BatchNo",
+            "Material Name",
+            "Opening Bal",
+            "Quenty",
             "Weight",
-            "Oil Produced",
-            "Percentage",
-            "OilInLitre"
+            "Closing Bal",
         ];
 
         worksheet.addRow(headers);
@@ -187,20 +168,12 @@ const ProductionReport = () => {
         // Add data rows
         data.forEach((item) => {
             worksheet.addRow([
-                item.ProductionNo,
-                item.ProductionDate,
-                item.Operator || "N/A",
-                item.Machine || "N/A",
-                Number(item.MachineStartTime) || 0,
-                Number(item.MachineEndTime) || 0,
-                item.Product || 0,
-                item.Storage || 0,
-                item.BrandName || 0,
-                item.BatchNo || 0,
-                Number(item.Weight) || 0,
-                Number(item.OilProduced) || 0,
-                Number(item.Percentage) || 0,
-                Number(item.OilInLitre) || 0
+                item.MaterialName,
+                Number(item['Opening Bal']),
+                Number(item.Qty || "N/A"),
+                Number(item.Weight || "N/A"),
+                Number(item['Closing Bal']) || 0,
+               
             ]);
         });
 
@@ -215,36 +188,36 @@ const ProductionReport = () => {
         });
 
         // Add Grand Total row
-        // const totalRowIndex = worksheet.lastRow.number + 2;
-        // const totalRow = worksheet.getRow(totalRowIndex);
-        // totalRow.getCell(11).value = "Grand Total";
-        // totalRow.getCell(11).font = { bold: true, size: 14 };
-        // totalRow.getCell(11).alignment = { horizontal: "right" };
+        const totalRowIndex = worksheet.lastRow.number + 2;
+        const totalRow = worksheet.getRow(totalRowIndex);
+        totalRow.getCell(4).value = "Closing Bal Total ";
+        totalRow.getCell(4).font = { bold: true, size: 14 };
+        totalRow.getCell(4).alignment = { horizontal: "right" };
 
-        // totalRow.getCell(12).value = { formula: `SUM(L2:L${worksheet.lastRow.number - 2})` };
-        // // totalRow.getCell(13).value = { formula: `SUM(M2:M${worksheet.lastRow.number - 2})` };
+        totalRow.getCell(5).value = { formula: `SUM(E2:E${worksheet.lastRow.number - 2})` };
+        // totalRow.getCell(13).value = { formula: `SUM(M2:M${worksheet.lastRow.number - 2})` };
 
-        // // Style Grand Total row
-        // totalRow.eachCell((cell) => {
-        //     cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
-        //     cell.fill = {
-        //         type: "pattern",
-        //         pattern: "solid",
-        //         fgColor: { argb: "FFFFE699" }, // Light yellow background
-        //     };
-        //     cell.alignment = { horizontal: "center", vertical: "middle" };
-        //     cell.border = {
-        //         top: { style: "thin" },
-        //         bottom: { style: "thin" },
-        //     };
-        // });
+        // Style Grand Total row
+        totalRow.eachCell((cell) => {
+            cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "FFFFE699" }, // Light yellow background
+            };
+            cell.alignment = { horizontal: "center", vertical: "middle" };
+            cell.border = {
+                top: { style: "thin" },
+                bottom: { style: "thin" },
+            };
+        });
 
         // Generate file
         const buffer = await workbook.xlsx.writeBuffer();
         const blob = new Blob([buffer], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         });
-        saveAs(blob, `ProductionReport_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        saveAs(blob, `stockreport_raw_material${new Date().toISOString().slice(0, 10)}.xlsx`);
     };
 
 
@@ -253,111 +226,47 @@ const ProductionReport = () => {
         return [
 
             {
-                accessorKey: 'ProductionNo',
-                header: 'Production No',
+                accessorKey: 'MaterialName',
+                header: 'Material Name',
                 size: 100,
             },
 
             {
-                accessorKey: 'ProductionDate',
-                header: 'Production Date',
+                accessorKey: ['Opening Bal'],
+                header: 'Opening Bal',
                 size: 50,
-                Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
+                // Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
             },
 
             {
-                accessorKey: 'Operator',
-                header: 'Operator',
+                accessorKey: 'Qty',
+                header: 'Quenty',
                 size: 50,
             },
-
-            {
-                accessorKey: 'Machine',
-                header: 'Machine',
-                size: 50,
-                
-            },
-
-            {
-                accessorKey: 'MachineStartTime',
-                header: 'Machine Start Time',
-                size: 50,
-              
-            },
-
-
-            {
-                accessorKey: 'MachineEndTime',
-                header: 'Machine End Time',
-                size: 50,
-            },
-
-
-            {
-                accessorKey: 'Product',
-                header: 'Product',
-                size: 50,
-            },
-
-            {
-                accessorKey: 'Storage',
-                header: 'Storage',
-                size: 50,
-            },
-
-
-            {
-                accessorKey: 'BrandName',
-                header: 'BrandName',
-                size: 50,
-            },
-
-
-            {
-                accessorKey: 'BatchNo',
-                header: 'Batch No',
-                size: 50,
-                 Cell: ({ cell }) => cell.getValue() || 0,
-            },
-
 
             {
                 accessorKey: 'Weight',
                 header: 'Weight',
                 size: 50,
-                 Cell: ({ cell }) => cell.getValue() || 0,
+                
             },
-
-
 
             {
-                accessorKey: 'OilProduced',
-                header: 'OilProduced',
+                accessorKey: ["Closing Bal"],
+                header: 'Closing Bal',
                 size: 50,
-                 Cell: ({ cell }) => cell.getValue() || 0,
+              
             },
 
 
-            {
-                accessorKey: 'Percentage',
-                header: 'Percentage',
-                size: 50,
-            },
-
-
-
-            {
-                accessorKey: 'OilInLitre',
-                header: 'Oil In Litre',
-                size: 50,
-            },
+           
 
         ];
     }, []);
 
     const table = useMaterialReactTable({
         columns,
-        data: productionData,
+        data: rawMaterialReportData,
         enablePagination: true,
         muiTableHeadCellProps: {
             style: {
@@ -370,13 +279,13 @@ const ProductionReport = () => {
 
     //grand Total
     const grandTotal = useMemo(() => {
-        return productionData?.reduce((acc, row) => acc + (Number(row["Product Subtotal"]) || 0), 0);
-    }, [productionData]);
+        return rawMaterialReportData?.reduce((acc, row) => acc + (Number(row["Closing Bal"]) || 0), 0);
+    }, [rawMaterialReportData]);
 
     return (
         <Box >
             <Box textAlign={'center'}>
-                <Typography sx={{ color: 'var(--complementary-color)', }} variant='h4'><b>Production Report</b></Typography>
+                <Typography sx={{ color: 'var(--complementary-color)', }} variant='h4'><b>Stock Report For Row Material </b></Typography>
             </Box>
 
             <Box sx={{ p: 5, height: 'auto' }}>
@@ -425,10 +334,10 @@ const ProductionReport = () => {
                                 background: 'var(--primary-color)',
                             }}
 
-                            onClick={handleGetProductionReport}
+                            onClick={handlegetRawMaterialReport}
                             variant="contained"
                         >
-                            Get Production Report
+                            Get Report
                         </Button>
                     </Box>
 
@@ -436,9 +345,9 @@ const ProductionReport = () => {
 
 
                 {/* table */}
-                {/* {showTable && productionData.length > 0 && ( */}
+                
                     <>
-                        {showTable && productionData.length > 0 && (
+                        {showTable && rawMaterialReportData.length > 0 && (
                             <>
                                 <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="xlg" fullWidth>
                                     <DialogTitle sx={{ textAlign: 'center' }}>
@@ -450,12 +359,12 @@ const ProductionReport = () => {
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                                         </Typography>
                                         <Typography sx={{ fontWeight: 'bold', mt: 1 }}>
-                                            Production Report Preview for  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
+                                            Preview of stock report for row material {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
                                         </Typography>
                                     </DialogTitle>
                                     <DialogContent dividers>
                                         <Box>
-                                            {productionData.length > 0 ? (
+                                            {rawMaterialReportData.length > 0 ? (
                                                 <Box>
 
                                                     <Box>
@@ -490,7 +399,7 @@ const ProductionReport = () => {
                                                 <Button
                                                     variant="contained"
                                                     endIcon={<FileDownloadIcon />}
-                                                    onClick={() => exportToExcel(productionData)}
+                                                    onClick={() => exportToExcel(rawMaterialReportData)}
                                                 >
                                                     Excel Data
                                                 </Button>
@@ -504,14 +413,14 @@ const ProductionReport = () => {
                                             </Box>
 
                                             {/* ✅ Right side: Grand Total */}
-                                            {/* <Box display="flex" alignItems="center" fontWeight="bold">
+                                            <Box display="flex" alignItems="center" fontWeight="bold">
                                                 <Typography variant="h6" sx={{ mr: 2 }}>
-                                                   <b>Grand Total:</b> 
+                                                   <b>Grand Total Of Closing Bal:</b> 
                                                 </Typography>
                                                 <Typography variant="h6" color="primary">
                                                    <b> {grandTotal.toLocaleString("en-IN")} </b> 
                                                 </Typography>
-                                            </Box> */}
+                                            </Box>
                                         </Box>
                                     </DialogActions>
 
@@ -519,10 +428,11 @@ const ProductionReport = () => {
                             </>
                         )}
                     </>
-                {/* )} */}
+               
             </Box >
         </Box >
     );
 };
 
-export default ProductionReport;
+export default StockReportForRowMaterial;
+

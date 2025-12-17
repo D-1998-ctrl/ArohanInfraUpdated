@@ -573,7 +573,7 @@ const exportToExcel = async (data) => {
                 )}
 
                 {/* table */}
-                {showTable && salesData.length > 0 && (
+                {/* {showTable && salesData.length > 0 && ( */}
                     <>
                         {showTable && salesData.length > 0 && (
                             <>
@@ -721,7 +721,7 @@ const exportToExcel = async (data) => {
                             </>
                         )}
                     </>
-                )}
+                {/* )} */}
             </Box >
         </Box >
     );

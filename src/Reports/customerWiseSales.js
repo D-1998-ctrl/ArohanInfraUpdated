@@ -466,7 +466,7 @@ const CustomerWiseSales = () => {
 
 
                 {/* table */}
-                {showTable && salesData.length > 0 && (
+                {/* {showTable && salesData.length > 0 && ( */}
                     <>
                         {showTable && salesData.length > 0 && (
                             <>
@@ -603,7 +603,7 @@ const CustomerWiseSales = () => {
                             </>
                         )}
                     </>
-                )}
+                {/* )} */}
             </Box >
         </Box >
     );
