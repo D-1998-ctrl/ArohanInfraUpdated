@@ -2069,31 +2069,31 @@ const PurchaseEntry = () => {
         requestOptions
       );
       const result = await response.json();
-      const purchaseEntryDta =result.data||[]
-       const PurchaseList = await Promise.all(
-      purchaseEntryDta.map(async (purchase) => {
-        try {
-          const acctResponse = await fetch(
-            `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=Account&Colname=Id&Colvalue=${purchase.SupplierId}`, // assuming AccountId is the linking field
-            requestOptions
-          );
-          const acctResult = await acctResponse.json();
-          const accountDetails = Array.isArray(acctResult) ? acctResult[0] : null;
+      const purchaseEntryDta = result.data || []
+      const PurchaseList = await Promise.all(
+        purchaseEntryDta.map(async (purchase) => {
+          try {
+            const acctResponse = await fetch(
+              `https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=Account&Colname=Id&Colvalue=${purchase.SupplierId}`, // assuming AccountId is the linking field
+              requestOptions
+            );
+            const acctResult = await acctResponse.json();
+            const accountDetails = Array.isArray(acctResult) ? acctResult[0] : null;
 
-          return {
-            ...purchase,
-            accountDetails // merged account info into invoice
-          };
-        } catch (error) {
-          console.error(`Failed to fetch account for invoice ${purchase.Id}:`, error);
-          return purchase; // fallback to original invoice
-        }
-      })
-    );
-    setPurchaseheaders(PurchaseList);
-   setTotalPages(result.total_pages);
+            return {
+              ...purchase,
+              accountDetails // merged account info into invoice
+            };
+          } catch (error) {
+            console.error(`Failed to fetch account for invoice ${purchase.Id}:`, error);
+            return purchase; // fallback to original invoice
+          }
+        })
+      );
+      setPurchaseheaders(PurchaseList);
+      setTotalPages(result.total_pages);
 
- //  console.log(' purchase header:', PurchaseList);
+      //  console.log(' purchase header:', PurchaseList);
 
       // setPurchaseheaders(result.data);
       // setTotalPages(result.total_pages);
@@ -2127,7 +2127,7 @@ const PurchaseEntry = () => {
   //table
   const columns = useMemo(() => {
     return [
-  
+
 
       {
         accessorKey: 'PurchaseNo',
@@ -2148,7 +2148,7 @@ const PurchaseEntry = () => {
         size: 150,
       },
 
- 
+
       {
         accessorKey: 'Total',
         header: 'Total',
@@ -2161,17 +2161,17 @@ const PurchaseEntry = () => {
         Cell: ({ row }) => (
           <Box display="flex" gap={1}>
             <Button
-               sx={{ background: 'var(--primary-color)'}}
-               variant="contained"
+              sx={{ background: 'var(--primary-color)' }}
+              variant="contained"
               size="small"
               onClick={() => handleSubmit213(row.original)}
             >
               Edit
             </Button>
 
-            <Button 
-            sx={{ background: 'var(--complementary-color)'}}
-               variant="contained"
+            <Button
+              sx={{ background: 'var(--complementary-color)' }}
+              variant="contained"
               // color="primary"
               size="small"
               onClick={() => {
@@ -2187,10 +2187,10 @@ const PurchaseEntry = () => {
                     };
                   });
 
-                 
-                  
+
+
                 setPreviewData({ ...row.original, invdetail });
-                console.log("headerData",row.original)
+                console.log("headerData", row.original)
                 setPreviewOpen(true);
               }}
             >
@@ -2210,7 +2210,7 @@ const PurchaseEntry = () => {
 
 
   const handleMenuOpen = (row) => {
-   // console.log('setShowEntry 3')
+    // console.log('setShowEntry 3')
     // setCurrentRow(row);
     setIsDrawerOpen(false);
     setShowEntry(3)
@@ -2219,7 +2219,7 @@ const PurchaseEntry = () => {
 
 
   const handleNewClick = () => {
-  //  console.log('setShowEntry 1')
+    //  console.log('setShowEntry 1')
     setIsDrawerOpen(true);
     resetForm();
     setIsEditing(false);
@@ -2459,7 +2459,7 @@ const PurchaseEntry = () => {
   const table = useMaterialReactTable({
     columns,
     data: purchaheaders,
-    enablePagination: false, 
+    enablePagination: false,
     muiTableHeadCellProps: {
       style: {
         backgroundColor: "#E9ECEF",
@@ -2547,7 +2547,7 @@ const PurchaseEntry = () => {
       (acc, row) => acc + (parseFloat(row.IGSTAmount) || 0),
       0
     );
-    
+
     const igstTotals = totalIGST.toFixed(2)
     setIgstTotal(igstTotals)
 
@@ -2583,7 +2583,7 @@ const PurchaseEntry = () => {
       PurchaseNo: parseInt(PurchaseNo),
       PurchaseDate: formattedPurchasedate,
       SupplierId: parseInt(selectedId) ? parseInt(selectedId) : customerName,
-      BillNo: parseInt(billNo),
+      BillNo: billNo,
       BillDate: formattedBillDate,
       Storelocation: selectedLocation,
       CGSTAmount: cgstTotal,
@@ -3020,7 +3020,9 @@ const PurchaseEntry = () => {
     selectedId: '',
     PurchaseDate: '',
     billDate: '',
-    selectedLocation: ''
+    selectedLocation: '',
+    brandName: "",
+    billNo: ''
   })
 
 
@@ -3030,6 +3032,8 @@ const PurchaseEntry = () => {
       PurchaseDate: '',
       BillDate: '',
       selectedLocation: '',
+      billNo: '',
+      brandName: ''
       // rows: ''
     };
 
@@ -3077,6 +3081,18 @@ const PurchaseEntry = () => {
       isValid = false;
     }
 
+
+    if (!billNo) {
+      newErrors.billNo = 'BillNo is required';
+      isValid = false;
+    }
+
+    if (!brandName) {
+      newErrors.brandName = 'Brand Name is required';
+      isValid = false;
+    }
+
+
     setErrors(newErrors);
     return isValid;
   };
@@ -3115,169 +3131,169 @@ const PurchaseEntry = () => {
   }, [yearid, fromdate, todate]);
 
   //for print
- const generatePDF = () => {
-  const doc = new jsPDF();
-  if (!previewData) return;
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    if (!previewData) return;
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  let y = 10;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let y = 10;
 
-  // Add border around the entire page 
-  
-  doc.setLineWidth(0.1); // Set border thickness
-  doc.rect(5, 5, pageWidth - 10, pageHeight - 10); // Draw rectangle with 5mm margin on all sides
+    // Add border around the entire page 
 
-  // Header
- const logoDiameter = 20; // Diameter of the circle
-  const logoRadius = logoDiameter / 2;
-  const x = pageWidth / 2 - logoRadius; 
+    doc.setLineWidth(0.1); // Set border thickness
+    doc.rect(5, 5, pageWidth - 10, pageHeight - 10); // Draw rectangle with 5mm margin on all sides
 
-  doc.setFillColor(255, 255, 255);
- 
-  doc.setDrawColor(0);
-   doc.circle(x + logoRadius, y + logoRadius, logoRadius, 'FD'); 
-  doc.clip(); 
-   doc.addImage(logonew, 'JPEG', x, y, logoDiameter, logoDiameter);
+    // Header
+    const logoDiameter = 20; // Diameter of the circle
+    const logoRadius = logoDiameter / 2;
+    const x = pageWidth / 2 - logoRadius;
 
-  doc.discardPath();
-  y += logoDiameter  + 6;
+    doc.setFillColor(255, 255, 255);
 
-  doc.setFontSize(16);
-  doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
-  y += 7;
-  doc.setFontSize(10)
-  doc.text("Address: Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
-  y += 7;
-  doc.setFontSize(12);
-  doc.text("Purchase Preview", pageWidth / 2, y, { align: "center" });
+    doc.setDrawColor(0);
+    doc.circle(x + logoRadius, y + logoRadius, logoRadius, 'FD');
+    doc.clip();
+    doc.addImage(logonew, 'JPEG', x, y, logoDiameter, logoDiameter);
 
-  y += 6;
-  doc.setLineWidth(0.5);
-  doc.line(10, y, 200, y);
-  y += 6;
+    doc.discardPath();
+    y += logoDiameter + 6;
 
-  // Rest of your existing code...
-  // Basic Details
-  doc.setFontSize(10);
-  doc.text(`Purchase No: ${previewData.PurchaseNo}`, 10, y);
-  doc.text(`Purchase Date: ${new Date(previewData.PurchaseDate.date).toLocaleDateString()}`, 140, y);
-  y += 6;
-  doc.text(`Party Name :${previewData.accountDetails.AccountName}`, 10, y);
-  doc.text(`Bill No: ${previewData.BillNo}`, 60, y);
-  doc.text(`Bill Date: ${new Date(previewData.BillDate.date).toLocaleDateString()}`, 100, y);
-  doc.text(`Brand Name: ${previewData.invdetail[0]?.Brandname || '-'}`, 150, y);
-  y += 6;
+    doc.setFontSize(16);
+    doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+    y += 7;
+    doc.setFontSize(10)
+    doc.text("Address: Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
+    y += 7;
+    doc.setFontSize(12);
+    doc.text("Purchase Preview", pageWidth / 2, y, { align: "center" });
 
-  doc.setLineWidth(0.1);
-  doc.line(10, y, 200, y);
-  doc.setLineWidth(0.2); 
-  y += 6;
+    y += 6;
+    doc.setLineWidth(0.5);
+    doc.line(10, y, 200, y);
+    y += 6;
 
-  
+    // Rest of your existing code...
+    // Basic Details
+    doc.setFontSize(10);
+    doc.text(`Purchase No: ${previewData.PurchaseNo}`, 10, y);
+    doc.text(`Purchase Date: ${new Date(previewData.PurchaseDate.date).toLocaleDateString()}`, 140, y);
+    y += 6;
+    doc.text(`Party Name :${previewData.accountDetails.AccountName}`, 10, y);
+    doc.text(`Bill No: ${previewData.BillNo}`, 60, y);
+    doc.text(`Bill Date: ${new Date(previewData.BillDate.date).toLocaleDateString()}`, 100, y);
+    doc.text(`Brand Name: ${previewData.invdetail[0]?.Brandname || '-'}`, 150, y);
+    y += 6;
 
-   doc.setFontSize(12);
-  doc.setFont(undefined, 'bold');
-  doc.text("Purchase Details", 10, y);
-  y += 6;
+    doc.setLineWidth(0.1);
+    doc.line(10, y, 200, y);
+    doc.setLineWidth(0.2);
+    y += 6;
+
+
+
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text("Purchase Details", 10, y);
+    y += 6;
 
     // Main table with all details
-  const tableHeaders = [
-    "Material",
-    "Quantity (Lit)",
-    "Rate",
-    "Amount (Rs)",
-    "CGST%",
-    "CGST Amount",
-    "SGST%",
-    "SGST Amount",
-    "IGST%",
-    "IGST Amount"
-  ];
-
-  const tableData = previewData.invdetail.map((item) => {
-    const materialName = productOptions.find(
-      (opt) => opt.value.toString() === item.MaterialId?.toString()
-    )?.label || "Unknown";
-
-    return [
-      materialName,
-      item.Quantity,
-      item.Rate,
-      item.Amount,
-      item.CGSTPercentage || 0,
-      item.CGSTAmount || 0,
-      item.SGSTPercentage || 0,
-      item.SGSTAmount || 0,
-      item.IGSTPercentage || 0,
-      item.IGSTAmount || 0
+    const tableHeaders = [
+      "Material",
+      "Quantity (Lit)",
+      "Rate",
+      "Amount (Rs)",
+      "CGST%",
+      "CGST Amount",
+      "SGST%",
+      "SGST Amount",
+      "IGST%",
+      "IGST Amount"
     ];
-  });
 
-  autoTable(doc, {
-    head: [tableHeaders],
-    body: tableData,
-    startY: y,
-    margin: { left: 10 },
-    theme: "grid",
-    styles: { fontSize: 8, cellPadding: 1.5 }, // Smaller font size to fit all columns
-    headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" },
-    columnStyles: {
-      0: { cellWidth: 'auto' },
-      1: { cellWidth: 'auto' },
-      2: { cellWidth: 'auto' },
-      3: { cellWidth: 'auto' },
-      4: { cellWidth: 'auto' },
-      5: { cellWidth: 'auto' },
-      6: { cellWidth: 'auto' },
-      7: { cellWidth: 'auto' },
-      8: { cellWidth: 'auto' },
-      9: { cellWidth: 'auto' }
-    }
-  });
+    const tableData = previewData.invdetail.map((item) => {
+      const materialName = productOptions.find(
+        (opt) => opt.value.toString() === item.MaterialId?.toString()
+      )?.label || "Unknown";
+
+      return [
+        materialName,
+        item.Quantity,
+        item.Rate,
+        item.Amount,
+        item.CGSTPercentage || 0,
+        item.CGSTAmount || 0,
+        item.SGSTPercentage || 0,
+        item.SGSTAmount || 0,
+        item.IGSTPercentage || 0,
+        item.IGSTAmount || 0
+      ];
+    });
+
+    autoTable(doc, {
+      head: [tableHeaders],
+      body: tableData,
+      startY: y,
+      margin: { left: 10 },
+      theme: "grid",
+      styles: { fontSize: 8, cellPadding: 1.5 }, // Smaller font size to fit all columns
+      headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" },
+      columnStyles: {
+        0: { cellWidth: 'auto' },
+        1: { cellWidth: 'auto' },
+        2: { cellWidth: 'auto' },
+        3: { cellWidth: 'auto' },
+        4: { cellWidth: 'auto' },
+        5: { cellWidth: 'auto' },
+        6: { cellWidth: 'auto' },
+        7: { cellWidth: 'auto' },
+        8: { cellWidth: 'auto' },
+        9: { cellWidth: 'auto' }
+      }
+    });
     y = doc.lastAutoTable.finalY + 10;
-  autoTable(doc, {
-    head: [["Other Charges", "Transport Charge"]],
-    body: [[previewData.Other || 0, previewData.TransportCharges || 0]],
-    startY: y,
-    margin: { left: 10, right: 110 },
-    theme: "grid",
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" }
-  });
+    autoTable(doc, {
+      head: [["Other Charges", "Transport Charge"]],
+      body: [[previewData.Other || 0, previewData.TransportCharges || 0]],
+      startY: y,
+      margin: { left: 10, right: 110 },
+      theme: "grid",
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" }
+    });
 
-  // Right Side: Summary Box
-  doc.setFontSize(11);
-  doc.text("Amount Summary", 155, y);
+    // Right Side: Summary Box
+    doc.setFontSize(11);
+    doc.text("Amount Summary", 155, y);
 
-  const summaryYStart = y + 10;
-  const lineHeight = 7;
-  const startX = 135;
+    const summaryYStart = y + 10;
+    const lineHeight = 7;
+    const startX = 135;
 
-  doc.setFontSize(10);
-  doc.text(`Subtotal:`, startX, summaryYStart + lineHeight * 0);
-  doc.text(`${previewData.SubTotal}`, startX + 40, summaryYStart + lineHeight * 0);
+    doc.setFontSize(10);
+    doc.text(`Subtotal:`, startX, summaryYStart + lineHeight * 0);
+    doc.text(`${previewData.SubTotal}`, startX + 40, summaryYStart + lineHeight * 0);
 
-  doc.text(`CGST Total:`, startX, summaryYStart + lineHeight * 1);
-  doc.text(`${previewData.CGSTAmount}`, startX + 40, summaryYStart + lineHeight * 1);
+    doc.text(`CGST Total:`, startX, summaryYStart + lineHeight * 1);
+    doc.text(`${previewData.CGSTAmount}`, startX + 40, summaryYStart + lineHeight * 1);
 
-  doc.text(`SGST Total:`, startX, summaryYStart + lineHeight * 2);
-  doc.text(`${previewData.SGSTAmount}`, startX + 40, summaryYStart + lineHeight * 2);
+    doc.text(`SGST Total:`, startX, summaryYStart + lineHeight * 2);
+    doc.text(`${previewData.SGSTAmount}`, startX + 40, summaryYStart + lineHeight * 2);
 
-  doc.text(`IGST Total:`, startX, summaryYStart + lineHeight * 3);
-  doc.text(`${previewData.IGSTAmount}`, startX + 40, summaryYStart + lineHeight * 3);
+    doc.text(`IGST Total:`, startX, summaryYStart + lineHeight * 3);
+    doc.text(`${previewData.IGSTAmount}`, startX + 40, summaryYStart + lineHeight * 3);
 
-  doc.text(`Other Charges:`, startX, summaryYStart + lineHeight * 4);
-  doc.text(`${previewData.Other}`, startX + 40, summaryYStart + lineHeight * 4);
+    doc.text(`Other Charges:`, startX, summaryYStart + lineHeight * 4);
+    doc.text(`${previewData.Other}`, startX + 40, summaryYStart + lineHeight * 4);
 
-  doc.setFont(undefined, "bold");
-  doc.text(`Grand Total:`, startX, summaryYStart + lineHeight * 5);
-  doc.text(`${previewData.Total}`, startX + 40, summaryYStart + lineHeight * 5);
-  doc.setFont(undefined, "normal");
+    doc.setFont(undefined, "bold");
+    doc.text(`Grand Total:`, startX, summaryYStart + lineHeight * 5);
+    doc.text(`${previewData.Total}`, startX + 40, summaryYStart + lineHeight * 5);
+    doc.setFont(undefined, "normal");
 
-  // Save
-  doc.save("Purchase_Preview.pdf");
-};
+    // Save
+    doc.save("Purchase_Preview.pdf");
+  };
 
   return (
     <Box>
@@ -3311,13 +3327,13 @@ const PurchaseEntry = () => {
         <Box>
           {/* ///for preview///////// */}.
           <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="xlg" fullWidth>
-            <DialogTitle sx={{ textAlign: 'center' }}>
+            <DialogTitle component="div"  sx={{ textAlign: 'center' }}>
               <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                 <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                <Typography variant="h6">Arohan Agro Kolhapur</Typography>
+                <Typography variant="h6">Aarohan Agro Kolhapur</Typography>
 
               </Box>
-                <Typography sx={{ mt: 1 }}>
+              <Typography sx={{ mt: 1 }}>
                 Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
               </Typography>
               <Typography variant="h6" mt={1} ><b>Purchase Preview</b>  </Typography>
@@ -3337,13 +3353,13 @@ const PurchaseEntry = () => {
                     </Box>
 
                     <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={2}>
-                       <Box><Typography><strong>Party Name:</strong> {previewData.accountDetails.AccountName}</Typography></Box>
+                      <Box><Typography><strong>Party Name:</strong> {previewData.accountDetails.AccountName}</Typography></Box>
                       <Box><Typography><strong>Bill No:</strong> {previewData.BillNo}</Typography></Box>
                       <Box><Typography><strong>Bill Date:</strong>{" "} {new Date(previewData.BillDate.date).toLocaleDateString()}</Typography></Box>
                       <Box><Typography><strong>Brand Name:</strong> {previewData.invdetail[0]?.Brandname}</Typography></Box>
                     </Box>
-                  <Divider sx={{ mt: 2 }} />
-          
+                    <Divider sx={{ mt: 2 }} />
+
                     {/* <Grid container spacing={4}>
                      
                       <Grid item xs={12} md={8}>
@@ -3485,116 +3501,116 @@ const PurchaseEntry = () => {
                       </Grid>
                     </Grid> */}
 
-                     <Grid container spacing={4}>
+                    <Grid container spacing={4}>
 
-                    <Grid item xs={12} md={8}>
-                      <Typography variant="h6" fontWeight="bold" gutterBottom mt={2}>
-                        PUrchase Details 
-                      </Typography>
+                      <Grid item xs={12} md={8}>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom mt={2}>
+                          PUrchase Details
+                        </Typography>
 
-                      <TableContainer component={Paper} elevation={2} sx={{ width: '100%', mt: 2 }}>
-                        <Table size="small">
-                          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                            <TableRow>
-                              <TableCell><strong>Material</strong></TableCell>
-                              <TableCell><strong>Quantity (Lit)</strong></TableCell>
-                              <TableCell><strong>Rate</strong></TableCell>
-                              <TableCell><strong>Amount (Rs)</strong></TableCell>
-                              <TableCell><strong>CGST%</strong></TableCell>
-                              <TableCell><strong>CGST Amount</strong></TableCell>
-                              <TableCell><strong>SGST%</strong></TableCell>
-                              <TableCell><strong>SGST Amount</strong></TableCell>
-                              <TableCell><strong>IGST%</strong></TableCell>
-                              <TableCell><strong>IGST Amount</strong></TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {previewData.invdetail.map((item, index) => {
-                              const materialName = productOptions.find(
-                                (opt) => opt.value.toString() === item.MaterialId?.toString()
-                              )?.label || "Unknown";
+                        <TableContainer component={Paper} elevation={2} sx={{ width: '100%', mt: 2 }}>
+                          <Table size="small">
+                            <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                              <TableRow>
+                                <TableCell><strong>Material</strong></TableCell>
+                                <TableCell><strong>Quantity (Lit)</strong></TableCell>
+                                <TableCell><strong>Rate</strong></TableCell>
+                                <TableCell><strong>Amount (Rs)</strong></TableCell>
+                                <TableCell><strong>CGST%</strong></TableCell>
+                                <TableCell><strong>CGST Amount</strong></TableCell>
+                                <TableCell><strong>SGST%</strong></TableCell>
+                                <TableCell><strong>SGST Amount</strong></TableCell>
+                                <TableCell><strong>IGST%</strong></TableCell>
+                                <TableCell><strong>IGST Amount</strong></TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {previewData.invdetail.map((item, index) => {
+                                const materialName = productOptions.find(
+                                  (opt) => opt.value.toString() === item.MaterialId?.toString()
+                                )?.label || "Unknown";
 
-                              return (
-                                <TableRow key={index}>
-                                  <TableCell>{materialName}</TableCell>
-                                  <TableCell>{item.Quantity}</TableCell>
-                                  <TableCell>{item.Rate}</TableCell>
-                                  <TableCell>{item.Amount}</TableCell>
-                                  <TableCell>{item.CGSTPercentage || 0}</TableCell>
-                                  <TableCell>{item.CGSTAmount || 0}</TableCell>
-                                  <TableCell>{item.SGSTPercentage || 0}</TableCell>
-                                  <TableCell>{item.SGSTAmount || 0}</TableCell>
-                                  <TableCell>{item.IGSTPercentage || 0}</TableCell>
-                                  <TableCell>{item.IGSTAmount || 0}</TableCell>
-                                </TableRow>
-                              );
-                            })}
+                                return (
+                                  <TableRow key={index}>
+                                    <TableCell>{materialName}</TableCell>
+                                    <TableCell>{item.Quantity}</TableCell>
+                                    <TableCell>{item.Rate}</TableCell>
+                                    <TableCell>{item.Amount}</TableCell>
+                                    <TableCell>{item.CGSTPercentage || 0}</TableCell>
+                                    <TableCell>{item.CGSTAmount || 0}</TableCell>
+                                    <TableCell>{item.SGSTPercentage || 0}</TableCell>
+                                    <TableCell>{item.SGSTAmount || 0}</TableCell>
+                                    <TableCell>{item.IGSTPercentage || 0}</TableCell>
+                                    <TableCell>{item.IGSTAmount || 0}</TableCell>
+                                  </TableRow>
+                                );
+                              })}
 
 
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
 
-                      <TableContainer component={Paper} elevation={1} sx={{ width: '100%', mt: 8 }}>
-                        <Table size="small">
-                          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                            <TableRow>
-                              <TableCell><strong>Other Charges</strong></TableCell>
+                        <TableContainer component={Paper} elevation={1} sx={{ width: '100%', mt: 8 }}>
+                          <Table size="small">
+                            <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                              <TableRow>
+                                <TableCell><strong>Other Charges</strong></TableCell>
                                 <TableCell><strong>Transport Charge</strong></TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            <TableRow>
-                             <TableCell>{previewData.Other}</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              <TableRow>
+                                <TableCell>{previewData.Other}</TableCell>
                                 <TableCell>{previewData.TransportCharges}</TableCell>
-                            </TableRow>
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </Grid>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Grid>
 
-                    {/* Summary Table */}
-                    <Grid item xs={12} md={4}>
-                      <Typography variant="h6" fontWeight="bold" gutterBottom mt={2}>
-                        Amount Summary
-                      </Typography>
+                      {/* Summary Table */}
+                      <Grid item xs={12} md={4}>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom mt={2}>
+                          Amount Summary
+                        </Typography>
 
-                      <TableContainer component={Paper} elevation={2} sx={{ marginTop: 2 }}>
-                        <Table size="small">
-                          <TableBody>
-                            <TableRow>
-                              <TableCell><strong>Subtotal</strong></TableCell>
-                              <TableCell>{previewData.SubTotal}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell><strong>CGST Total</strong></TableCell>
-                              <TableCell>{previewData.CGSTAmount}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell><strong>SGST Total</strong></TableCell>
-                              <TableCell>{previewData.SGSTAmount}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell><strong>IGST Total</strong></TableCell>
-                              <TableCell>{previewData.IGSTAmount}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell><strong>Other</strong></TableCell>
-                              <TableCell>{previewData.Other}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell><strong>Transport</strong></TableCell>
-                              <TableCell>{previewData.TransportCharges}</TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell><strong>Grand Total</strong></TableCell>
-                              <TableCell>{previewData.Total}</TableCell>
-                            </TableRow>
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
+                        <TableContainer component={Paper} elevation={2} sx={{ marginTop: 2 }}>
+                          <Table size="small">
+                            <TableBody>
+                              <TableRow>
+                                <TableCell><strong>Subtotal</strong></TableCell>
+                                <TableCell>{previewData.SubTotal}</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell><strong>CGST Total</strong></TableCell>
+                                <TableCell>{previewData.CGSTAmount}</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell><strong>SGST Total</strong></TableCell>
+                                <TableCell>{previewData.SGSTAmount}</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell><strong>IGST Total</strong></TableCell>
+                                <TableCell>{previewData.IGSTAmount}</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell><strong>Other</strong></TableCell>
+                                <TableCell>{previewData.Other}</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell><strong>Transport</strong></TableCell>
+                                <TableCell>{previewData.TransportCharges}</TableCell>
+                              </TableRow>
+                              <TableRow>
+                                <TableCell><strong>Grand Total</strong></TableCell>
+                                <TableCell>{previewData.Total}</TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Grid>
                     </Grid>
-                  </Grid> 
                   </Box>
                 ) : (
                   <Typography>No data to preview</Typography>
@@ -3602,7 +3618,7 @@ const PurchaseEntry = () => {
               </Box>
             </DialogContent>
             <DialogActions>
-               <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{fontSize:35}}/></Button>
+              <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{ fontSize: 35 }} /></Button>
               <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
             </DialogActions>
           </Dialog>
@@ -3771,7 +3787,17 @@ const PurchaseEntry = () => {
                         }}
                         focused
                         value={billNo}
-                        onChange={(e) => setBillNo(e.target.value)}
+                        // onChange={(e) => setBillNo(e.target.value)}
+                        onChange={(e) => {
+                          setBillNo(e.target.value);
+                          setErrors((prev) => ({
+                            ...prev,
+                            billNo: e.target.value ? "" : "Bill No is required"
+                          }));
+                        }}
+
+                        error={Boolean(errors.billNo)}
+                        helperText={errors.billNo}
                         size="small"
                         margin="none"
                         placeholder='Bill No'
@@ -3808,7 +3834,18 @@ const PurchaseEntry = () => {
                         }}
                         focused
                         value={brandName}
-                        onChange={(e) => setBrandName(e.target.value)}
+                        // onChange={(e) => setBrandName(e.target.value)}
+                        onChange={(e) => {
+                          setBrandName(e.target.value);
+                          setErrors((prev) => ({
+                            ...prev,
+                            brandName: e.target.value ? "" : "Brand Name is required"
+                          }));
+                        }}
+
+                        error={Boolean(errors.brandName)}
+                        helperText={errors.brandName}
+
                         size="small"
                         margin="none"
 

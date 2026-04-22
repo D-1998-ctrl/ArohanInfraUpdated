@@ -31,7 +31,7 @@ const CustomerMaster = () => {
 
   //table
   //tble data
-  const [Id, setID] = useState('')
+
   const [data, setData] = useState([]);
 
   const [anchorEl, setAnchorEl] = useState(null);

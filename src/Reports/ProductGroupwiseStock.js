@@ -13,7 +13,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
-
+import { MRT_TablePagination as MUITablePagination } from "material-react-table";
 
 const ProductGroupwiseStock = () => {
   const [fromDate, setFromDate] = useState(null);
@@ -87,7 +87,7 @@ const ProductGroupwiseStock = () => {
     y += height + 6;
 
     doc.setFontSize(16);
-    doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+    doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
     y += 7;
     doc.setFontSize(10)
     doc.text(" Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
@@ -292,6 +292,8 @@ const ProductGroupwiseStock = () => {
 
     ];
   }, []);
+
+
   const table = useMaterialReactTable({
     columns,
     data: salesData,
@@ -303,6 +305,50 @@ const ProductGroupwiseStock = () => {
         fontSize: "16px",
       },
     },
+    renderBottomToolbar: ({ table }) => (
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mr: 4
+
+                }}
+            >
+                {/* ⬅️ Pagination on Left */}
+                <MUITablePagination table={table} />
+
+                {/* ➡️ Totals on Right */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        fontWeight: "bold",
+                    }}
+                >
+                   
+                    <Box sx={{ display: "flex", alignItems: "center", }} >
+                        <Typography variant="subtitle1" fontWeight="bold">
+                            Grand Total Of Invoice:
+                        </Typography>
+                        <Typography variant="subtitle1" color="primary" fontWeight="bold">
+                            {grandTotal.toLocaleString("en-IN")}
+                        </Typography>
+                    </Box>
+
+                    {/* Purchase Other Total */}
+                    <Box sx={{ display: "flex", alignItems: "center", }} >
+                        <Typography variant="subtitle1" fontWeight="bold">
+                            Grand Total Of PurchaseOther:
+                        </Typography>
+                        <Typography variant="subtitle1" color="primary" fontWeight="bold">
+                            {grandTotalofPurchaseOtherAmount.toLocaleString("en-IN")}
+                        </Typography>
+                    </Box>
+                </Box>
+            </Box>
+        )
   });
 
   //grand Total
@@ -386,7 +432,7 @@ const ProductGroupwiseStock = () => {
                   <DialogTitle sx={{ textAlign: 'center' }}>
                     <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                       <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                      <Typography >Arohan Agro Kolhapur</Typography>
+                      <Typography >Aarohan Agro Kolhapur</Typography>
                     </Box>
                     <Typography sx={{ mt: 1 }}>
                       Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
@@ -445,8 +491,8 @@ const ProductGroupwiseStock = () => {
                         </Button>
                       </Box>
 
-                      {/* ✅ Right side: Grand Total */}
-                      <Box>
+                      
+                      {/* <Box>
                         <Box display="flex" alignItems="center" fontWeight="bold">
                           <Typography variant="h6" sx={{ mr: 2 }}>
                             <b>Grand Total Of Invoice Amount:</b>
@@ -465,7 +511,7 @@ const ProductGroupwiseStock = () => {
                             <b> {grandTotalofPurchaseOtherAmount.toLocaleString("en-IN")} </b>
                           </Typography>
                         </Box>
-                      </Box>
+                      </Box> */}
 
 
 

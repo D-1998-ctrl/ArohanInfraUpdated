@@ -3,7 +3,7 @@ import { useState,useMemo } from 'react';
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { Paper, Dialog, DialogActions, DialogContent, DialogTitle, Box, TableBody, TableCell, TableContainer, TableHead, TableRow, Table, Typography, Button } from '@mui/material';
+import {  Dialog, DialogActions, DialogContent, DialogTitle, Box,  Typography, Button } from '@mui/material';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -13,7 +13,7 @@ import ExcelJS from "exceljs";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
-
+import { MRT_TablePagination as MUITablePagination } from "material-react-table";
 
 const ProductwiseSales = () => {
     const [fromDate, setFromDate] = useState(null);
@@ -88,7 +88,7 @@ const ProductwiseSales = () => {
         y += height + 6;
 
         doc.setFontSize(16);
-        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+        doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
         y += 7;
         doc.setFontSize(10)
         doc.text(" Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
@@ -158,73 +158,7 @@ const ProductwiseSales = () => {
     };
 
 
-    // const exportToExcel = async (data) => {
-    //   if (!data || data.length === 0) {
-    //     alert("No data available to export");
-    //     return;
-    //   }
-    
-    //   const workbook = new ExcelJS.Workbook();
-    //   const worksheet = workbook.addWorksheet("SalesReport");
-    
-    //   // Define header row
-    //   const headers = [
-    //     "Product Name",
-    //     "UOM",
-    //     "SellPrice",
-    //     "InvoiceQuantity",
-    //     "InvoiceAmount",
-    //     "PurchaseOtherQuantity",
-    //     "PurchaseOtherAmount",
-
-     
-    //   ];
-    
-    //   worksheet.addRow(headers);
-    
-    //   // Apply header styling
-    //   worksheet.getRow(1).eachCell((cell) => {
-    //     cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; // white bold
-    //     cell.fill = {
-    //       type: "pattern",
-    //       pattern: "solid",
-    //       fgColor: { argb: "FF4F81BD" }, // blue background
-    //     };
-    //     cell.alignment = { horizontal: "center", vertical: "middle" };
-    //   });
-    
-    //   // Add data rows
-    //   data.forEach((item) => {
-    //     worksheet.addRow([
-       
-    //       item.ProductName,
-    //       item.UOM || "N/A",
-    //       item.SellPrice || 0,
-    //       item.InvoiceQuantity || 0,
-    //       item.InvoiceAmount || 0,
-    //       item.PurchaseOtherQuantity || 0,
-    //       item.PurchaseOtherAmount || 0,
-          
-    //     ]);
-    //   });
-    
-    //   // Auto-fit columns
-    //   worksheet.columns.forEach((col) => {
-    //     let maxLength = 10;
-    //     col.eachCell({ includeEmpty: true }, (cell) => {
-    //       const columnLength = cell.value ? cell.value.toString().length : 0;
-    //       if (columnLength > maxLength) maxLength = columnLength;
-    //     });
-    //     col.width = maxLength + 5;
-    //   });
-    
-    //   // Write workbook
-    //   const buffer = await workbook.xlsx.writeBuffer();
-    //   const blob = new Blob([buffer], {
-    //     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    //   });
-    //   saveAs(blob, `Productwise_SalesReport_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    // };
+   
 const exportToExcel = async (data) => {
   if (!data || data.length === 0) {
     alert("No data available to export");
@@ -319,75 +253,119 @@ const exportToExcel = async (data) => {
 };
 
 
-     const columns = useMemo(() => {
-            return [
-    
-                {
-                    accessorKey: 'ProductName',
-                    header: 'Product Name',
-                    size: 50,
-                },
-    
-                {
-                    accessorKey: 'UOM',
-                    header: 'UOM',
-                    size: 30,
-                    Cell: ({ cell }) => cell.getValue() || "-",
-                },
-    
-                {
-                    accessorKey: 'SellPrice',
-                    header: 'SellPrice',
-                    size: 30,
-                    Cell:({cell})=>cell.getValue()||0
-                },
-    
-                {
-                    accessorKey: 'InvoiceQuantity',
-                    header: 'Invoice Quantity',
-                    size: 30,
-                    Cell:({cell})=>cell.getValue()||0
-                },
-    
-                {
-                    accessorKey: 'InvoiceAmount',
-                    header: 'InvoiceAmount',
-                    size: 30,
-                
-                    Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
-                },
-    
-    
-                {
-                    accessorKey: 'PurchaseOtherQuantity',
-                    header: 'PurchaseOtherQuantity',
-                    size: 30,
-                    Cell:({cell})=>cell.getValue()||0
-                },
-    
-    
-                {
-                    accessorKey: 'PurchaseOtherAmount',
-                    header: 'PurchaseOtherAmount',
-                    size: 30,
-                    // Cell:({cell})=>cell.getValue()||0
-                     Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
-                },
-            ];
-        }, []);
+    const columns = useMemo(() => {
+        return [
 
-        const table = useMaterialReactTable({
-            columns,
-            data: salesData,
-            enablePagination: true,
-            muiTableHeadCellProps: {
-                style: {
-                    backgroundColor: "#E9ECEF",
-                    color: "black",
-                    fontSize: "16px",
-                },
+            {
+                accessorKey: 'ProductName',
+                header: 'Product Name',
+                size: 50,
             },
-        });
+
+            {
+                accessorKey: 'UOM',
+                header: 'UOM',
+                size: 30,
+                Cell: ({ cell }) => cell.getValue() || "-",
+            },
+
+            {
+                accessorKey: 'SellPrice',
+                header: 'SellPrice',
+                size: 30,
+                Cell: ({ cell }) => cell.getValue() || 0
+            },
+
+            {
+                accessorKey: 'InvoiceQuantity',
+                header: 'Invoice Quantity',
+                size: 30,
+                Cell: ({ cell }) => cell.getValue() || 0
+            },
+
+            {
+                accessorKey: 'InvoiceAmount',
+                header: 'InvoiceAmount',
+                size: 30,
+
+                Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
+            },
+
+
+            {
+                accessorKey: 'PurchaseOtherQuantity',
+                header: 'PurchaseOtherQuantity',
+                size: 30,
+                Cell: ({ cell }) => cell.getValue() || 0
+            },
+
+
+            {
+                accessorKey: 'PurchaseOtherAmount',
+                header: 'PurchaseOtherAmount',
+                size: 30,
+                // Cell:({cell})=>cell.getValue()||0
+                Cell: ({ cell }) => Number(cell.getValue() || 0).toFixed(2),
+            },
+        ];
+    }, []);
+
+    const table = useMaterialReactTable({
+        columns,
+        data: salesData,
+        enablePagination: true,
+        muiTableHeadCellProps: {
+            style: {
+                backgroundColor: "#E9ECEF",
+                color: "black",
+                fontSize: "16px",
+            },
+        },
+        renderBottomToolbar: ({ table }) => (
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mr: 4
+
+                }}
+            >
+                {/* ⬅️ Pagination on Left */}
+                <MUITablePagination table={table} />
+
+                {/* ➡️ Totals on Right */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        fontWeight: "bold",
+                    }}
+                >
+                    {/* Invoice Total */}
+                    <Box sx={{ display: "flex", alignItems: "center", }} >
+                        <Typography variant="subtitle1" fontWeight="bold">
+                            Grand Total Of Invoice:
+                        </Typography>
+                        <Typography variant="subtitle1" color="primary" fontWeight="bold">
+                            {grandTotalOfInvoice.toLocaleString("en-IN")}
+                        </Typography>
+                    </Box>
+
+                    {/* Purchase Other Total */}
+                    <Box sx={{ display: "flex", alignItems: "center", }} >
+                        <Typography variant="subtitle1" fontWeight="bold">
+                            Grand Total Of PurchaseOther:
+                        </Typography>
+                        <Typography variant="subtitle1" color="primary" fontWeight="bold">
+                            {grandTotalOfPurchaseOther.toLocaleString("en-IN")}
+                        </Typography>
+                    </Box>
+                </Box>
+            </Box>
+        )
+    });
     
         //grand Total
     const grandTotalOfInvoice = useMemo(() => {
@@ -470,7 +448,7 @@ const exportToExcel = async (data) => {
                                     <DialogTitle sx={{ textAlign: 'center' }}>
                                         <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                                             <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                                            <Typography variant="h6">Arohan Agro Kolhapur</Typography>
+                                            <Typography variant="h6">Aarohan Agro Kolhapur</Typography>
                                         </Box>
                                         <Typography sx={{ mt: 1 }}>
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
@@ -483,42 +461,6 @@ const exportToExcel = async (data) => {
                                         <Box>
                                             {salesData.length > 0 ? (
                                                 <Box>
-
-
-                                                    {/* Table to display sales data */}
-                                                    {/* <TableContainer fullWidth component={Paper} sx={{ mt: 3 }}>
-                                                        <Table>
-                                                            <TableHead>
-                                                                <TableRow>
-                                                                    <TableCell><b>Product Name</b></TableCell>
-                                                                    <TableCell><b>UOM</b></TableCell>
-                                                                    <TableCell><strong>SellPrice</strong></TableCell>
-                                                                    <TableCell><b>InvoiceQuantity</b></TableCell>
-                                                                    <TableCell><b>InvoiceAmount</b></TableCell>
-                                                                    <TableCell> <b>PurchaseOtherQuantity</b></TableCell>
-                                                                    <TableCell><b>PurchaseOtherAmount</b></TableCell>
-                                                                    
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {salesData.map((item, index) => (
-                                                                    <TableRow key={index}>
-                                                                        <TableCell>{item.ProductName}</TableCell>
-                                                                        <TableCell>{item.UOM}</TableCell>
-                                                                        <TableCell>{item.SellPrice || 0}</TableCell>
-
-                                                                        <TableCell>{item.InvoiceQuantity|| 0}</TableCell>
-                                                                        <TableCell>{item.InvoiceAmount || 0}</TableCell>
-                                                                        <TableCell>{item.PurchaseOtherQuantity || 0}</TableCell>
-                                                                        <TableCell>{item.PurchaseOtherAmount || 0}</TableCell>
-                                                                        
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer> */}
-
-                                                    
                                                     <Box>
                                                         <MaterialReactTable table={table}
                                                             enableColumnResizing
@@ -535,14 +477,7 @@ const exportToExcel = async (data) => {
                                             )}
                                         </Box>
                                     </DialogContent>
-                                    {/* <DialogActions>
-                                         <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{fontSize:35}}/></Button>
-                                          <Button variant='contained' endIcon={<FileDownloadIcon />} onClick={() => exportToExcel(salesData)}>Excel Data</Button>
-
-                                        <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
-                                    </DialogActions> */}
-
-
+                                    
                                     <DialogActions sx={{ p: 0 }}>
                                         <Box
                                             display="flex"
@@ -573,7 +508,7 @@ const exportToExcel = async (data) => {
                                             </Box>
 
                                             {/* ✅ Right side: Grand Total */}
-                                            <Box display="flex" alignItems="center" fontWeight="bold" gap={2}>
+                                            {/* <Box display="flex" alignItems="center" fontWeight="bold" gap={2}>
                                                 <Box display="flex">
                                                     <Typography variant="h6" sx={{ mr: 2 }}>
                                                         <b>Grand Total Of Invoice:</b>
@@ -593,7 +528,7 @@ const exportToExcel = async (data) => {
                                                     </Typography>
                                                 </Box>
 
-                                            </Box>
+                                            </Box> */}
                                         </Box>
                                     </DialogActions>
                                 </Dialog>

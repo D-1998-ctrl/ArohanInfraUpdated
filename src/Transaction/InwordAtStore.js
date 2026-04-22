@@ -376,32 +376,7 @@ const InwordAtStore = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
 
 
-    // const fetchProduct = async () => {
-    //     const requestOptions = {
-    //         method: "GET",
-    //         redirect: "follow",
-    //     };
-
-    //     fetch(
-    //         "https://arohanagroapi.microtechsolutions.co.in/php/get/gettable.php?Table=productmaster",
-    //         requestOptions
-    //     )
-    //         .then((response) => response.json())
-    //         .then((result) => {
-    //             // console.log("API Response:", result); // Debugging log
-
-
-    //             const productsOptions = result.map((product) => ({
-    //                 value: product?.Id || "",
-    //                 label: product?.ProductName,
-    //             }));
-
-    //             setProductOptions(productsOptions);
-
-    //         })
-    //         .catch((error) => console.error("Error fetching Storelocation:", error));
-    // };
-
+   
 
     const fetchProduct = async () => {
         try {
@@ -802,7 +777,7 @@ const InwordAtStore = () => {
         y += logoDiameter + 6;
 
         doc.setFontSize(16);
-        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+        doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
         y += 7;
         doc.setFontSize(10)
         doc.text("Address: Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
@@ -902,10 +877,10 @@ const InwordAtStore = () => {
                 <Box>
                     {/* ///for preview///////// */}.
                     <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="lg" fullWidth>
-                        <DialogTitle sx={{ textAlign: 'center' }}>
+                        <DialogTitle component="div" sx={{ textAlign: 'center' }}>
                             <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                                 <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                                <Typography variant="h6">Arohan Agro Kolhapur</Typography>
+                                <Typography variant="h6">Aarohan Agro Kolhapur</Typography>
 
                             </Box>
                             <Typography sx={{ mt: 1 }}>
@@ -921,7 +896,7 @@ const InwordAtStore = () => {
                                             <Typography><strong>Inward No:</strong> {previewData.InwardNo}</Typography>
                                             <Typography>
                                                 <strong>Inward Date:</strong>{" "}
-                                                {new Date(previewData.InwardDate.date).toLocaleDateString()}
+                                                {new Date(previewData.InwardDate.date).toLocaleDateString("en-GB")}
                                             </Typography>
                                         </Box>
 

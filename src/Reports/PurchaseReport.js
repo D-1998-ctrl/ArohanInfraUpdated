@@ -10,10 +10,9 @@ import logonew from '../imgs/logo_white.png'
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
-
+import { MRT_TablePagination as MUITablePagination } from "material-react-table";
 
 const PurchaseReport = () => {
     const [fromDate, setFromDate] = useState(null);
@@ -59,267 +58,130 @@ const PurchaseReport = () => {
     };
 
 
-const generatePDF = () => {
-  const doc = new jsPDF("landscape");
-  if (!salesData || !salesData.length) return;
+    const generatePDF = () => {
+        const doc = new jsPDF("landscape");
+        if (!salesData || !salesData.length) return;
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  let y = 10;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        let y = 10;
 
-  // Border
-  doc.setLineWidth(0.5);
-  doc.rect(5, 5, pageWidth - 10, doc.internal.pageSize.getHeight() - 10);
+        // Border
+        doc.setLineWidth(0.5);
+        doc.rect(5, 5, pageWidth - 10, doc.internal.pageSize.getHeight() - 10);
 
-  // Logo
-  const width = 20, height = 20, x = pageWidth / 2 - width / 2;
-  if (logonew) doc.addImage(logonew, "JPEG", x, y, width, height, "", "FAST");
-  y += height + 6;
+        // Logo
+        const width = 20, height = 20, x = pageWidth / 2 - width / 2;
+        if (logonew) doc.addImage(logonew, "JPEG", x, y, width, height, "", "FAST");
+        y += height + 6;
 
-  // Company Info
-  doc.setFontSize(16);
-  doc.text("Arohan Agro", pageWidth / 2, y, { align: "center" });
-  y += 7;
-  doc.setFontSize(10);
-  doc.text(
-    "Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003",
-    pageWidth / 2,
-    y,
-    { align: "center", maxWidth: pageWidth - 20 }
-  );
-  y += 9;
+        // Company Info
+        doc.setFontSize(16);
+        doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center" });
+        y += 7;
+        doc.setFontSize(10);
+        doc.text(
+            "Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003",
+            pageWidth / 2,
+            y,
+            { align: "center", maxWidth: pageWidth - 20 }
+        );
+        y += 9;
 
-  // Report Title
-  doc.setFontSize(14);
-  doc.text("Purchase Report Preview", pageWidth / 2, y, { align: "center" });
-  y += 6;
+        // Report Title
+        doc.setFontSize(14);
+        doc.text("Purchase Report Preview", pageWidth / 2, y, { align: "center" });
+        y += 6;
 
-  // Divider Line
-  doc.setLineWidth(0.5);
-  doc.line(10, y, pageWidth - 10, y);
-  y += 6;
+        // Divider Line
+        doc.setLineWidth(0.5);
+        doc.line(10, y, pageWidth - 10, y);
+        y += 6;
 
-  // Helper to safely parse numbers
-  const parseNum = (v) => {
-    if (v === null || v === undefined) return 0;
-    const cleaned = String(v).replace(/,/g, "").trim();
-    const n = parseFloat(cleaned);
-    return Number.isFinite(n) ? n : 0;
-  };
+        // Helper to safely parse numbers
+        const parseNum = (v) => {
+            if (v === null || v === undefined) return 0;
+            const cleaned = String(v).replace(/,/g, "").trim();
+            const n = parseFloat(cleaned);
+            return Number.isFinite(n) ? n : 0;
+        };
 
-  const tableHeaders = [
-    "InvoiceNo","Invoice Date","Order No","Order Date","Account Name","Quantity","Rate","Amount",
-    "CGST%","CGST Amt","SGST%","SGST Amt","IGST%","IGST Amt","Total with Tax",
-    "Invoice CGST Amt","Invoice SGST Amt","Invoice IGST Amt","InvoiceSubtotal","Transport","Total Amount"
-  ];
+        const tableHeaders = [
+            "InvoiceNo", "Invoice Date", "Order No", "Order Date", "Account Name", "Quantity", "Rate", "Amount",
+            "CGST%", "CGST Amt", "SGST%", "SGST Amt", "IGST%", "IGST Amt", "Total with Tax",
+            "Invoice CGST Amt", "Invoice SGST Amt", "Invoice IGST Amt", "InvoiceSubtotal", "Transport", "Total Amount"
+        ];
 
-  const tableData = salesData.map((item) => [
-    item.InvoiceNo,
-    item.InvoiceDate,
-    item.OrderNo || "N/A",
-    item.OrderDate || "N/A",
-    item.AccountName || "N/A",
-    item.Quantity ?? 0,
-    item.Rate ?? 0,
-    item.Amount ?? 0,
-    item.CGSTPercentage ?? 0,
-    item["Product CGST AMT"] ?? 0,
-    item.SGSTPercentage ?? 0,
-    item["Product SGST AMT"] ?? 0,
-    item.IGSTPercentage ?? 0,
-    item["Product IGST AMT"] ?? 0,
-    item["Product Subtotal"] ?? 0,
-    item["Total Invoice CGST Amt"] ?? 0,
-    item["Total Invoice SGST Amt"] ?? 0,
-    item["Total Invoice IGST Amt"] ?? 0,
-    item["Total Invoice Subtotal"] ?? 0,
-    item.Transport ?? 0,
-    item["Total amt"] ?? item["Total Amount"] ?? 0,
-  ]);
+        const tableData = salesData.map((item) => [
+            item.InvoiceNo,
+            item.InvoiceDate,
+            item.OrderNo || "N/A",
+            item.OrderDate || "N/A",
+            item.AccountName || "N/A",
+            item.Quantity ?? 0,
+            item.Rate ?? 0,
+            item.Amount ?? 0,
+            item.CGSTPercentage ?? 0,
+            item["Product CGST AMT"] ?? 0,
+            item.SGSTPercentage ?? 0,
+            item["Product SGST AMT"] ?? 0,
+            item.IGSTPercentage ?? 0,
+            item["Product IGST AMT"] ?? 0,
+            item["Product Subtotal"] ?? 0,
+            item["Total Invoice CGST Amt"] ?? 0,
+            item["Total Invoice SGST Amt"] ?? 0,
+            item["Total Invoice IGST Amt"] ?? 0,
+            item["Total Invoice Subtotal"] ?? 0,
+            item.Transport ?? 0,
+            item["Total amt"] ?? item["Total Amount"] ?? 0,
+        ]);
 
-  // ✅ Calculate Totals
-  const totalCGST = salesData.reduce((s, it) => s + parseNum(it["Product CGST AMT"]), 0);
-  const totalSGST = salesData.reduce((s, it) => s + parseNum(it["Product SGST AMT"]), 0);
-  const totalIGST = salesData.reduce((s, it) => s + parseNum(it["Product IGST AMT"]), 0);
-  const totalAmount = salesData.reduce((s, it) => s + parseNum(it["Total amt"] ?? it["Total Amount"]), 0);
+        // ✅ Calculate Totals
+        const totalCGST = salesData.reduce((s, it) => s + parseNum(it["Product CGST AMT"]), 0);
+        const totalSGST = salesData.reduce((s, it) => s + parseNum(it["Product SGST AMT"]), 0);
+        const totalIGST = salesData.reduce((s, it) => s + parseNum(it["Product IGST AMT"]), 0);
+        const totalAmount = salesData.reduce((s, it) => s + parseNum(it["Total amt"] ?? it["Total Amount"]), 0);
 
-  // ✅ Footer Row (totals aligned under respective columns)
-  const footerRow = new Array(tableHeaders.length).fill("");
-  footerRow[9] = totalCGST.toFixed(2);   // "CGST Amt"
-  footerRow[11] = totalSGST.toFixed(2);  // "SGST Amt"
-  footerRow[13] = totalIGST.toFixed(2);  // "IGST Amt"
-  footerRow[20] = totalAmount.toFixed(2); // "Total Amount"
-  footerRow[4] = "TOTAL"; // Label under "Account Name" column
+        // ✅ Footer Row (totals aligned under respective columns)
+        const footerRow = new Array(tableHeaders.length).fill("");
+        footerRow[9] = totalCGST.toFixed(2);   // "CGST Amt"
+        footerRow[11] = totalSGST.toFixed(2);  // "SGST Amt"
+        footerRow[13] = totalIGST.toFixed(2);  // "IGST Amt"
+        footerRow[20] = totalAmount.toFixed(2); // "Total Amount"
+        footerRow[4] = "TOTAL"; // Label under "Account Name" column
 
-  autoTable(doc, {
-    head: [tableHeaders],
-    body: [...tableData, footerRow],  // add totals as last row
-    startY: y,
-    margin: { top: 10, left: 8, right: 8 },
-    theme: "grid",
-    styles: { fontSize: 7, cellPadding: 1, overflow: "linebreak" },
-    headStyles: { fillColor: [230, 230, 230],
-         textColor: 20, fontStyle: "bold", halign: "center" },
-    bodyStyles: { halign: "center" },
-    alternateRowStyles: { fillColor: [245, 245, 245] },
-    columnStyles: {
-      0: { cellWidth: 10 }, 1: { cellWidth: 18 }, 2: { cellWidth: 10 }, 3: { cellWidth: 20 },
-      4: { cellWidth: 30 }, 5: { cellWidth: 13, halign: "right" }, 6: { cellWidth: 10, halign: "right" },
-      7: { cellWidth: 13, halign: "right" }, 8: { cellWidth: 12 }, 9: { cellWidth: 13, halign: "right" },
-      10: { cellWidth: 12 }, 11: { cellWidth: 13, halign: "right" }, 12: { cellWidth: 10 },
-      13: { cellWidth: 10, halign: "right" }, 14: { cellWidth: 15, halign: "right" },
-      15: { cellWidth: 13, halign: "right" }, 16: { cellWidth: 15, halign: "right" },
-      17: { cellWidth: 15, halign: "right" }, 18: { cellWidth: 10, halign: "right" },
-      19: { cellWidth: 10, halign: "right" }, 20: { cellWidth: 15, halign: "right" }
-    },
-    didParseCell: (data) => {
-      if (data.row.index === tableData.length) {
-        data.cell.styles.fillColor = [220, 220, 220]; // grey bg for totals
-        data.cell.styles.fontStyle = "bold";
-      }
-    }
-  });
+        autoTable(doc, {
+            head: [tableHeaders],
+            body: [...tableData, footerRow],  // add totals as last row
+            startY: y,
+            margin: { top: 10, left: 8, right: 8 },
+            theme: "grid",
+            styles: { fontSize: 7, cellPadding: 1, overflow: "linebreak" },
+            headStyles: {
+                fillColor: [230, 230, 230],
+                textColor: 20, fontStyle: "bold", halign: "center"
+            },
+            bodyStyles: { halign: "center" },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            columnStyles: {
+                0: { cellWidth: 10 }, 1: { cellWidth: 18 }, 2: { cellWidth: 10 }, 3: { cellWidth: 20 },
+                4: { cellWidth: 30 }, 5: { cellWidth: 13, halign: "right" }, 6: { cellWidth: 10, halign: "right" },
+                7: { cellWidth: 13, halign: "right" }, 8: { cellWidth: 12 }, 9: { cellWidth: 13, halign: "right" },
+                10: { cellWidth: 12 }, 11: { cellWidth: 13, halign: "right" }, 12: { cellWidth: 10 },
+                13: { cellWidth: 10, halign: "right" }, 14: { cellWidth: 15, halign: "right" },
+                15: { cellWidth: 13, halign: "right" }, 16: { cellWidth: 15, halign: "right" },
+                17: { cellWidth: 15, halign: "right" }, 18: { cellWidth: 10, halign: "right" },
+                19: { cellWidth: 10, halign: "right" }, 20: { cellWidth: 15, halign: "right" }
+            },
+            didParseCell: (data) => {
+                if (data.row.index === tableData.length) {
+                    data.cell.styles.fillColor = [220, 220, 220]; // grey bg for totals
+                    data.cell.styles.fontStyle = "bold";
+                }
+            }
+        });
 
-  doc.save("Purchase_Report_Preview.pdf");
-};
-
-
-// const generatePDF = () => {
-//   const doc = new jsPDF("landscape"); // Landscape for wide tables
-//   if (!salesData) return;
-
-//   const pageWidth = doc.internal.pageSize.getWidth();
-//   let y = 10;
-
-//   // Border
-//   doc.setLineWidth(0.5);
-//   doc.rect(5, 5, pageWidth - 10, doc.internal.pageSize.getHeight() - 10);
-
-//   // Logo
-//   const width = 20, height = 20, x = pageWidth / 2 - width / 2;
-//   doc.addImage(logonew, "JPEG", x, y, width, height, "", "FAST");
-//   y += height + 6;
-
-//   // Company Info
-//   doc.setFontSize(16);
-//   doc.text("Arohan Agro", pageWidth / 2, y, { align: "center" });
-//   y += 7;
-//   doc.setFontSize(10);
-//   doc.text(
-//     "Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003",
-//     pageWidth / 2,
-//     y,
-//     { align: "center", maxWidth: pageWidth - 20 }
-//   );
-//   y += 9;
-
-//   // Report Title
-//   doc.setFontSize(14);
-//   doc.text("Purchase Report Preview", pageWidth / 2, y, { align: "center" });
-//   y += 6;
-
-//   // Divider Line
-//   doc.setLineWidth(0.5);
-//   doc.line(10, y, pageWidth - 10, y);
-//   y += 6;
-
-//   // Table
-//   const tableHeaders = [
-//     "InvoiceNo",
-//     "Invoice Date",
-//     "Order No",
-//     "Order Date",
-//     "Account Name",
-//     "Quantity",
-//     "Rate",
-//     "Amount",
-//     "CGST%",
-//     "CGST Amt",
-//     "SGST%",
-//     "SGST Amt",
-//     "IGST%",
-//     "IGST Amt",
-//     "Total with Tax",
-//     "Invoice CGST Amt",
-//     "Invoice SGST Amt",
-//     "Invoice IGST Amt",
-//      "InvoiceSubtotal",
-//     "Transport",
-//     "Total Amount"
-//   ];
-
-//   const tableData = salesData.map((item) => [
-//     item.InvoiceNo,
-//     item.InvoiceDate,
-//     item.OrderNo || "N/A",
-//     item.OrderDate || "N/A",
-//     item.AccountName || "N/A",
-//     item.Quantity || 0,
-//     item.Rate || 0,
-//     item.Amount || 0,
-//     item.CGSTPercentage || 0,
-//     item["Product CGST AMT"] || 0,
-//     item.SGSTPercentage || 0,
-//     item["Product SGST AMT"] || 0,
-//     item.IGSTPercentage || 0,
-//     item["Product IGST AMT"] || 0,
-//     item["Product Subtotal"] || 0,
-//     item["Total Invoice CGST Amt"] || 0,
-//     item["Total Invoice SGST Amt"] || 0,
-//     item["Total Invoice IGST Amt"] || 0,
-//     item["Total Invoice Subtotal"] || 0,
-//     item.Transport || 0,
-//     item["Total amt"] || 0,
-//   ]);
-
-//   autoTable(doc, {
-//     head: [tableHeaders],
-//     body: tableData,
-//     startY: y,
-//     margin: { top: 10, left: 8, right: 8 },
-//     theme: "grid",
-//     styles: {
-//       fontSize: 7, // smaller font for more columns
-//       cellPadding: 1,
-//       overflow: "linebreak",
-//     },
-//     headStyles: {
-//       fillColor: [230, 230, 230],
-//       textColor: 20,
-//       fontStyle: "bold",
-//       halign: "center",
-//     },
-//     bodyStyles: {
-//       halign: "center",
-//     },
-//     alternateRowStyles: { fillColor: [245, 245, 245] },
-//     columnStyles: {
-//       0: { cellWidth: 10 }, // Invoice No
-//       1: { cellWidth: 18 }, // Invoice Date
-//       2: { cellWidth: 10 }, // Order No
-//       3: { cellWidth: 20 }, // Order Date
-//       4: { cellWidth: 30 }, // Account Name
-//       5: { cellWidth: 13, halign: "right" }, // Quantity
-//       6: { cellWidth: 10, halign: "right" }, // Rate
-//       7: { cellWidth: 13, halign: "right" }, // Amount
-//       8: { cellWidth: 12 }, // CGST%
-//       9: { cellWidth: 13, halign: "right" },
-//       10: { cellWidth: 12 }, // SGST%
-//       11: { cellWidth: 13, halign: "right" },
-//       12: { cellWidth: 10 }, // IGST%
-//       13: { cellWidth: 10, halign: "right" },
-//       14: { cellWidth: 15, halign: "right" }, // Product Subtotal
-//       15: { cellWidth: 13, halign: "right" },
-//       16: { cellWidth: 15, halign: "right" },
-//       17: { cellWidth: 15, halign: "right" },
-//       18: { cellWidth: 10, halign: "right" },
-//       19: { cellWidth: 10, halign: "right" }, // Transport
-//       20: { cellWidth: 10,} // Total Amount
-//     },
-//   });
-
-//   doc.save("Purchase_Report_Preview.pdf");
-// };
-
+        doc.save("Purchase_Report_Preview.pdf");
+    };
 
     const exportToExcel = async (data) => {
         if (!data || data.length === 0) {
@@ -390,8 +252,8 @@ const generatePDF = () => {
                 Number(item["Total Invoice CGST Amt"]) || 0,
                 Number(item["Total Invoice SGST Amt"]) || 0,
                 Number(item["Total Invoice IGST Amt"]) || 0,
-                Number(item["Total Invoice Subtotal"] )|| 0,
-                Number(item.Transport) ||0,
+                Number(item["Total Invoice Subtotal"]) || 0,
+                Number(item.Transport) || 0,
                 Number(item["Total amt"]) || 0,
             ]);
         });
@@ -407,30 +269,30 @@ const generatePDF = () => {
         });
 
 
-    // Add Grand Total row
-    const totalRowIndex = worksheet.lastRow.number + 2;
-    const totalRow = worksheet.getRow(totalRowIndex);
-    totalRow.getCell(20).value = "Grand Total";
-    totalRow.getCell(20).font = { bold: true, size: 14 };
-    totalRow.getCell(20).alignment = { horizontal: "right" };
+        // Add Grand Total row
+        const totalRowIndex = worksheet.lastRow.number + 2;
+        const totalRow = worksheet.getRow(totalRowIndex);
+        totalRow.getCell(20).value = "Grand Total";
+        totalRow.getCell(20).font = { bold: true, size: 14 };
+        totalRow.getCell(20).alignment = { horizontal: "right" };
 
-    totalRow.getCell(21).value = { formula: `SUM(U2:U${worksheet.lastRow.number - 2})` };
-    // totalRow.getCell(13).value = { formula: `SUM(M2:M${worksheet.lastRow.number - 2})` };
+        totalRow.getCell(21).value = { formula: `SUM(U2:U${worksheet.lastRow.number - 2})` };
+        // totalRow.getCell(13).value = { formula: `SUM(M2:M${worksheet.lastRow.number - 2})` };
 
-    // Style Grand Total row
-    totalRow.eachCell((cell) => {
-        cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
-        cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "FFFFE699" }, // Light yellow background
-        };
-        cell.alignment = { horizontal: "center", vertical: "middle" };
-        cell.border = {
-            top: { style: "thin" },
-            bottom: { style: "thin" },
-        };
-    });
+        // Style Grand Total row
+        totalRow.eachCell((cell) => {
+            cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
+            cell.fill = {
+                type: "pattern",
+                pattern: "solid",
+                fgColor: { argb: "FFFFE699" }, // Light yellow background
+            };
+            cell.alignment = { horizontal: "center", vertical: "middle" };
+            cell.border = {
+                top: { style: "thin" },
+                bottom: { style: "thin" },
+            };
+        });
 
         // Write workbook
         const buffer = await workbook.xlsx.writeBuffer();
@@ -608,6 +470,30 @@ const generatePDF = () => {
                 fontSize: "16px",
             },
         },
+
+         renderBottomToolbar: ({ table }) => (
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+
+            >
+                {/* ⬅️ Pagination on Left */}
+                <MUITablePagination table={table} />
+
+                {/* ➡️ Grand Total on Right */}
+                <Box display="flex" alignItems="center" mr={4}>
+                    <Typography variant="subtitle1" >
+                        <b>Grand Total Of Amount :</b>
+                    </Typography>
+
+                    <Typography variant="subtitle1" color="primary">
+                        <b>{grandTotal.toLocaleString("en-IN")}</b>
+                    </Typography>
+                </Box>
+            </Box>
+        ),
     });
 
     //grand Total
@@ -686,7 +572,7 @@ const generatePDF = () => {
                                     <DialogTitle sx={{ textAlign: 'center' }}>
                                         <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                                             <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                                            <Typography >Arohan Agro Kolhapur</Typography>
+                                            <Typography >Aarohan Agro Kolhapur</Typography>
                                         </Box>
                                         <Typography sx={{ mt: 1 }}>
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
@@ -745,15 +631,15 @@ const generatePDF = () => {
                                                 </Button>
                                             </Box>
 
-                                            {/* ✅ Right side: Grand Total */}
-                                            <Box display="flex" alignItems="center" fontWeight="bold">
+                                       
+                                            {/* <Box display="flex" alignItems="center" fontWeight="bold">
                                                 <Typography variant="h6" sx={{ mr: 2 }}>
                                                    <b>Grand Total:</b> 
                                                 </Typography>
                                                 <Typography variant="h6" color="primary">
                                                    <b> {grandTotal.toLocaleString("en-IN")} </b> 
                                                 </Typography>
-                                            </Box>
+                                            </Box> */}
                                         </Box>
                                     </DialogActions>
 

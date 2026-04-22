@@ -31,9 +31,6 @@
 }
 
 
-
-
-
 .newSidebar {
   background-color: var(--color-sidebar-bg);
   color: var(--color-text);
@@ -241,6 +238,8 @@
   .header .bar-icon {
     display: block;
   }
+
+  
 
   @media (max-width: 768px) {
     .custom-right-drawer {

@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import {Dialog, DialogActions, DialogContent, DialogTitle, Box,Typography, Button } from '@mui/material';
+import {Dialog, DialogActions, DialogContent, DialogTitle, Box,  Typography, Button } from '@mui/material';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -11,19 +11,20 @@ import logonew from '../imgs/logo_white.png'
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
 import { MRT_TablePagination as MUITablePagination } from "material-react-table";
 
-const StockReportForRowMaterial = () => {
+const PurchaseHSN = () => {
     const [fromDate, setFromDate] = useState(null);
     const [toDate, setToDate] = useState(null);
-    const [rawMaterialReportData, setRawMaterialReportData] = useState([]);
+    const [hSNPurchaseData, setHSNPurchaseData] = useState([]);
     const [showTable, setShowTable] = useState(false);
     const [previewOpen, setPreviewOpen] = useState(false);
 
 
-    const getRawMaterialReport = () => {
+    const getPurchaseHSNwise = () => {
         // Format dates to 'YYYY-MM-DD' using split
         const formatDate = (date) => {
             if (!date) return '';
@@ -31,7 +32,7 @@ const StockReportForRowMaterial = () => {
         };
         const formattedFromDate = formatDate(fromDate);
         const formattedToDate = formatDate(toDate);
-        const url = `https://arohanagroapi.microtechsolutions.net.in/php/get/getstockreportrawmaterial.php?FromDate=${formattedFromDate}&ToDate=${formattedToDate}`;
+        const url = `https://arohanagroapi.microtechsolutions.net.in/php/get/getPurchaseHSNwise.php?FromDate=${formattedFromDate}&ToDate=${formattedToDate}`;
         console.log("URL:", url);
 
         const requestOptions = {
@@ -42,26 +43,27 @@ const StockReportForRowMaterial = () => {
         fetch(url, requestOptions)
             .then((response) => response.json())
             .then(data => {
-                 console.log('data', data)
-                setRawMaterialReportData(data);
+                // console.log('data', data)
+                setHSNPurchaseData(data);
                 setShowTable(true);
                 setPreviewOpen(true)
             })
             .catch((error) => console.error(error));
     };
 
-    const handlegetRawMaterialReport = () => {
+    const handleGetPurchaseHSNwise = () => {
         if (!fromDate || !toDate) {
             alert("Please select both From Date and To Date.");
             return;
         }
-        getRawMaterialReport();
+        getPurchaseHSNwise();
     };
 
 
+    
     const generatePDF = () => {
         const doc = new jsPDF();
-        if (!rawMaterialReportData) return;
+        if (!hSNPurchaseData) return;
 
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
@@ -87,7 +89,7 @@ const StockReportForRowMaterial = () => {
         y += 9;
 
         doc.setFontSize(16);
-        doc.text("Stock report for row material", pageWidth / 2, y, { align: "center" });
+        doc.text("Purchase HSN Wise Report Preview", pageWidth / 2, y, { align: "center" });
         y += 6;
         doc.setLineWidth(0.5);
         doc.line(10, y, 200, y);
@@ -95,178 +97,198 @@ const StockReportForRowMaterial = () => {
 
         // Table headers
         const tableHeaders = [
-            "Material Name", "Opening Bal", "Quenty",
-            "Weight", "Closing Bal"
+              "HSN Code", "CGST%", "CGSTAmount",
+            "SGST%", "IGST%", "IGSTAmount",
         ];
 
         // Table data
-        const tableData = rawMaterialReportData.map((item) => [
-            item.MaterialName,
-            item['Opening Bal'],
-            item.Qty,
-            item.Weight,
-            item['Closing Bal'] ,
-          
+        const tableData = hSNPurchaseData.map((item) => [
+            item.HSNCode,
+            item.CGSTPercentage,
+            item.TotalCGSTAmount,
+            item.SGSTPercentage || 0,
+            item.IGSTPercentage || 0,
+            item.TotalIGSTAmount || 0,
+           
         ]);
 
         // Calculate grand total
-         const grandTotal = rawMaterialReportData?.reduce((acc, row) => acc + (Number(row["Closing Bal"]) || 0), 0);
+        const grandTotal = hSNPurchaseData?.reduce((acc, row) => acc + (Number(row.TotalCGSTAmount) || 0), 0);
+        const grandIGSTTotal = hSNPurchaseData?.reduce((acc, row) => acc + (Number(row.TotalIGSTAmount) || 0), 0);
 
-        autoTable(doc, {
+      autoTable(doc, {
             head: [tableHeaders],
             body: tableData,
             startY: y,
             margin: 8,
             theme: "grid",
             styles: { fontSize: 8, cellPadding: 1.5 },
-            headStyles: { fillColor: [245, 245, 245], textColor: 0, fontStyle: "bold" },
-           
+            headStyles: {
+                fillColor: [245, 245, 245],
+                textColor: 0,
+                fontStyle: "bold"
+            },
             foot: [
                 [
-                    { content: "Grand Total (Closing Bal)", colSpan: 4, styles: { halign: "right", fontStyle: "bold" } },
-                     { content: grandTotal.toFixed(2), colSpan: 1, styles: { halign: "right", fontStyle: "bold" } }
+                    { content: "Total CGST Amount", colSpan: 2, styles: { halign: "right", fontStyle: "bold" } },
+                    { content: grandTotal.toFixed(2), styles: { halign: "right", fontStyle: "bold" } },
+
+                    { content: "Total IGST Amount", colSpan: 2, styles: { halign: "right", fontStyle: "bold" } },
+                    { content: grandIGSTTotal.toFixed(2), styles: { halign: "right", fontStyle: "bold" } }
                 ]
             ]
         });
 
-        doc.save("stockreport_for_row_material.pdf");
+        doc.save("PurchaseHSN_Report_Preview.pdf");
     };
 
+   
+const exportToExcel = async (data) => {
+    if (!data || data.length === 0) {
+        alert("No data available to export");
+        return;
+    }
 
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("PurchaseHSNReport");
 
-    const exportToExcel = async (data) => {
-        if (!data || data.length === 0) {
-            alert("No data available to export");
-            return;
-        }
+    // Define header row
+    const headers = [
+         "HSNCode",
+            "CGST%",
+            "CGSTAmount",
+            "SGST%",
+            "IGST%",
+            "IGSTAmount",
+    ];
 
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet("ProductionReport");
+    worksheet.addRow(headers);
 
-        // Define header row
-        const headers = [
-            "Material Name",
-            "Opening Bal",
-            "Quenty",
-            "Weight",
-            "Closing Bal",
-        ];
+    // Style header
+    worksheet.getRow(1).eachCell((cell) => {
+        cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 12 };
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FF4F81BD" }, // Blue header background
+        };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+    });
 
-        worksheet.addRow(headers);
+    // Add data rows
+    data.forEach((item) => {
+        worksheet.addRow([
+             item.HSNCode,
+                Number(item.CGSTPercentage) || 0,
+                Number(item.TotalCGSTAmount) || 0,
+                Number(item.SGSTPercentage) || 0,
+                Number(item.IGSTPercentage) || 0,
+                Number(item.TotalIGSTAmount) || 0,
+        ]);
+    });
 
-        // Style header
-        worksheet.getRow(1).eachCell((cell) => {
-            cell.font = { bold: true, color: { argb: "FFFFFFFF" }, size: 12 };
-            cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "FF4F81BD" }, // Blue header background
-            };
-            cell.alignment = { horizontal: "center", vertical: "middle" };
+    // Auto-fit columns
+    worksheet.columns.forEach((col) => {
+        let maxLength = 10;
+        col.eachCell({ includeEmpty: true }, (cell) => {
+            const columnLength = cell.value ? cell.value.toString().length : 0;
+            if (columnLength > maxLength) maxLength = columnLength;
         });
+        col.width = maxLength + 5;
+    });
 
-        // Add data rows
-        data.forEach((item) => {
-            worksheet.addRow([
-                item.MaterialName,
-                Number(item['Opening Bal']),
-                Number(item.Qty || "N/A"),
-                Number(item.Weight || "N/A"),
-                Number(item['Closing Bal']) || 0,
-               
-            ]);
-        });
+    // Add Grand Total row
+    const totalRowIndex = worksheet.lastRow.number + 2;
+    const totalRow = worksheet.getRow(totalRowIndex);
+    totalRow.getCell(2).value = "Grand Total";
+    totalRow.getCell(2).font = { bold: true, size: 14 };
+    totalRow.getCell(2).alignment = { horizontal: "right" };
 
-        // Auto-fit columns
-        worksheet.columns.forEach((col) => {
-            let maxLength = 10;
-            col.eachCell({ includeEmpty: true }, (cell) => {
-                const columnLength = cell.value ? cell.value.toString().length : 0;
-                if (columnLength > maxLength) maxLength = columnLength;
-            });
-            col.width = maxLength + 5;
-        });
+    totalRow.getCell(3).value = { formula: `SUM(L2:L${worksheet.lastRow.number - 2})` };
+     totalRow.getCell(6).value = { formula: `SUM(M2:M${worksheet.lastRow.number - 2})` };
+    // totalRow.getCell(13).value = { formula: `SUM(M2:M${worksheet.lastRow.number - 2})` };
 
-        // Add Grand Total row
-        const totalRowIndex = worksheet.lastRow.number + 2;
-        const totalRow = worksheet.getRow(totalRowIndex);
-        totalRow.getCell(4).value = "Closing Bal Total ";
-        totalRow.getCell(4).font = { bold: true, size: 14 };
-        totalRow.getCell(4).alignment = { horizontal: "right" };
+    // Style Grand Total row
+    totalRow.eachCell((cell) => {
+        cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: "FFFFE699" }, // Light yellow background
+        };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+        };
+    });
 
-        totalRow.getCell(5).value = { formula: `SUM(E2:E${worksheet.lastRow.number - 2})` };
-        // totalRow.getCell(13).value = { formula: `SUM(M2:M${worksheet.lastRow.number - 2})` };
+    // Generate file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, `PurchaseHSNReport_${new Date().toISOString().slice(0, 10)}.xlsx`);
+};
 
-        // Style Grand Total row
-        totalRow.eachCell((cell) => {
-            cell.font = { bold: true, size: 14, color: { argb: "FF000000" } }; // Black bold text
-            cell.fill = {
-                type: "pattern",
-                pattern: "solid",
-                fgColor: { argb: "FFFFE699" }, // Light yellow background
-            };
-            cell.alignment = { horizontal: "center", vertical: "middle" };
-            cell.border = {
-                top: { style: "thin" },
-                bottom: { style: "thin" },
-            };
-        });
 
-        // Generate file
-        const buffer = await workbook.xlsx.writeBuffer();
-        const blob = new Blob([buffer], {
-            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        });
-        saveAs(blob, `stockreport_raw_material${new Date().toISOString().slice(0, 10)}.xlsx`);
-    };
-
+    
 
 
     const columns = useMemo(() => {
         return [
 
             {
-                accessorKey: 'MaterialName',
-                header: 'Material Name',
+                accessorKey: 'HSNCode',
+                header: 'HSN Code',
                 size: 100,
             },
 
-            {
-                accessorKey: ['Opening Bal'],
-                header: 'Opening Bal',
-                size: 50,
-                // Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
-            },
+            
 
             {
-                accessorKey: 'Qty',
-                header: 'Quenty',
+                accessorKey: 'CGSTPercentage',
+                header: 'CGST%',
                 size: 50,
             },
 
             {
-                accessorKey: 'Weight',
-                header: 'Weight',
+                accessorKey: 'TotalCGSTAmount',
+                header: 'CGST Amount',
                 size: 50,
                 
             },
 
+          
+
             {
-                accessorKey: ["Closing Bal"],
-                header: 'Closing Bal',
+                accessorKey: 'SGSTPercentage',
+                header: 'SGST%',
                 size: 50,
-              
             },
 
 
-           
+            {
+                accessorKey: 'IGSTPercentage',
+                header: 'IGST%',
+                size: 50,
+            },
 
+            {
+                accessorKey: 'TotalIGSTAmount',
+                header: 'IGST Amount',
+                size: 50,
+            },
+
+
+          
         ];
     }, []);
 
+
     const table = useMaterialReactTable({
         columns,
-        data: rawMaterialReportData,
+        data: hSNPurchaseData,
         enablePagination: true,
         muiTableHeadCellProps: {
             style: {
@@ -275,54 +297,81 @@ const StockReportForRowMaterial = () => {
                 fontSize: "16px",
             },
         },
-        renderBottomToolbar: ({ table }) => (
-                  <Box
-                      sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          mr: 4
-      
-                      }}
-                  >
-                      
-                      <MUITablePagination table={table} />
-      
-                     
-                      <Box
-                          sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 2,
-                              fontWeight: "bold",
-                          }}
-                      >
-                        
-                          <Box sx={{ display: "flex", alignItems: "center", }} >
-                              <Typography variant="subtitle1" fontWeight="bold">
-                                  Total Of Closing Bal:
-                              </Typography>
-                              <Typography variant="subtitle1" color="primary" fontWeight="bold">
-                                  {grandTotal.toLocaleString("en-IN")}
-                              </Typography>
-                          </Box>
-      
-                         
-                      </Box>
-                  </Box>
-              )
 
+            renderBottomToolbar: ({ table }) => (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mr: 4
+
+                }}
+                
+                >
+                    {/* ⬅️ Pagination on Left */}
+                    <MUITablePagination table={table} />
+        
+                    {/* ➡️ Grand Total on Right */}
+                    <Box display="flex" alignItems="center">
+                        <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                            <b>CGST Total:</b>
+                        </Typography>
+        
+                        <Typography variant="subtitle1" color="primary">
+                            <b>{CGSTTotal.toLocaleString("en-IN")}</b>
+                        </Typography>
+                    </Box>
+
+
+                    <Box display="flex" alignItems="center">
+                        <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                            <b>SGST Total:</b>
+                        </Typography>
+        
+                        <Typography variant="subtitle1" color="primary">
+                            <b>{SGSTTotal.toLocaleString("en-IN")}</b>
+                        </Typography>
+                    </Box>
+
+
+
+
+                    <Box display="flex" alignItems="center">
+                        <Typography variant="h6" sx={{ mr: 2 }}>
+                            <b>IGST Total:</b>
+                        </Typography>
+        
+                        <Typography variant="h6" color="primary">
+                            <b>{IGSTTotal.toLocaleString("en-IN")}</b>
+                        </Typography>
+                    </Box>
+                </Box>
+            ),
     });
 
     //grand Total
-    const grandTotal = useMemo(() => {
-        return rawMaterialReportData?.reduce((acc, row) => acc + (Number(row["Closing Bal"]) || 0), 0);
-    }, [rawMaterialReportData]);
+    const CGSTTotal = useMemo(() => {
+        return hSNPurchaseData?.reduce((acc, row) => acc + (Number(row.TotalCGSTAmount) || 0), 0);
+    }, [hSNPurchaseData]);
+
+
+    const SGSTTotal = useMemo(() => {
+        return hSNPurchaseData?.reduce((acc, row) => acc + (Number(row.TotalSGSTAmount) || 0), 0);
+    }, [hSNPurchaseData]);
+
+
+
+    const IGSTTotal = useMemo(() => {
+        return hSNPurchaseData?.reduce((acc, row) => acc + (Number(row.TotalIGSTAmount) || 0), 0);
+    }, [hSNPurchaseData]);
+
+
 
     return (
         <Box >
             <Box textAlign={'center'}>
-                <Typography sx={{ color: 'var(--complementary-color)', }} variant='h4'><b>Stock Report For Row Material </b></Typography>
+                <Typography sx={{ color: 'var(--complementary-color)', }} variant='h4'><b>Purchase HSN Wise Report</b></Typography>
             </Box>
 
             <Box sx={{ p: 5, height: 'auto' }}>
@@ -371,10 +420,10 @@ const StockReportForRowMaterial = () => {
                                 background: 'var(--primary-color)',
                             }}
 
-                            onClick={handlegetRawMaterialReport}
+                            onClick={handleGetPurchaseHSNwise}
                             variant="contained"
                         >
-                            Get Report
+                            Get Purchase HSN Report
                         </Button>
                     </Box>
 
@@ -384,7 +433,7 @@ const StockReportForRowMaterial = () => {
                 {/* table */}
                 
                     <>
-                        {showTable && rawMaterialReportData.length > 0 && (
+                        {showTable && hSNPurchaseData.length > 0 && (
                             <>
                                 <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="xlg" fullWidth>
                                     <DialogTitle sx={{ textAlign: 'center' }}>
@@ -396,14 +445,13 @@ const StockReportForRowMaterial = () => {
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
                                         </Typography>
                                         <Typography sx={{ fontWeight: 'bold', mt: 1 }}>
-                                            Preview of stock report for row material {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
+                                            Purchase HSN Wise Report Preview for  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
                                         </Typography>
                                     </DialogTitle>
                                     <DialogContent dividers>
                                         <Box>
-                                            {rawMaterialReportData.length > 0 ? (
+                                            {hSNPurchaseData.length > 0 ? (
                                                 <Box>
-
                                                     <Box>
                                                         <MaterialReactTable table={table}
                                                             enableColumnResizing
@@ -412,14 +460,14 @@ const StockReportForRowMaterial = () => {
                                                             }}
                                                         />
                                                     </Box>
-
                                                 </Box>
                                             ) : (
                                                 <Typography>No data to preview</Typography>
                                             )}
                                         </Box>
                                     </DialogContent>
-                                    
+                                
+
                                     <DialogActions sx={{ p: 0 }}>
                                         <Box
                                             display="flex"
@@ -436,7 +484,7 @@ const StockReportForRowMaterial = () => {
                                                 <Button
                                                     variant="contained"
                                                     endIcon={<FileDownloadIcon />}
-                                                    onClick={() => exportToExcel(rawMaterialReportData)}
+                                                    onClick={() => exportToExcel(hSNPurchaseData)}
                                                 >
                                                     Excel Data
                                                 </Button>
@@ -450,14 +498,7 @@ const StockReportForRowMaterial = () => {
                                             </Box>
 
                                             {/* ✅ Right side: Grand Total */}
-                                            {/* <Box display="flex" alignItems="center" fontWeight="bold">
-                                                <Typography variant="h6" sx={{ mr: 2 }}>
-                                                   <b>Grand Total Of Closing Bal:</b> 
-                                                </Typography>
-                                                <Typography variant="h6" color="primary">
-                                                   <b> {grandTotal.toLocaleString("en-IN")} </b> 
-                                                </Typography>
-                                            </Box> */}
+                                      
                                         </Box>
                                     </DialogActions>
 
@@ -465,11 +506,11 @@ const StockReportForRowMaterial = () => {
                             </>
                         )}
                     </>
-               
+
             </Box >
         </Box >
     );
 };
 
-export default StockReportForRowMaterial;
+export default PurchaseHSN;
 

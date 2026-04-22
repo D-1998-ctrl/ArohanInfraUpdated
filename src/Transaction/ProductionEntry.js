@@ -753,7 +753,7 @@ const ProductionEntry = () => {
 
         // Title
         doc.setFontSize(16);
-        doc.text("Arohan Agro Kolhapur", pageWidth / 2, y, { align: "center" });
+        doc.text("Aarohan Agro Kolhapur", pageWidth / 2, y, { align: "center" });
         y += 6;
         doc.setFontSize(10);
         doc.text(
@@ -946,7 +946,7 @@ const ProductionEntry = () => {
                         <DialogTitle sx={{ textAlign: 'center' }}>
                             <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                                 <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                                <Typography >Arohan Agro Kolhapur</Typography>
+                                <Typography >Aarohan Agro Kolhapur</Typography>
 
                             </Box>
                             <Typography sx={{ mt: 1 }}>

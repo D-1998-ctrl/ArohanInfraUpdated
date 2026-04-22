@@ -11,10 +11,8 @@ import axios from 'axios';
 import { toast } from "react-toastify";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import moment from 'moment';
-
 import qs from "qs";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-
 import {useMaterialReactTable,} from "material-react-table";
 import Cookies from 'js-cookie';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
@@ -209,7 +207,7 @@ useEffect(() => {
                               });
                             setPreviewData({ ...row.original, invdetail });
                             setPreviewOpen(true);
-                            console.log('previewdata',row.original)
+                            // console.log('previewdata',row.original)
                           }}
                         >
                           Preview
@@ -763,7 +761,7 @@ useEffect(() => {
         y += logoDiameter + 6;
 
         doc.setFontSize(16);
-        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+        doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
         y += 7;
         doc.setFontSize(10)
         doc.text("Address: Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
@@ -865,7 +863,7 @@ useEffect(() => {
                         <DialogTitle sx={{ textAlign: 'center' }}>
                             <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                                 <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                                <Typography >Arohan Agro Kolhapur</Typography>
+                                <Typography >Aarohan Agro Kolhapur</Typography>
 
                             </Box>
                             <Typography sx={{ mt: 1 }}>

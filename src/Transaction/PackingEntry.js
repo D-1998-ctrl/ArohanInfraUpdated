@@ -484,10 +484,10 @@ const PackingEntry = () => {
                 </Box>
 
                 <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="xlg" fullWidth>
-                    <DialogTitle sx={{ textAlign: 'center' }}>
+                    <DialogTitle component="div"  sx={{ textAlign: 'center' }}>
                         <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                             <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                            <Typography variant="h6">Arohan Agro Kolhapur</Typography>
+                            <Typography variant="h6">Aarohan Agro Kolhapur</Typography>
 
                         </Box>
                         <Typography sx={{ mt: 1 }}>

@@ -8,8 +8,6 @@ import PostAddIcon from '@mui/icons-material/PostAdd';
 
 export const menuItems = [
 
-
-
   {
     title: "Masters",
     path: '/master',
@@ -122,7 +120,7 @@ export const menuItems = [
     icon: <DescriptionIcon />,
     submenus: [
       {
-        title: " Sales Report",
+        title: "Sales Report",
         path: "/salesReport ",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
@@ -137,6 +135,20 @@ export const menuItems = [
         path: "/customerwisesales",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
+
+      {
+        title: "Sales HSN Wise ",
+        path: "/saleshsnwise",
+        icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
+      },
+
+      {
+        title:"Customerwise monthly sales",
+        path:"/customerwisemonthlysales",
+        icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
+      },
+
+
       {
         title: "Stock Report",
         path: "/stockreport",
@@ -165,6 +177,13 @@ export const menuItems = [
 
 
       {
+        title: "Purchase HSN Wise ",
+        path: "/purchasehsnwise",
+        icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
+      },
+
+
+      {
         title: "Product-Group wise Stock",
         path: "/product-group-wise-Stock",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
@@ -183,6 +202,9 @@ export const menuItems = [
         path: "/stockreportforrowmaterial ",
         icon: <FiberManualRecordIcon sx={{ fontSize: 15 }} />,
       },
+
+      
+     
     ],
   },
 

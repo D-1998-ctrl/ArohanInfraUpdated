@@ -35,7 +35,9 @@ import PurchaseReport from './Reports/PurchaseReport';
 import ProductGroupwiseStock from './Reports/ProductGroupwiseStock';
 import ProductionReport from './Reports/ProductionReport';
 import StockReportForRowMaterial from './Reports/StockReportForRowMaterial';
-
+import SalesHSN from './Reports/SalesHSN';
+import PurchaseHSN from './Reports/PurchaseHSN';
+import Customerwisemonthlysales from './Reports/Customerwisemonthlysales';
 
 function App() {
   return (
@@ -69,12 +71,15 @@ function App() {
           <Route path="/customerwisesales" element={<CustomerWiseSales />} />
           <Route path="/stockreport" element={<StockReport />} />
           <Route path="/accountreceivable" element={<AccountReceivable />} />
-
           <Route path="/accountpayable" element={<AccountPayable />} />
           <Route path="/purchasereport" element={<PurchaseReport />} />
           <Route path="/product-group-wise-Stock" element={<ProductGroupwiseStock />} />
           <Route path="/productionReport" element={<ProductionReport />} />
           <Route path="/stockreportforrowmaterial" element={<StockReportForRowMaterial />} />
+          <Route path="/saleshsnwise" element={<SalesHSN />} />
+          <Route path="/purchasehsnwise" element={<PurchaseHSN />} />
+          <Route path="/customerwisemonthlysales" element={<Customerwisemonthlysales />} />
+
           <Route path="/commonpage" element={<Commonpage />} />
         </Route>
       </Routes>

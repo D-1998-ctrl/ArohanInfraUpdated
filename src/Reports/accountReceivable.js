@@ -3,7 +3,7 @@ import { useState ,useEffect,useMemo} from 'react';
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import {Autocomplete,TextField, Paper, Dialog, DialogActions, DialogContent, DialogTitle, Box, TableBody, TableCell, TableContainer, TableHead, TableRow, Table, Typography, Button } from '@mui/material';
+import {Autocomplete,TextField, Dialog, DialogActions, DialogContent, DialogTitle, Box,Typography, Button } from '@mui/material';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -14,6 +14,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
 import moment from 'moment';
+import { MRT_TablePagination as MUITablePagination } from "material-react-table";
 
 const AccountReceivable = () => {
     const [fromDate, setFromDate] = useState(null);
@@ -121,7 +122,7 @@ const getSalesReport = () => {
         y += height + 6;
 
         doc.setFontSize(16);
-        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+        doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
         y += 7;
         doc.setFontSize(10)
         doc.text(" Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
@@ -179,68 +180,6 @@ const getSalesReport = () => {
         doc.save("Account_receivable.pdf");
     };
 
-
-    // const exportToExcel = async (data) => {
-    //   if (!data || data.length === 0) {
-    //     alert("No data available to export");
-    //     return;
-    //   }
-    
-    //   const workbook = new ExcelJS.Workbook();
-    //   const worksheet = workbook.addWorksheet("SalesReport");
-    
-    //   // Define header row
-    //   const headers = [
-    //     "Date",
-    //     "DocNo",
-    //     "Contact",
-    //     "Amount",
-    //     "Source",
-        
-    //   ];
-    
-    //   worksheet.addRow(headers);
-    
-    //   // Apply header styling
-    //   worksheet.getRow(1).eachCell((cell) => {
-    //     cell.font = { bold: true, color: { argb: "FFFFFFFF" } }; // white bold
-    //     cell.fill = {
-    //       type: "pattern",
-    //       pattern: "solid",
-    //       fgColor: { argb: "FF4F81BD" }, // blue background
-    //     };
-    //     cell.alignment = { horizontal: "center", vertical: "middle" };
-    //   });
-    
-    //   // Add data rows
-    //   data.forEach((item) => {
-    //     worksheet.addRow([
-    //       item.Date,
-    //       item.DocNo,
-    //       item.Contact || 0,
-    //       item.Amount || 0,
-    //       item.Source || 0,
-         
-    //     ]);
-    //   });
-    
-    //   // Auto-fit columns
-    //   worksheet.columns.forEach((col) => {
-    //     let maxLength = 10;
-    //     col.eachCell({ includeEmpty: true }, (cell) => {
-    //       const columnLength = cell.value ? cell.value.toString().length : 0;
-    //       if (columnLength > maxLength) maxLength = columnLength;
-    //     });
-    //     col.width = maxLength + 5;
-    //   });
-    
-    //   // Write workbook
-    //   const buffer = await workbook.xlsx.writeBuffer();
-    //   const blob = new Blob([buffer], {
-    //     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    //   });
-    //   saveAs(blob, `AccountReceivable_Report.xlsx`);
-    // };
 
 
 
@@ -434,6 +373,52 @@ const exportToExcel = async (data) => {
                     fontSize: "16px",
                 },
             },
+
+              renderBottomToolbar: ({ table }) => (
+        <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            width="100%"
+        
+        >
+            {/* ⬅️ Pagination on Left */}
+            <MUITablePagination table={table} />
+
+            {/* ➡️ Grand Total on Right */}
+            <Box display="flex" alignItems="center">
+                <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                    <b>Credit Total:</b>
+                </Typography>
+
+                <Typography variant="subtitle1" color="primary">
+                    <b>{grandTotal.toLocaleString("en-IN")}</b>
+                </Typography>
+            </Box>
+
+
+            <Box display="flex" alignItems="center">
+                <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                    <b>Debit Total:</b>
+                </Typography>
+
+                <Typography variant="subtitle1" color="primary">
+                    <b>{grandDebitTotal.toLocaleString("en-IN")}</b>
+                </Typography>
+            </Box>
+
+             <Box display="flex" alignItems="center">
+                <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                    <b>Closing Bal Total:</b>
+                </Typography>
+
+                <Typography variant="subtitle1" color="primary">
+                    <b>{grandClosingBalTotal.toLocaleString("en-IN")}</b>
+                </Typography>
+            </Box>
+
+        </Box>
+    ),
         });
 
     const grandTotal = useMemo(() => {
@@ -496,37 +481,7 @@ const exportToExcel = async (data) => {
                             </Box>
 
 
-                            {/* <Box sx={{ width: '300px' }}>
-                                <Typography>Customers</Typography>
-                                <FormControl fullWidth size="small" variant="standard"
-                                    sx={{
-                                        '& .MuiInput-underline:after': {
-                                            borderBottomWidth: 1.5,
-                                            borderBottomColor: '#44ad74',
-
-                                        }, mt: 1
-                                    }}
-
-                                    focused>
-                                    <Select
-                                        value={selectedAccountOption}
-                                        onChange={(event) => setSelectedAccountOption(event.target.value)}
-                                    >
-
-                                        {accountOption.length > 0 ? (
-                                            accountOption.map((option) => (
-                                                <MenuItem key={option.value} value={option.value}>
-                                                    {option.label}
-                                                </MenuItem>
-                                            ))
-                                        ) : (
-                                            <MenuItem disabled>No options available</MenuItem>
-                                        )}
-
-                                    </Select>
-                                </FormControl>
-                            </Box> */}
-
+                           
                             <Box sx={{ width: 300 }}>
                                 <Typography>Customers</Typography>
                                 <Autocomplete
@@ -581,7 +536,7 @@ const exportToExcel = async (data) => {
                                     <DialogTitle sx={{ textAlign: 'center' }}>
                                         <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                                             <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                                            <Typography >Arohan Agro Kolhapur</Typography>
+                                            <Typography >Aarohan Agro Kolhapur</Typography>
                                         </Box>
                                         <Typography sx={{ mt: 1 }}>
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
@@ -598,38 +553,6 @@ const exportToExcel = async (data) => {
                                                 <Box>
 
 
-                                                    {/* Table to display sales data */}
-                                                    {/* <TableContainer fullWidth component={Paper} sx={{ mt: 3 }}>
-                                                        <Table>
-                                                            <TableHead>
-                                                                <TableRow>
-                                                                    <TableCell><b>Date</b></TableCell>
-                                                                    <TableCell><b>DocNo</b></TableCell>
-                                                                    <TableCell><strong>Contact</strong></TableCell>
-                                                                    <TableCell><b>Amount</b></TableCell>
-                                                                    <TableCell><b>Source</b></TableCell>
-                                                                 
-                                                                   
-                                                                    
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {salesData.map((item, index) => (
-                                                                    <TableRow key={index}>
-                                                                        <TableCell>{item.Date}</TableCell>
-                                                                        <TableCell>{item.DocNo || "-"}</TableCell>
-                                                                        <TableCell>{item.Contact}</TableCell>
-
-                                                                        <TableCell>{item.Amount|| 0}</TableCell>
-                                                                       
-                                                                        <TableCell>{item.Source || 0}</TableCell>
-                                                                       
-                                                                        
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer> */}
 
                                                     
                                                     <Box>
@@ -648,12 +571,7 @@ const exportToExcel = async (data) => {
                                             )}
                                         </Box>
                                     </DialogContent>
-                                    {/* <DialogActions>
-                                         <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{fontSize:35}}/></Button>
-                                          <Button variant='contained' endIcon={<FileDownloadIcon />} onClick={() => exportToExcel(salesData)}>Excel Data</Button>
-                                         
-                                        <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
-                                    </DialogActions> */}
+                                   
                                           <DialogActions sx={{ p: 0 }}>
                                                                             <Box
                                                                                 display="flex"
@@ -683,8 +601,8 @@ const exportToExcel = async (data) => {
                                                                                     </Button>
                                                                                 </Box>
                                     
-                                                                                {/* ✅ Right side: Grand Total */}
-                                            <Box display="flex" alignItems="center" fontWeight="bold" gap={2}>
+                                                                                
+                                            {/* <Box display="flex" alignItems="center" fontWeight="bold" gap={2}>
                                                 <Box display={'flex'}>
                                                     <Typography variant="h6" sx={{ mr: 2 }}>
                                                         <b> Credit Total:</b>
@@ -714,7 +632,7 @@ const exportToExcel = async (data) => {
                                                 </Box>
                                                 
 
-                                            </Box>
+                                            </Box> */}
                                         </Box>
                                     </DialogActions>
                                 </Dialog>

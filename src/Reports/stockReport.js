@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { Paper, Dialog, DialogActions, DialogContent, DialogTitle, Box, TableBody, TableCell, TableContainer, TableHead, TableRow, Table, Typography, Button } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Box, Typography, Button } from '@mui/material';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -12,7 +12,7 @@ import ExcelJS from "exceljs";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
-import moment from 'moment';
+import { MRT_TablePagination as MUITablePagination } from "material-react-table";
 
 const StockReport = () => {
     const [fromDate, setFromDate] = useState(null);
@@ -93,7 +93,7 @@ const StockReport = () => {
         y += height + 6;
 
         doc.setFontSize(16);
-        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+        doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
         y += 7;
         doc.setFontSize(10)
         doc.text(" Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
@@ -346,6 +346,53 @@ const StockReport = () => {
                 fontSize: "16px",
             },
         },
+
+          renderBottomToolbar: ({ table }) => (
+            <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+                   
+            >
+                {/* ⬅️ Pagination on Left */}
+                <MUITablePagination table={table} />
+
+                {/* ➡️ Grand Total on Right */}
+                <Box display="flex" alignItems="center" >
+                    <Typography variant="subtitle1" >
+                        <b>Grand Total:</b>
+                    </Typography>
+
+                    <Typography variant="subtitle1" color="primary">
+                        <b>{grandTotal.toLocaleString("en-IN")}</b>
+                    </Typography>
+                </Box>
+
+
+                <Box display="flex" alignItems="center">
+                    <Typography variant="subtitle1" >
+                        <b>Purchase Total:</b>
+                    </Typography>
+
+                    <Typography variant="subtitle1" color="primary">
+                        <b>{PurchaseTotal.toLocaleString("en-IN")}</b>
+                    </Typography>
+                </Box>
+
+
+
+                <Box display="flex" alignItems="center" mr={4}>
+                    <Typography variant="subtitle1" >
+                        <b>Invoice Total:</b>
+                    </Typography>
+
+                    <Typography variant="subtitle1" color="primary">
+                        <b>{InvoiceTotal.toLocaleString("en-IN")}</b>
+                    </Typography>
+                </Box>
+            </Box>
+        ),
     });
 
     const grandTotal = useMemo(() => {
@@ -432,7 +479,7 @@ const StockReport = () => {
                                     <DialogTitle sx={{ textAlign: 'center' }}>
                                         <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                                             <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                                            <Typography variant="h6">Arohan Agro Kolhapur</Typography>
+                                            <Typography variant="h6">Aarohan Agro Kolhapur</Typography>
                                         </Box>
                                         <Typography sx={{ mt: 1 }}>
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
@@ -445,50 +492,6 @@ const StockReport = () => {
                                         <Box>
                                             {stockData.length > 0 ? (
                                                 <Box>
-
-
-                                                    {/* Table to display sales data */}
-                                                    {/* <TableContainer fullWidth component={Paper} sx={{ mt: 3 }}>
-                                                        <Table>
-                                                            <TableHead>
-                                                                <TableRow>
-                                                                    <TableCell><b>Product Name</b></TableCell>
-                                                                    <TableCell><b>Sell Price</b></TableCell>
-                                                                    <TableCell><strong>Opening Balance</strong></TableCell>
-                                                                   
-                                                                    <TableCell> <b>Inward Total</b></TableCell>
-                                                                    <TableCell><b>Purchase Total</b></TableCell>
-                                                                    <TableCell><strong>Invoice Total</strong></TableCell>
-                                                                    <TableCell><strong>Balance</strong></TableCell>
-                                                                    <TableCell><strong>Value</strong></TableCell>
-
-
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {stockData.map((item, index) => (
-                                                                    <TableRow key={index}>
-                                                                        <TableCell>{item.ProductName}</TableCell>
-                                                                        <TableCell>{item.SellPrice}</TableCell>
-                                                                        <TableCell>{item.OpeningBalance || 0}</TableCell>
-
-                                                                       
-                                                                        <TableCell>{item.InwardTotal || 0}</TableCell>
-                                                                        <TableCell>{item.PurchaseTotal || 0}</TableCell>
-                                                                        <TableCell>{item.InvoiceTotal || 0}</TableCell>
-                                                                        <TableCell>{item.Balance || 0}</TableCell>
-
-
-                                                                        <TableCell>{item.Value || 0}</TableCell>
-
-
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer> */}
-
-
                                                     <Box>
                                                         <MaterialReactTable table={table}
                                                             enableColumnResizing
@@ -504,11 +507,7 @@ const StockReport = () => {
                                             )}
                                         </Box>
                                     </DialogContent>
-                                    {/* <DialogActions>
-                                        <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{ fontSize: 35 }} /></Button>
-                                        <Button variant='contained' endIcon={<FileDownloadIcon />} onClick={() => exportToExcel(stockData)}>Excel Data</Button>
-                                        <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
-                                    </DialogActions> */}
+                                   
                                     <DialogActions sx={{ p: 0 }}>
                                         <Box
                                             display="flex"
@@ -539,7 +538,7 @@ const StockReport = () => {
                                             </Box>
 
                                             {/* ✅ Right side: Grand Total */}
-                                            <Box display="flex" alignItems="center" fontWeight="bold" gap={2}>
+                                            {/* <Box display="flex" alignItems="center" fontWeight="bold" gap={2}>
                                                 <Box display={'flex'}>
                                                     <Typography variant="h6" sx={{ mr: 2 }}>
                                                         <b>Inward Total:</b>
@@ -569,7 +568,7 @@ const StockReport = () => {
                                                     </Typography>
                                                 </Box>
 
-                                            </Box>
+                                            </Box> */}
                                         </Box>
                                     </DialogActions>
                                 </Dialog>

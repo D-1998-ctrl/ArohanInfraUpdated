@@ -26,8 +26,6 @@ const Payment = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-
-
     const handleDrawerOpen = () => {
         setIsDrawerOpen(true);
         resetForm();
@@ -112,7 +110,7 @@ const Payment = () => {
     
     const [bankOptions, setBankOptions] = useState([]);
     const [selectedBankOption, setSelectedBankOption] = useState("");
-  useEffect(() => {
+    useEffect(() => {
         const fetchOptions = async () => {
             try {
                 const urls = [
@@ -137,23 +135,33 @@ const Payment = () => {
 
         fetchOptions();
     }, []);
-const [accountOption, setAccountOption] = useState([]); 
-    const fetchAllAccounts = async () => {
+
+
+    const [accountOption, setAccountOption] = useState([]);
+
+     const [text, setText] = useState("");
+     
+const fetchAllAccounts = async () => {
     try {
         const response = await fetch(
-            "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Account"
+            `https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Account&Text=${text}`
+            
         );
 
         const result = await response.json();
 
-        const allAccountOptions = result.map((account) => ({
-            value: account.Id,
-            label: account.AccountName,
-        }));
+        const allAccountOptions = result
+            .filter(account => account.TypeCode === "S")
+            .map(account => ({
+                value: account.Id,
+                label: account.AccountName,
+            }));
 
         setAccountOption(allAccountOptions);
+         return allAccountOptions; 
     } catch (error) {
         console.error("Error fetching accounts:", error);
+        return [];
     }
 };
 
@@ -187,10 +195,16 @@ const [accountOption, setAccountOption] = useState([]);
     }, [pageNo]);
 
     useEffect(() => {
-       fetchAllAccounts();
+    
         fetchBranch();
         fetchReceiptdetails();
     }, []);
+
+useEffect(() => {
+    if (text !== "") {
+        fetchAllAccounts();
+    }
+}, [text]);
 
 
     //  api to call fetchPAYMENTdetails
@@ -210,113 +224,88 @@ const [accountOption, setAccountOption] = useState([]);
     //create and update receipt voucher
     const handleSubmit = async (e) => {
         e.preventDefault();
-        for (const [index, row] of rows.entries()) {
-            const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
-            const formattedchequedate = row.ChequeDate
-                ? moment(row.ChequeDate).format("YYYY-MM-DD")
-                : null;
+        const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
+        const formattedChequeDate = moment(chequeDate).format("YYYY-MM-DD");
+        console.log('formattedChequeDate', formattedChequeDate)
 
-            const paymentheaderdata = {
-                Id: rowId,
-                VoucherType: "PY",
-                VoucherNo: receiptNo ? receiptNo : null,
-                VoucherDate: formattedVoucherdate,
-                ChequeNo: chequeNo,
-                ChequeDate: formattedchequedate,
-                Narration: narration,
-                CreatedBy: !isEditing ? userId : undefined,
-                UpdatedBy: isEditing ? userId : undefined,
-            };
+        const paymentheaderdata = {
+            Id: rowId,
+            VoucherType: "PY",
+            VoucherNo: receiptNo || null,
+            VoucherDate: formattedVoucherdate,
+            ChequeNo: chequeNo,
+            ChequeDate: formattedChequeDate,
+            Narration: narration,
+            CreatedBy: !isEditing ? userId : undefined,
+            UpdatedBy: isEditing ? userId : undefined,
+        };
 
-            try {
-                const invoiceurl = rowId
-                    ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
-                    : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
+        try {
+            const invoiceurl = rowId
+                ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
+                : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
 
+            const response = await axios.post(
+                invoiceurl,
+                qs.stringify(paymentheaderdata),
+                { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+            );
 
-                const response = await axios.post(
-                    invoiceurl,
-                    qs.stringify(paymentheaderdata),
-                    {
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                    }
+            const PaymentId = rowId || parseInt(response.data.ID, 10);
+
+            // ✔ Step 2: Insert DETAILS (loop here only)
+            for (const [index, row] of rows.entries()) {
+                const formattedChequeDate = row.ChequeDate
+                    ? moment(row.ChequeDate).format("YYYY-MM-DD")
+                    : null;
+
+                const rowData = {
+                    Id: parseInt(row.Id, 10),
+                    VoucherId: PaymentId,
+                    VoucherType: "PY",
+                    SRN: index + 1,
+                    VoucherNo: receiptNo || null,
+                    VoucherDate: formattedVoucherdate,
+                    AccountId: row.AccountId,
+                    Amount: parseFloat(row.amount),
+                    DOrC: index === 0 ? "C" : row.DOrC,
+                    Narration: row.narration,
+                    CostCenterId: row.CostCenterId,
+                    ChequeNo: row.chequeNo,
+                    ChequeDate: formattedChequeDate,
+                    ChequeAmount: row.chequeAmount,
+                    MICRCode: row.MICRCode,
+                    BankName: row.bankName,
+                    BankBranch: row.bankBranch,
+                    IsOldCheque: isOldCheque,
+                    AccountPayeeCheque: accountPayeeCheque,
+                    CreatedBy: !isEditing ? userId : undefined,
+                    UpdatedBy: isEditing ? userId : undefined,
+                };
+
+                const detailUrl = row.Id
+                    ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
+                    : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
+
+                await axios.post(
+                    detailUrl,
+                    qs.stringify(rowData),
+                    { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
                 );
-                //console.log('postinwardheaders', paymentheaderdata)
-
-                let PaymentId = rowId ? rowId : parseInt(response.data.ID, 10);
-                //console.log("Payment Id ", PaymentId);
-                console.log("rows", rows);
-
-                for (const [index, row] of rows.entries()) {
-                    const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
-                    const formattedchequedate = row.ChequeDate
-                        ? moment(row.ChequeDate).format("YYYY-MM-DD")
-                        : null;
-
-                    const rowData = {
-                        Id: parseInt(row.Id, 10),
-                        VoucherId: parseInt(PaymentId, 10),
-                        VoucherType: "PY",
-                        SRN: rows.indexOf(row) + 1,
-                        VoucherNo: receiptNo ? receiptNo : null,
-                        VoucherDate: formattedVoucherdate,
-                        AccountId: row.AccountId, 
-                        Amount: parseFloat(row.amount),
-                        DOrC: index === 0 ? "C" : row.DOrC,
-                        Narration: row.narration,
-                        CostCenterId: row.CostCenterId,
-                        ChequeNo: row.chequeNo,
-                        ChequeDate: formattedchequedate,
-                        ChequeAmount: row.chequeAmount,
-                        MICRCode: row.MICRCode,
-                        BankName: row.bankName,
-                        BankBranch: row.bankBranch,
-                        IsOldCheque: isOldCheque,
-                        AccountPayeeCheque: accountPayeeCheque,
-                        CreatedBy: !isEditing ? userId : undefined,
-                        UpdatedBy: isEditing ? userId : undefined,
-                    };
-                    //console.log("this row has rowData ", rowData);
-
-                    const paymentdetailurl = row.Id
-                        ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
-                        : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
-
-                    //console.log(" paymentdetailurl is used ", paymentdetailurl);
-
-                    try {
-                        const response = await axios.post(
-                            paymentdetailurl,
-                            qs.stringify(rowData),
-                            {
-                                headers: {
-                                    "Content-Type": "application/x-www-form-urlencoded",
-                                },
-                            }
-                        );
-                        // console.log("Response:", response);
-                    } catch (error) {
-                        console.error("Error:", error);
-                    }
-
-                }
-                setIsDrawerOpen(false);
-                toast.success(
-                    isEditing
-                        ? "payment Voucher updated successfully!"
-                        : "payment Voucher Created successfully!"
-                );
-                resetForm();
-                fetchData();
-                fetchReceiptdetails();
-
-            } catch (error) {
-                console.error("Error submitting payment:", error);
             }
+
+            setIsDrawerOpen(false);
+            toast.success(isEditing ? "Payment updated!" : "Payment created!");
+            fetchData();
+            resetForm();
+
+            fetchReceiptdetails();
+
+        } catch (error) {
+            console.error("Error submitting payment:", error);
         }
     };
 
-    
 
     const dOrCOptions = [
         { value: "D", label: "D" },
@@ -336,11 +325,6 @@ const [accountOption, setAccountOption] = useState([]);
             },
 
             {
-                accessorKey: 'VoucherType',
-                header: 'Voucher Type',
-                size: 150,
-            },
-            {
                 accessorKey: 'VoucherNo',
                 header: 'Voucher No',
                 size: 150,
@@ -353,7 +337,19 @@ const [accountOption, setAccountOption] = useState([]);
                 Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
             },
 
-          
+            {
+                accessorKey: 'AccountName',
+                header: 'Party Name',
+                size: 150,
+
+            },
+
+            {
+                accessorKey: 'ChequeNo',
+                header: 'Cheque No',
+                size: 150,
+
+            },
 
             {
                 accessorKey: 'ChequeDate.date',
@@ -362,12 +358,7 @@ const [accountOption, setAccountOption] = useState([]);
                 Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
             },
 
-              {
-                accessorKey: 'AccountName',
-                header: 'Party Name',
-                size: 150,
-                
-            },
+              
 
 
              {
@@ -375,6 +366,13 @@ const [accountOption, setAccountOption] = useState([]);
                 header: 'Amount',
                 size: 150,
               
+            },
+
+
+              {
+                accessorKey: 'Narration',
+                header: 'Narration',
+                size: 150,
             },
 
             {
@@ -395,14 +393,25 @@ const [accountOption, setAccountOption] = useState([]);
                             variant="contained"
                             sx={{ background: 'var(--complementary-color)' }}
                             size="small"
-                            onClick={() => {
-                                const invdetail = receiptdetails
-                                    .filter((detail) => detail.VoucherId === row.original.Id)
-                              
+                          
+                            onClick={async () => {
+                                const invdetail = receiptdetails.filter(
+                                    (detail) => detail.VoucherId === row.original.Id
+                                );
+
+                                const needsDebit = invdetail.some(r => r.DOrC === "D");
+                                const needsCredit = invdetail.some(r => r.DOrC === "C");
+
+                                const promises = [];
+                                if (needsDebit && accountOption.length === 0) promises.push(fetchAllAccounts());
+                                if (needsCredit && branchOption.length === 0) promises.push(fetchBranch());
+
+                                await Promise.all(promises);
+
                                 setPreviewData({ ...row.original, invdetail });
                                 setPreviewOpen(true);
-                                console.log('previewdata', previewData)
                             }}
+
                         >
                             Preview
                         </Button>
@@ -471,17 +480,16 @@ const [accountOption, setAccountOption] = useState([]);
     });
 
 
-   
-
-const handleEdit = (rowData) => {
-    console.log("This row has been clicked:", rowData);
-    setRowId(rowData.Id);
+const handleEdit = async (rowData) => {
+     console.log("This row has been clicked:", rowData);
     setIsDrawerOpen(true);
-    setIsEditing(!!rowData.Id);
-    setAmount(rowData.Amount);
+   setIsEditing(!!rowData.Id);
+    setRowId(rowData.Id);
     setReceiptNo(rowData.VoucherNo);
+setAmount(rowData.Amount);
 
-    // Receipt date (safe check)
+
+// Receipt date (safe check)
     if (rowData.VoucherDate?.date) {
         const dateStr = rowData.VoucherDate.date.split(" ")[0];
         const [year, month, day] = dateStr.split("-").map(Number);
@@ -502,19 +510,36 @@ const handleEdit = (rowData) => {
         setChequeDate(""); 
     }
 
-    // Receipt details
-    const receiptetail = receiptdetails.filter(
+const receiptetail = receiptdetails.filter(
         (detail) => detail.VoucherId === rowData.Id
     );
 
-    if (receiptetail.length > 0) {
+
+  if (receiptetail.length > 0) {
         setAccountId(receiptetail[0].AccountId);
         setNarration(receiptetail[0]?.Narration);
         setAmount(receiptetail[0]?.Amount);
     }
+    
 
-    console.log("receiptetail", receiptetail);
+    // 🔥 Detect what is needed
+    const needsDebit = receiptetail.some(r => r.DOrC === "D");
+    const needsCredit = receiptetail.some(r => r.DOrC === "C");
 
+    // 🔥 Load required option lists BEFORE setting rows
+    const promises = [];
+
+    if (needsDebit && accountOption.length === 0) {
+        promises.push(fetchAllAccounts());
+    }
+
+ if (needsCredit && branchOption.length === 0) {
+    promises.push(fetchBranch());
+}
+
+    await Promise.all(promises); // 💥 KEY LINE
+
+    // ✅ Now options exist for BOTH D & C
     const mappedRows = receiptetail.map((detail) => ({
         Id: detail.Id,
         VoucherId: detail.VoucherId,
@@ -527,7 +552,7 @@ const handleEdit = (rowData) => {
             ? detail.ChequeDate.date.split(" ")[0]
             : "",
         chequeAmount: parseFloat(detail.ChequeAmount) || 0,
-        MICRCode: parseFloat(detail.MICRCode) || 0,
+        MICRCode: detail.MICRCode || "",
         bankName: detail.BankName,
         bankBranch: detail.BankBranch,
     }));
@@ -704,10 +729,10 @@ const handleInputChange = (index, field, value) => {
 
                 {/* ///for preview///////// */}.
                 <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="xlg" fullWidth>
-                    <DialogTitle sx={{ textAlign: 'center' }}>
+                    <DialogTitle component="div"  sx={{ textAlign: 'center' }}>
                         <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                             <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                            <Typography variant="h6">Arohan Agro Kolhapur</Typography>
+                            <Typography variant="h6">Aarohan Agro Kolhapur</Typography>
 
                         </Box>
                         <Typography sx={{ mt: 1 }}>
@@ -762,21 +787,34 @@ const handleInputChange = (index, field, value) => {
                                                         <TableCell><strong>Cheque No</strong></TableCell>
                                                         <TableCell><strong>Cheque Date</strong></TableCell>
                                                         <TableCell><strong>Cheque Amount(Rs)</strong></TableCell>
-                                                        <TableCell><strong>MICR Code</strong></TableCell>
+                                                        {/* <TableCell><strong>MICR Code</strong></TableCell>
                                                         <TableCell><strong>Bank Name</strong></TableCell>
-                                                        <TableCell><strong>Bank Branch</strong></TableCell>
+                                                        <TableCell><strong>Bank Branch</strong></TableCell> */}
                                                     </TableRow>
                                                 </TableHead>
                                                 <TableBody>
                                                     {previewData.invdetail.map((item, index) => {
-                                                        const accountName = branchOption.find(
-                                                            (opt) => opt.value.toString() === item.AccountId?.toString()
-                                                        )?.label || "Unknown";
+                                                     
+
+                                                        // const accountName = accountOption.find(
+                                                        //     (opt) => opt.value.toString() === item.AccountId?.toString()
+                                                        // )?.label || "Unknown";
+
+                                                        const accountName =
+    item.DOrC === "D"
+        ? accountOption.find(
+              (opt) => opt.value.toString() === item.AccountId?.toString()
+          )?.label
+        : branchOption.find(
+              (opt) => opt.value.toString() === item.AccountId?.toString()
+          )?.label
+    || "Unknown";
+
 
                                                         // Get bank name - similar logic to your edit table
-                                                        const bankNameDisplay = item.DOrC === "C"
-                                                            ? item.BankName || "0"
-                                                            : (bankOptions.find(opt => opt.value === item.BankName)?.label || item.BankName || "0");
+                                                        // const bankNameDisplay = item.DOrC === "C"
+                                                        //     ? item.BankName || "0"
+                                                        //     : (bankOptions.find(opt => opt.value === item.BankName)?.label || item.BankName || "0");
 
                                                         return (
                                                             <TableRow key={index}>
@@ -787,9 +825,9 @@ const handleInputChange = (index, field, value) => {
                                                                 <TableCell>{item.ChequeNo || "0"}</TableCell>
                                                                 <TableCell>{item.ChequeDate?.date ? item.ChequeDate.date.substring(0, 10) : "0"}</TableCell>
                                                                 <TableCell>{item.ChequeAmount || "0"}</TableCell>
-                                                                <TableCell>{item.MICRCode || "0"}</TableCell>
+                                                                {/* <TableCell>{item.MICRCode || "0"}</TableCell>
                                                                 <TableCell>{bankNameDisplay}</TableCell>
-                                                                <TableCell>{item.BankBranch || "0"}</TableCell>
+                                                                <TableCell>{item.BankBranch || "0"}</TableCell> */}
                                                             </TableRow>
                                                         );
                                                     })}
@@ -1056,40 +1094,79 @@ const handleInputChange = (index, field, value) => {
                                                             {index === 0 ? (
                                                                 branchOption.find(option => option.value === AccountId)?.label || ""
                                                             ) : (
+                                                                // <Autocomplete
+                                                                //     options={row.DOrC === "D" ? accountOption : branchOption}
+                                                                //     value={
+                                                                //         (row.DOrC === "D" ? accountOption : branchOption).find(
+                                                                //             (option) => option.value === row.AccountId
+                                                                //         ) || null
+                                                                //     }
+                                                                //     onChange={(event, newValue) =>
+                                                                //         handleInputChange(
+                                                                //             index,
+                                                                //             "AccountId",
+                                                                //             newValue ? newValue.value : ""
+                                                                //         )
+                                                                //     }
+                                                                //     sx={{ width: "200px" }}
+                                                                //     getOptionLabel={(option) => option.label}
+                                                                //     renderInput={(params) => (
+                                                                //         <TextField
+                                                                //             {...params}
+                                                                //             placeholder="Select Acc"
+                                                                //             size="big"
+                                                                //             fullWidth
+                                                                //             sx={{
+                                                                //                 "& .MuiInputBase-root": {
+                                                                //                     height: "50px",
+                                                                //                     width: "200px",
+                                                                //                 },
+                                                                //                 "& .MuiInputBase-input": {
+                                                                //                     padding: "14px",
+                                                                //                 },
+                                                                //             }}
+                                                                //         />
+                                                                //     )}
+                                                                // />
+
                                                                 <Autocomplete
-                                                                    options={row.DOrC === "D" ? accountOption : branchOption}
-                                                                    value={
-                                                                        (row.DOrC === "D" ? accountOption : branchOption).find(
-                                                                            (option) => option.value === row.AccountId
-                                                                        ) || null
-                                                                    }
-                                                                    onChange={(event, newValue) =>
-                                                                        handleInputChange(
-                                                                            index,
-                                                                            "AccountId",
-                                                                            newValue ? newValue.value : ""
-                                                                        )
-                                                                    }
-                                                                    sx={{ width: "200px" }}
-                                                                    getOptionLabel={(option) => option.label}
-                                                                    renderInput={(params) => (
-                                                                        <TextField
-                                                                            {...params}
-                                                                            placeholder="Select Acc"
-                                                                            size="big"
-                                                                            fullWidth
-                                                                            sx={{
-                                                                                "& .MuiInputBase-root": {
-                                                                                    height: "50px",
-                                                                                    width: "200px",
-                                                                                },
-                                                                                "& .MuiInputBase-input": {
-                                                                                    padding: "14px",
-                                                                                },
-                                                                            }}
-                                                                        />
-                                                                    )}
-                                                                />
+    options={row.DOrC === "D" ? accountOption : branchOption}
+    value={
+        (row.DOrC === "D" ? accountOption : branchOption).find(
+            (option) => option.value === row.AccountId
+        ) || null
+    }
+    onChange={(event, newValue) =>
+        handleInputChange(
+            index,
+            "AccountId",
+            newValue ? newValue.value : ""
+        )
+    }
+    onInputChange={(event, newInputValue) => {
+        setText(newInputValue);   // 👈 THIS sets text
+    }}
+    sx={{ width: "200px" }}
+    getOptionLabel={(option) => option.label}
+    renderInput={(params) => (
+        <TextField
+            {...params}
+            placeholder="Select Acc"
+            size="big"
+            fullWidth
+            sx={{
+                "& .MuiInputBase-root": {
+                    height: "50px",
+                    width: "200px",
+                },
+                "& .MuiInputBase-input": {
+                    padding: "14px",
+                },
+            }}
+        />
+    )}
+/>
+
                                                             )}
                                                         </TableCell>
 
@@ -1340,9 +1417,23 @@ export default Payment
 
 
 
-//main
 
-// import React, { useMemo, useState, useEffect } from 'react'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import  { useMemo, useState, useEffect } from 'react'
 // import { Grid, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Table, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Box, useMediaQuery, Button, Typography, TextField, Drawer, Divider, Autocomplete, FormControl, Select, MenuItem, FormControlLabel, RadioGroup, Radio } from '@mui/material';
 // import CloseIcon from '@mui/icons-material/Close';
 // import { MaterialReactTable, } from 'material-react-table';
@@ -1362,9 +1453,6 @@ export default Payment
 // import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 // import LastPageIcon from '@mui/icons-material/LastPage';
 // import FirstPageIcon from '@mui/icons-material/FirstPage';
-// import autoTable from 'jspdf-autotable';
-// import jsPDF from 'jspdf';
-// import PrintIcon from '@mui/icons-material/Print';
 // import logonew from '../imgs/logo_white.png'
 
 // const Payment = () => {
@@ -1372,8 +1460,6 @@ export default Payment
 //     const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 //     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 //     const [isEditing, setIsEditing] = useState(false);
-
-
 
 //     const handleDrawerOpen = () => {
 //         setIsDrawerOpen(true);
@@ -1391,9 +1477,9 @@ export default Payment
 
 //     const [receiptNo, setReceiptNo] = useState();
 //     const [receiptDate, setReceiptDate] = useState(null);
-//     const [selectedCashorbank, setSelectedCashorbank] = useState("");
+
 //     const [amount, setAmount] = useState('');
-//     // const [chequeOrDD, setChequeOrDd] = useState('cheque');
+
 //     const [bankName, setBankName] = useState('');
 //     const [chequeNo, setChequeNo] = useState();
 //     const [chequeDate, setChequeDate] = useState(null);
@@ -1429,24 +1515,6 @@ export default Payment
 //     const [branchOption, setBranchOption] = useState([]);
 //     const [AccountId, setAccountId] = useState('')
 
-//     // const fetchBranch = async () => {
-//     //     try {
-//     //         const response = await fetch(
-//     //             "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Account"
-//     //         );
-//     //         const result = await response.json();
-//     //         //  console.log("Branch info:", result);
-//     //         const options = result.map((branch) => ({
-//     //             value: branch.Id,
-//     //             label: branch.AccountName,
-//     //         }));
-//     //         setBranchOption(options);
-//     //     } catch (error) {
-//     //         console.error("Error fetching accounts:", error);
-//     //     }
-//     // };
-
-
 //     //fetch Bank
     
 //     const fetchBranch = async () => {
@@ -1477,7 +1545,7 @@ export default Payment
     
 //     const [bankOptions, setBankOptions] = useState([]);
 //     const [selectedBankOption, setSelectedBankOption] = useState("");
-//   useEffect(() => {
+//     useEffect(() => {
 //         const fetchOptions = async () => {
 //             try {
 //                 const urls = [
@@ -1502,30 +1570,29 @@ export default Payment
 
 //         fetchOptions();
 //     }, []);
-//     // useEffect(() => {
-//     //     const fetchOptions = async () => {
-//     //         try {
-//     //             const urls = [
-//     //                 "https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=7",
-//     //                 "https://arohanagroapi.microtechsolutions.net.in/php/getbyid.php?Table=AccountGroup&Colname=GroupCode&Colvalue=8"
-//     //             ];
 
-//     //             const responses = await Promise.all(urls.map(url => axios.get(url)));
-//     //             const combinedData = responses.flatMap(response => response.data || []);
 
-//     //             const options = combinedData.map(item => ({
-//     //                 label: item.GroupName,
-//     //                 value: item.GroupCode
-//     //             }));
+//     const [accountOption, setAccountOption] = useState([]);
+//     const fetchAllAccounts = async () => {
+//         try {
+//             const response = await fetch(
+//                 "https://arohanagroapi.microtechsolutions.net.in/php/get/gettable.php?Table=Account"
+//             );
 
-//     //             setBankOptions(options);
-//     //         } catch (error) {
-//     //             console.error("Failed to fetch bank options", error);
-//     //         }
-//     //     };
+//             const result = await response.json();
+            
+//             const allAccountOptions = result.map((account) => ({
+//                 value: account.Id,
+//                 label: account.AccountName,
+//             }));
 
-//     //     fetchOptions();
-//     // }, []);
+//             setAccountOption(allAccountOptions);
+//         } catch (error) {
+//             console.error("Error fetching accounts:", error);
+//         }
+//     };
+
+
 
 //     //table
 //     const [pageNo, setPageNo] = useState(1)
@@ -1550,12 +1617,12 @@ export default Payment
 //             console.error(error);
 //         }
 //     };
-//     useEffect(() => {
-//         fetchData();
-//     }, [pageNo]);
+    // useEffect(() => {
+    //     fetchData();
+    // }, [pageNo]);
 
 //     useEffect(() => {
-
+//        fetchAllAccounts();
 //         fetchBranch();
 //         fetchReceiptdetails();
 //     }, []);
@@ -1576,254 +1643,198 @@ export default Payment
 
 
 //     //create and update receipt voucher
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         for (const [index, row] of rows.entries()) {
-//             const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
-//             const formattedchequedate = row.ChequeDate
-//                 ? moment(row.ChequeDate).format("YYYY-MM-DD")
-//                 : null;
-
-//             const paymentheaderdata = {
-//                 Id: rowId,
-//                 VoucherType: "PY",
-//                 VoucherNo: receiptNo ? receiptNo : null,
-//                 VoucherDate: formattedVoucherdate,
-//                 ChequeNo: chequeNo,
-//                 ChequeDate: formattedchequedate,
-//                 Narration: narration,
-//                 CreatedBy: !isEditing ? userId : undefined,
-//                 UpdatedBy: isEditing ? userId : undefined,
-//             };
-
-//             try {
-//                 const invoiceurl = rowId
-//                     ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
-//                     : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
-
-
-//                 const response = await axios.post(
-//                     invoiceurl,
-//                     qs.stringify(paymentheaderdata),
-//                     {
-//                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-//                     }
-//                 );
-//                 //console.log('postinwardheaders', paymentheaderdata)
-
-//                 let PaymentId = rowId ? rowId : parseInt(response.data.ID, 10);
-//                 //console.log("Payment Id ", PaymentId);
-//                 console.log("rows", rows);
-
-//                 for (const [index, row] of rows.entries()) {
-//                     const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
-//                     const formattedchequedate = row.ChequeDate
-//                         ? moment(row.ChequeDate).format("YYYY-MM-DD")
-//                         : null;
-
-//                     const rowData = {
-//                         Id: parseInt(row.Id, 10),
-//                         VoucherId: parseInt(PaymentId, 10),
-//                         VoucherType: "PY",
-//                         SRN: rows.indexOf(row) + 1,
-//                         VoucherNo: receiptNo ? receiptNo : null,
-//                         VoucherDate: formattedVoucherdate,
-//                         AccountId: parseInt(row.AccountId, 10),
-//                         Amount: parseFloat(row.amount),
-//                         DOrC: index === 0 ? "C" : row.DOrC,
-//                         Narration: row.narration,
-//                         CostCenterId: row.CostCenterId,
-//                         ChequeNo: row.chequeNo,
-//                         ChequeDate: formattedchequedate,
-//                         ChequeAmount: row.chequeAmount,
-//                         MICRCode: row.MICRCode,
-//                         BankName: row.bankName,
-//                         BankBranch: row.bankBranch,
-//                         IsOldCheque: isOldCheque,
-//                         AccountPayeeCheque: accountPayeeCheque,
-//                         CreatedBy: !isEditing ? userId : undefined,
-//                         UpdatedBy: isEditing ? userId : undefined,
-//                     };
-//                     //console.log("this row has rowData ", rowData);
-
-//                     const paymentdetailurl = row.Id
-//                         ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
-//                         : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
-
-//                     //console.log(" paymentdetailurl is used ", paymentdetailurl);
-
-//                     try {
-//                         const response = await axios.post(
-//                             paymentdetailurl,
-//                             qs.stringify(rowData),
-//                             {
-//                                 headers: {
-//                                     "Content-Type": "application/x-www-form-urlencoded",
-//                                 },
-//                             }
-//                         );
-//                         // console.log("Response:", response);
-//                     } catch (error) {
-//                         console.error("Error:", error);
-//                     }
-
-//                 }
-//                 setIsDrawerOpen(false);
-//                 toast.success(
-//                     isEditing
-//                         ? "payment Voucher updated successfully!"
-//                         : "payment Voucher Created successfully!"
-//                 );
-//                 resetForm();
-//                 fetchData();
-//                 fetchReceiptdetails();
-
-//             } catch (error) {
-//                 console.error("Error submitting payment:", error);
-//             }
-//         }
-//     };
-
 //     // const handleSubmit = async (e) => {
 //     //     e.preventDefault();
-
-//     //     try {
-//     //         // Format header date safely
-//     //         const formattedVoucherDate = receiptDate
-//     //             ? moment(receiptDate).format("YYYY-MM-DD HH:mm:ss")
+//     //     for (const [index, row] of rows.entries()) {
+//     //         const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
+//     //         const formattedchequedate = row.ChequeDate
+//     //             ? moment(row.ChequeDate).format("YYYY-MM-DD")
 //     //             : null;
 
-//     //         // Build header payload
-//     //         const paymentHeaderData = {
-//     //             Id: rowId || null,
+//     //         const paymentheaderdata = {
+//     //             Id: rowId,
 //     //             VoucherType: "PY",
-//     //             VoucherNo: receiptNo || null,
-//     //             VoucherDate: formattedVoucherDate,
-//     //             ChequeNo: chequeNo || null,
-//     //             ChequeDate: null, // header-level cheque date (optional, can be set if needed)
-//     //             Narration: narration || null,
-//     //             CreatedBy: !isEditing ? userId : null,
-//     //             UpdatedBy: isEditing ? userId : null,
+//     //             VoucherNo: receiptNo ? receiptNo : null,
+//     //             VoucherDate: formattedVoucherdate,
+//     //             ChequeNo: chequeNo,
+//     //             ChequeDate: formattedchequedate,
+//     //             Narration: narration,
+//     //             CreatedBy: !isEditing ? userId : undefined,
+//     //             UpdatedBy: isEditing ? userId : undefined,
 //     //         };
 
-//     //         // Remove undefined values
-//     //         Object.keys(paymentHeaderData).forEach(
-//     //             (key) =>
-//     //                 paymentHeaderData[key] === undefined &&
-//     //                 delete paymentHeaderData[key]
-//     //         );
+//     //         try {
+//     //             const invoiceurl = rowId
+//     //                 ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
+//     //                 : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
 
-//     //         // Decide header URL
-//     //         const invoiceUrl = rowId
-//     //             ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
-//     //             : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
 
-//     //         // Post header
-//     //         const headerResponse = await axios.post(
-//     //             invoiceUrl,
-//     //             qs.stringify(paymentHeaderData),
-//     //             {
-//     //                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-//     //             }
-//     //         );
-
-//     //         // Get PaymentId
-//     //         const PaymentId = rowId ? rowId : parseInt(headerResponse.data.ID, 10);
-
-//     //         console.log("PaymentId:", PaymentId);
-
-//     //         // Loop through detail rows
-//     //         for (const [index, row] of rows.entries()) {
-//     //             const formattedVoucherDateDetail = receiptDate
-//     //                 ? moment(receiptDate).format("YYYY-MM-DD HH:mm:ss")
-//     //                 : null;
-
-//     //             const formattedChequeDateDetail = row.ChequeDate
-//     //                 ? moment(row.ChequeDate).format("YYYY-MM-DD HH:mm:ss")
-//     //                 : null;
-
-//     //             const rowData = {
-//     //                 Id: row.Id ? parseInt(row.Id, 10) : null,
-//     //                 VoucherId: parseInt(PaymentId, 10),
-//     //                 VoucherType: "PY",
-//     //                 SRN: index + 1,
-//     //                 VoucherNo: receiptNo || null,
-//     //                 VoucherDate: formattedVoucherDateDetail,
-//     //                 AccountId: row.AccountId ? parseInt(row.AccountId, 10) : null,
-//     //                 Amount: row.amount ? parseFloat(row.amount) : 0,
-//     //                 DOrC: index === 0 ? "C" : row.DOrC || "D",
-//     //                 Narration: row.narration || null,
-//     //                 CostCenterId: row.CostCenterId || null,
-//     //                 ChequeNo: row.chequeNo || null,
-//     //                 ChequeDate: formattedChequeDateDetail,
-//     //                 ChequeAmount: row.chequeAmount ? parseFloat(row.chequeAmount) : 0,
-//     //                 MICRCode: row.MICRCode || null,
-//     //                 BankName: row.bankName || null,
-//     //                 BankBranch: row.bankBranch || null,
-//     //                 IsOldCheque: isOldCheque || null,
-//     //                 AccountPayeeCheque: accountPayeeCheque || null,
-//     //                 CreatedBy: !isEditing ? userId : null,
-//     //                 UpdatedBy: isEditing ? userId : null,
-//     //             };
-
-//     //             // Remove undefined values
-//     //             Object.keys(rowData).forEach(
-//     //                 (key) => rowData[key] === undefined && delete rowData[key]
-//     //             );
-
-//     //             // Decide detail URL
-//     //             const paymentDetailUrl = row.Id
-//     //                 ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
-//     //                 : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
-
-//     //             try {
-//     //                 const detailResponse = await axios.post(
-//     //                     paymentDetailUrl,
-//     //                     qs.stringify(rowData),
-//     //                     {
-//     //                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-//     //                     }
-//     //                 );
-//     //                 console.log("Detail response:", detailResponse.data);
-//     //             } catch (error) {
-//     //                 if (error.response) {
-//     //                     console.error(
-//     //                         "Detail API error:",
-//     //                         error.response.status,
-//     //                         error.response.data
-//     //                     );
-//     //                 } else if (error.request) {
-//     //                     console.error("No response received:", error.request);
-//     //                 } else {
-//     //                     console.error("Axios setup error:", error.message);
+//     //             const response = await axios.post(
+//     //                 invoiceurl,
+//     //                 qs.stringify(paymentheaderdata),
+//     //                 {
+//     //                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
 //     //                 }
-//     //             }
-//     //         }
-
-//     //         // Success actions
-//     //         setIsDrawerOpen(false);
-//     //         toast.success(
-//     //             isEditing
-//     //                 ? "Payment Voucher updated successfully!"
-//     //                 : "Payment Voucher created successfully!"
-//     //         );
-//     //         resetForm();
-//     //         fetchData();
-//     //         fetchReceiptdetails();
-//     //     } catch (error) {
-//     //         if (error.response) {
-//     //             console.error(
-//     //                 "Header API error:",
-//     //                 error.response.status,
-//     //                 error.response.data
 //     //             );
-//     //         } else if (error.request) {
-//     //             console.error("No response received:", error.request);
-//     //         } else {
-//     //             console.error("Axios setup error:", error.message);
+//     //             //console.log('postinwardheaders', paymentheaderdata)
+
+//     //             let PaymentId = rowId ? rowId : parseInt(response.data.ID, 10);
+//     //             //console.log("Payment Id ", PaymentId);
+//     //             console.log("rows", rows);
+
+//     //             for (const [index, row] of rows.entries()) {
+//     //                 const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
+//     //                 const formattedchequedate = row.ChequeDate
+//     //                     ? moment(row.ChequeDate).format("YYYY-MM-DD")
+//     //                     : null;
+
+//     //                 const rowData = {
+//     //                     Id: parseInt(row.Id, 10),
+//     //                     VoucherId: parseInt(PaymentId, 10),
+//     //                     VoucherType: "PY",
+//     //                     SRN: rows.indexOf(row) + 1,
+//     //                     VoucherNo: receiptNo ? receiptNo : null,
+//     //                     VoucherDate: formattedVoucherdate,
+//     //                     AccountId: row.AccountId, 
+//     //                     Amount: parseFloat(row.amount),
+//     //                     DOrC: index === 0 ? "C" : row.DOrC,
+//     //                     Narration: row.narration,
+//     //                     CostCenterId: row.CostCenterId,
+//     //                     ChequeNo: row.chequeNo,
+//     //                     ChequeDate: formattedchequedate,
+//     //                     ChequeAmount: row.chequeAmount,
+//     //                     MICRCode: row.MICRCode,
+//     //                     BankName: row.bankName,
+//     //                     BankBranch: row.bankBranch,
+//     //                     IsOldCheque: isOldCheque,
+//     //                     AccountPayeeCheque: accountPayeeCheque,
+//     //                     CreatedBy: !isEditing ? userId : undefined,
+//     //                     UpdatedBy: isEditing ? userId : undefined,
+//     //                 };
+//     //                 //console.log("this row has rowData ", rowData);
+
+//     //                 const paymentdetailurl = row.Id
+//     //                     ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
+//     //                     : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
+
+//     //                 //console.log(" paymentdetailurl is used ", paymentdetailurl);
+
+//     //                 try {
+//     //                     const response = await axios.post(
+//     //                         paymentdetailurl,
+//     //                         qs.stringify(rowData),
+//     //                         {
+//     //                             headers: {
+//     //                                 "Content-Type": "application/x-www-form-urlencoded",
+//     //                             },
+//     //                         }
+//     //                     );
+//     //                     // console.log("Response:", response);
+//     //                 } catch (error) {
+//     //                     console.error("Error:", error);
+//     //                 }
+
+//     //             }
+//     //             setIsDrawerOpen(false);
+//     //             toast.success(
+//     //                 isEditing
+//     //                     ? "payment Voucher updated successfully!"
+//     //                     : "payment Voucher Created successfully!"
+//     //             );
+//     //             resetForm();
+//     //             fetchData();
+//     //             fetchReceiptdetails();
+
+//     //         } catch (error) {
+//     //             console.error("Error submitting payment:", error);
 //     //         }
 //     //     }
 //     // };
+
+//     const handleSubmit = async (e) => {
+//         e.preventDefault();
+//         const formattedVoucherdate = moment(receiptDate).format("YYYY-MM-DD");
+//         const formattedChequeDate = moment(chequeDate).format("YYYY-MM-DD");
+//         console.log('formattedChequeDate', formattedChequeDate)
+
+//         const paymentheaderdata = {
+//             Id: rowId,
+//             VoucherType: "PY",
+//             VoucherNo: receiptNo || null,
+//             VoucherDate: formattedVoucherdate,
+//             ChequeNo: chequeNo,
+//             ChequeDate: formattedChequeDate,
+//             Narration: narration,
+//             CreatedBy: !isEditing ? userId : undefined,
+//             UpdatedBy: isEditing ? userId : undefined,
+//         };
+
+//         try {
+//             const invoiceurl = rowId
+//                 ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherhd.php"
+//                 : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherhd.php";
+
+//             const response = await axios.post(
+//                 invoiceurl,
+//                 qs.stringify(paymentheaderdata),
+//                 { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+//             );
+
+//             const PaymentId = rowId || parseInt(response.data.ID, 10);
+
+//             // ✔ Step 2: Insert DETAILS (loop here only)
+//             for (const [index, row] of rows.entries()) {
+//                 const formattedChequeDate = row.ChequeDate
+//                     ? moment(row.ChequeDate).format("YYYY-MM-DD")
+//                     : null;
+
+//                 const rowData = {
+//                     Id: parseInt(row.Id, 10),
+//                     VoucherId: PaymentId,
+//                     VoucherType: "PY",
+//                     SRN: index + 1,
+//                     VoucherNo: receiptNo || null,
+//                     VoucherDate: formattedVoucherdate,
+//                     AccountId: row.AccountId,
+//                     Amount: parseFloat(row.amount),
+//                     DOrC: index === 0 ? "C" : row.DOrC,
+//                     Narration: row.narration,
+//                     CostCenterId: row.CostCenterId,
+//                     ChequeNo: row.chequeNo,
+//                     ChequeDate: formattedChequeDate,
+//                     ChequeAmount: row.chequeAmount,
+//                     MICRCode: row.MICRCode,
+//                     BankName: row.bankName,
+//                     BankBranch: row.bankBranch,
+//                     IsOldCheque: isOldCheque,
+//                     AccountPayeeCheque: accountPayeeCheque,
+//                     CreatedBy: !isEditing ? userId : undefined,
+//                     UpdatedBy: isEditing ? userId : undefined,
+//                 };
+
+//                 const detailUrl = row.Id
+//                     ? "https://arohanagroapi.microtechsolutions.net.in/php/updatevoucherdetail.php"
+//                     : "https://arohanagroapi.microtechsolutions.net.in/php/postvoucherdetail.php";
+
+//                 await axios.post(
+//                     detailUrl,
+//                     qs.stringify(rowData),
+//                     { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+//                 );
+//             }
+
+//             setIsDrawerOpen(false);
+//             toast.success(isEditing ? "Payment updated!" : "Payment created!");
+//             fetchData();
+//             resetForm();
+
+//             fetchReceiptdetails();
+
+//         } catch (error) {
+//             console.error("Error submitting payment:", error);
+//         }
+//     };
+
 
 //     const dOrCOptions = [
 //         { value: "D", label: "D" },
@@ -1842,11 +1853,7 @@ export default Payment
 //                 Cell: ({ row }) => (pageNo - 1) * 15 + row.index + 1,
 //             },
 
-//             {
-//                 accessorKey: 'VoucherType',
-//                 header: 'Voucher Type',
-//                 size: 150,
-//             },
+            
 //             {
 //                 accessorKey: 'VoucherNo',
 //                 header: 'Voucher No',
@@ -1860,11 +1867,19 @@ export default Payment
 //                 Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
 //             },
 
-//             // {
-//             //     accessorKey: 'ChequeNo',
-//             //     header: 'Cheque No',
-//             //     size: 150,
-//             // },
+//             {
+//                 accessorKey: 'AccountName',
+//                 header: 'Party Name',
+//                 size: 150,
+
+//             },
+
+//             {
+//                 accessorKey: 'ChequeNo',
+//                 header: 'Cheque No',
+//                 size: 150,
+
+//             },
 
 //             {
 //                 accessorKey: 'ChequeDate.date',
@@ -1873,19 +1888,21 @@ export default Payment
 //                 Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
 //             },
 
-//               {
-//                 accessorKey: 'AccountName',
-//                 header: 'Party Name',
-//                 size: 150,
-//                 // Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
-//             },
+              
 
 
 //              {
 //                 accessorKey: 'Amount',
 //                 header: 'Amount',
 //                 size: 150,
-//                 // Cell: ({ cell }) => <span>{moment(cell.getValue()).format('DD-MM-YYYY')}</span>,
+              
+//             },
+
+
+//               {
+//                 accessorKey: 'Narration',
+//                 header: 'Narration',
+//                 size: 150,
 //             },
 
 //             {
@@ -1909,15 +1926,7 @@ export default Payment
 //                             onClick={() => {
 //                                 const invdetail = receiptdetails
 //                                     .filter((detail) => detail.VoucherId === row.original.Id)
-//                                 //   .map((detail) => {
-//                                 //     const matchedMaterial = productOptions.find(
-//                                 //       (item) => item.value.toString() === detail.ProductId?.toString()
-//                                 //     );
-//                                 //     return {
-//                                 //       ...detail,
-//                                 //       ProductName: matchedMaterial?.label || "Unknown",
-//                                 //     };
-//                                 //   });
+                              
 //                                 setPreviewData({ ...row.original, invdetail });
 //                                 setPreviewOpen(true);
 //                                 console.log('previewdata', previewData)
@@ -1990,64 +1999,7 @@ export default Payment
 //     });
 
 
-//     // const handleEdit = (rowData) => {
-//     //     console.log("This row has been clicked:", rowData);
-
-//     //     console.log("rowData.Id:", rowData.Id);
-//     //     setRowId(rowData.Id)
-//     //     setIsDrawerOpen(true);
-//     //     setIsEditing(!!rowData.Id);
-//     //     // setIdwiseData(rowData.Id);
-//     //     setAmount(rowData.Amount)
-//     //     setReceiptNo(rowData.VoucherNo)
-//     //     //receipt date
-//     //     const dateStr = rowData.VoucherDate.date.split(" ")[0];
-//     //     const [year, month, day] = dateStr.split("-").map(Number); // Convert to numbers
-//     //     const formattedDate = `${year}-${month}-${day}`;
-//     //     setReceiptDate(formattedDate);
-
-//     //     //Cheque date
-//     //     const dateStrc = rowData.ChequeDate.date.split(" ")[0];
-//     //     const [yearc, monthc, dayc] = dateStrc.split("-").map(Number); // Convert to numbers
-//     //     const formattedChequeDate = `${yearc}-${monthc}-${dayc}`;
-//     //     setChequeDate(formattedChequeDate);
-
-
-//     //     const receiptetail = receiptdetails
-//     //         .filter((detail) => detail.VoucherId === rowData.Id);
-//     //     if (receiptetail) {
-//     //         setAccountId(receiptetail[0].AccountId)
-//     //         setNarration(receiptetail[0]?.Narration)
-//     //         setAmount(receiptetail[0]?.Amount)
-//     //         //  console.log('amt', receiptetail[0]?.Amount)
-
-//     //     }
-
-
-//     //     console.log('receiptetail', receiptetail)
-
-
-
-
-//     //     const mappedRows = receiptetail.map((detail) => ({
-//     //         Id: detail.Id,
-//     //         VoucherId: detail.VoucherId,
-//     //         AccountId: detail.AccountId,
-//     //         DOrC: detail.DOrC,
-//     //         narration: detail.Narration,
-//     //         amount: parseFloat(detail.Amount) || 0,
-//     //         chequeNo: detail.ChequeNo,
-//     //         ChequeDate: detail.ChequeDate?.date.split(" ")[0],
-//     //         chequeAmount: parseFloat(detail.ChequeAmount) || 0,
-//     //         MICRCode: parseFloat(detail.MICRCode) || 0,
-//     //         bankName: detail.BankName,
-//     //         bankBranch: detail.BankBranch,
-//     //     }));
-//     //     // console.log('mappedRows', mappedRows)
-
-//     //     setRows(mappedRows)
-
-//     // };
+   
 
 // const handleEdit = (rowData) => {
 //     console.log("This row has been clicked:", rowData);
@@ -2066,9 +2018,7 @@ export default Payment
 //     } else {
 //         setReceiptDate(""); // or null
 //     }
-// //         const receiptDateStr = rowData.VoucherDate ? rowData.VoucherDate.split(" ")[0] : "";
-// //   console.log("Setting receipt date to:", receiptDateStr);
-// //   setReceiptDate(receiptDateStr);
+
 
 //     // Cheque date (safe check)
 //     if (rowData.ChequeDate?.date) {
@@ -2077,7 +2027,7 @@ export default Payment
 //         const formattedChequeDate = `${yearc}-${monthc}-${dayc}`;
 //         setChequeDate(formattedChequeDate);
 //     } else {
-//         setChequeDate(""); // or null
+//         setChequeDate(""); 
 //     }
 
 //     // Receipt details
@@ -2116,6 +2066,7 @@ export default Payment
 
 
 
+
 //     const resetForm = () => {
 //         setReceiptDate('');
 //         setChequeDate('');
@@ -2123,10 +2074,10 @@ export default Payment
 //         setSelectedBankOption('');
 //         setBankName('');
 //         setAmount('');
-//         // setChequeOrDd('');
+       
 //         setReceiptNo('');
 //         setChequeNo('');
-//         // setSelectedCashorbank('');
+   
 //         setNarration('')
 
 //         setRows([{
@@ -2223,20 +2174,29 @@ export default Payment
 //         setRows((prevRows) => [...prevRows, newRow]);
 //     };
 
-//     const handleInputChange = (index, field, value) => {
-       
-//         const updatedRows = [...rows];
-//         updatedRows[index] = { ...updatedRows[index], [field]: value };
-//         // Special handling for certain fields
-//         if (field === "DOrC") {
-//             if (value === "C") {
-//                 updatedRows[index].bankName = bankName; // for Credit
-//             } else if (value === "D") {
-//                 updatedRows[index].bankName = selectedBankOption; // for Debit
+    
+// const handleInputChange = (index, field, value) => {
+//     const updatedRows = [...rows];
+//     updatedRows[index] = { ...updatedRows[index], [field]: value };
+    
+//     // Special handling for certain fields
+//     if (field === "DOrC") {
+//         if (value === "C") {
+//             updatedRows[index].bankName = bankName; // for Credit
+//         } else if (value === "D") {
+//             updatedRows[index].bankName = selectedBankOption; // for Debit
+            
+//             // Fetch all accounts when switching to Debit
+//             if (index !== 0) { // Don't fetch for first row if it's special
+//                 fetchAllAccounts();
 //             }
 //         }
-//         setRows(updatedRows);
-//     };
+//     }
+    
+//     setRows(updatedRows);
+// };
+
+
 
 //     const handleDeleteRow = (index) => {
 //         const updatedRows = rows.filter((_, i) => i !== index);
@@ -2252,7 +2212,7 @@ export default Payment
 //             </Box>
 
 //             <Box sx={{
-//                 //  background: 'rgb(236, 253, 230)', 
+              
 //                 p: 5, height: 'auto'
 //             }}>
 
@@ -2272,10 +2232,10 @@ export default Payment
 
 //                 {/* ///for preview///////// */}.
 //                 <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="xlg" fullWidth>
-//                     <DialogTitle sx={{ textAlign: 'center' }}>
+//                     <DialogTitle component="div"  sx={{ textAlign: 'center' }}>
 //                         <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
 //                             <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-//                             <Typography variant="h6">Arohan Agro Kolhapur</Typography>
+//                             <Typography variant="h6">Aarohan Agro Kolhapur</Typography>
 
 //                         </Box>
 //                         <Typography sx={{ mt: 1 }}>
@@ -2303,7 +2263,7 @@ export default Payment
 
 //                                     <Box display={'flex'} justifyContent={'space-between'} gap={2} mt={2}>
 
-//                                         {/* <Box><Typography><strong>Cheque No:</strong> {previewData.ChequeNo}</Typography></Box> */}
+                                     
 //                                         <Box><Typography><strong>Cheque Date:</strong>{" "} {new Date(previewData.ChequeDate.date).toLocaleDateString()}</Typography></Box>
 //                                         <Box><Typography> <strong>Amount:</strong> {previewData?.invdetail?.[0]?.Amount ?? 'N/A'}</Typography></Box>
 //                                         <Box><Typography><strong>Narration:</strong> {previewData.Narration}</Typography></Box>
@@ -2330,21 +2290,18 @@ export default Payment
 //                                                         <TableCell><strong>Cheque No</strong></TableCell>
 //                                                         <TableCell><strong>Cheque Date</strong></TableCell>
 //                                                         <TableCell><strong>Cheque Amount(Rs)</strong></TableCell>
-//                                                         <TableCell><strong>MICR Code</strong></TableCell>
-//                                                         <TableCell><strong>Bank Name</strong></TableCell>
-//                                                         <TableCell><strong>Bank Branch</strong></TableCell>
+                                                      
 //                                                     </TableRow>
 //                                                 </TableHead>
 //                                                 <TableBody>
 //                                                     {previewData.invdetail.map((item, index) => {
-//                                                         const accountName = branchOption.find(
+                                                       
+
+//                                                         const accountName = accountOption.find(
 //                                                             (opt) => opt.value.toString() === item.AccountId?.toString()
 //                                                         )?.label || "Unknown";
 
-//                                                         // Get bank name - similar logic to your edit table
-//                                                         const bankNameDisplay = item.DOrC === "C"
-//                                                             ? item.BankName || "0"
-//                                                             : (bankOptions.find(opt => opt.value === item.BankName)?.label || item.BankName || "0");
+                                                       
 
 //                                                         return (
 //                                                             <TableRow key={index}>
@@ -2355,9 +2312,7 @@ export default Payment
 //                                                                 <TableCell>{item.ChequeNo || "0"}</TableCell>
 //                                                                 <TableCell>{item.ChequeDate?.date ? item.ChequeDate.date.substring(0, 10) : "0"}</TableCell>
 //                                                                 <TableCell>{item.ChequeAmount || "0"}</TableCell>
-//                                                                 <TableCell>{item.MICRCode || "0"}</TableCell>
-//                                                                 <TableCell>{bankNameDisplay}</TableCell>
-//                                                                 <TableCell>{item.BankBranch || "0"}</TableCell>
+                                                               
 //                                                             </TableRow>
 //                                                         );
 //                                                     })}
@@ -2487,8 +2442,7 @@ export default Payment
 //                                 <Box flex={1}>
 //                                     <Typography variant="body2">Cheque No</Typography>
 //                                     <TextField
-//                                         // value={chequeNo}
-//                                         // onChange={(e) => setChequeNo(e.target.value)}
+                                        
 //                                         variant="standard"
 //                                         sx={{
 //                                             '& .MuiInput-underline:after': {
@@ -2546,11 +2500,10 @@ export default Payment
 //                                         }}
 //                                         focused
 //                                         value={rows[0]?.amount || ""}
-//                                         //value={rows.amount}
+                                        
 //                                         onChange={(e) => {
 //                                             handleInputChange(0, "amount", e.target.value);
-//                                             // setTotalcredit(e.target.value);
-//                                             // If you still need this
+                                           
 //                                             setAmount(e.target.value);
 //                                         }}
 
@@ -2598,9 +2551,7 @@ export default Payment
 //                                                 <TableCell>Cheque No</TableCell>
 //                                                 <TableCell>Cheque Date</TableCell>
 //                                                 <TableCell>Cheque Amount</TableCell>
-//                                                 {/* <TableCell>MICR Code</TableCell>
-//                                                 <TableCell>Bank Name</TableCell>
-//                                                 <TableCell>Bank Branch</TableCell> */}
+                                               
 //                                                 <TableCell>Actions</TableCell>
 //                                             </TableRow>
 //                                         </TableHead>
@@ -2622,15 +2573,15 @@ export default Payment
 //                                                     <TableRow key={index}>
 //                                                         <TableCell>{index + 1}</TableCell>
 
+                                                        
 //                                                         <TableCell>
 //                                                             {index === 0 ? (
 //                                                                 branchOption.find(option => option.value === AccountId)?.label || ""
 //                                                             ) : (
-                                                                
 //                                                                 <Autocomplete
-//                                                                     options={branchOption}
+//                                                                     options={row.DOrC === "D" ? accountOption : branchOption}
 //                                                                     value={
-//                                                                         branchOption.find(
+//                                                                         (row.DOrC === "D" ? accountOption : branchOption).find(
 //                                                                             (option) => option.value === row.AccountId
 //                                                                         ) || null
 //                                                                     }
@@ -2641,7 +2592,7 @@ export default Payment
 //                                                                             newValue ? newValue.value : ""
 //                                                                         )
 //                                                                     }
-//                                                                     sx={{ width: "200px" }} // Set width
+//                                                                     sx={{ width: "200px" }}
 //                                                                     getOptionLabel={(option) => option.label}
 //                                                                     renderInput={(params) => (
 //                                                                         <TextField
@@ -2652,10 +2603,10 @@ export default Payment
 //                                                                             sx={{
 //                                                                                 "& .MuiInputBase-root": {
 //                                                                                     height: "50px",
-//                                                                                     width: "200px", // Adjust height here
+//                                                                                     width: "200px",
 //                                                                                 },
 //                                                                                 "& .MuiInputBase-input": {
-//                                                                                     padding: "14px", // Adjust padding for better alignment
+//                                                                                     padding: "14px",
 //                                                                                 },
 //                                                                             }}
 //                                                                         />
@@ -2685,10 +2636,7 @@ export default Payment
 //                                                                             size="small"
 //                                                                             sx={{ width: '80px' }}
 
-//                                                                         // sx={{
-//                                                                         //     "& .MuiInputBase-root": { height: "50px" },
-//                                                                         //     "& .MuiInputBase-input": { padding: "14px" },
-//                                                                         // }}
+                                                                     
 //                                                                         />
 //                                                                     )}
 //                                                                 />
@@ -2794,73 +2742,7 @@ export default Payment
 //                                                             />
 //                                                         </TableCell>
 
-//                                                         {/* <TableCell>
-//                                                             <TextField
-//                                                                 type="text"
-//                                                                 value={row.MICRCode}
-//                                                                 onChange={(e) => {
-//                                                                     const value = e.target.value;
-//                                                                     if (value.length <= 30) {
-//                                                                         handleInputChange(index, "MICRCode", value);
-//                                                                     }
-//                                                                 }}
-//                                                                 placeholder="MICR Code"
-//                                                                 sx={{ width: '150px' }}
-//                                                                 size="small"
-//                                                             />
-//                                                         </TableCell>
-
-                                                       
-//                                                         <TableCell>
-//                                                             {row.DOrC === "C" ? (
-//                                                                 <TextField
-//                                                                     type="text"
-//                                                                     value={row.bankName}
-//                                                                     onChange={(e) => {
-//                                                                         const value = e.target.value;
-//                                                                         if (value.length <= 50) {
-//                                                                             handleInputChange(index, "bankName", value);
-//                                                                         }
-//                                                                     }}
-//                                                                     placeholder="Bank Name"
-//                                                                     sx={{ width: '150px' }}
-//                                                                     size="small"
-//                                                                 />
-//                                                             ) : (
-//                                                                 <FormControl fullWidth size="small">
-//                                                                     <Select
-//                                                                         value={row.bankName || ""}
-//                                                                         onChange={(event) => {
-//                                                                             const selectedValue = event.target.value;
-//                                                                             handleInputChange(index, "bankName", selectedValue);
-//                                                                         }}
-//                                                                     >
-//                                                                         {bankOptions.map((option) => (
-//                                                                             <MenuItem key={option.value} value={option.value}>
-//                                                                                 {option.label}
-//                                                                             </MenuItem>
-//                                                                         ))}
-//                                                                     </Select>
-//                                                                 </FormControl>
-//                                                             )}
-//                                                         </TableCell>
-
-
-//                                                         <TableCell>
-//                                                             <TextField
-//                                                                 type="text"
-//                                                                 value={row.bankBranch}
-//                                                                 onChange={(e) => {
-//                                                                     const value = e.target.value;
-//                                                                     if (value.length <= 50) {
-//                                                                         handleInputChange(index, "bankBranch", value);
-//                                                                     }
-//                                                                 }}
-//                                                                 placeholder="Bank Branch"
-//                                                                 sx={{ width: '150px' }}
-//                                                                 size="small"
-//                                                             />
-//                                                         </TableCell> */}
+                                                        
 
 //                                                         <TableCell>
 //                                                             <Box style={{ display: "flex", justifyContent: "space-between" }}>
@@ -2940,7 +2822,6 @@ export default Payment
 //     )
 // }
 // export default Payment
-
 
 
 

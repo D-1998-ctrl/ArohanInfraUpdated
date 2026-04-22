@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import {Dialog, DialogActions, DialogContent, DialogTitle, Box, TableBody, TableCell, TableContainer, TableHead, TableRow, Table, Typography, Button } from '@mui/material';
+import {Dialog, DialogActions, DialogContent, DialogTitle, Box,  Typography, Button } from '@mui/material';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -13,6 +13,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import moment from 'moment';
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
+import { MRT_TablePagination as MUITablePagination } from "material-react-table";
 
 
 const SalesReport = () => {
@@ -199,7 +200,7 @@ const SalesReport = () => {
         y += height + 6;
 
         doc.setFontSize(16);
-        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center" });
+        doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center" });
         y += 7;
         doc.setFontSize(10);
         doc.text("Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
@@ -502,27 +503,46 @@ const exportToExcel = async (data) => {
                 size: 50,
             },
 
+            
+            {
+                accessorKey: 'CGSTPercentage',
+                header: 'CGST%',
+                size: 50,
+            },
 
             {
                 accessorKey: ["Product CGST AMT"],
-                header: 'CGST',
+                header: 'CGST Amount',
                 size: 50,
                  Cell: ({ cell }) => cell.getValue() || 0,
             },
 
+               {
+                accessorKey: 'IGSTPercentage',
+                header: 'IGST%',
+                size: 50,
+            },
 
+
+                  
             {
                 accessorKey: ["Product IGST AMT"],
-                header: 'IGST',
+                header: 'IGST Amount',
                 size: 50,
                  Cell: ({ cell }) => cell.getValue() || 0,
             },
 
+
+      {
+                accessorKey: 'SGSTPercentage',
+                header: 'SGST%',
+                size: 50,
+            },
 
 
             {
                 accessorKey: ["Product SGST AMT"],
-                header: 'SGST',
+                header: 'SGST Amount',
                 size: 50,
                  Cell: ({ cell }) => cell.getValue() || 0,
             },
@@ -550,18 +570,46 @@ const exportToExcel = async (data) => {
             },
         ];
     }, []);
+
     const table = useMaterialReactTable({
-        columns,
-        data: salesData,
-        enablePagination: true,
-        muiTableHeadCellProps: {
-            style: {
-                backgroundColor: "#E9ECEF",
-                color: "black",
-                fontSize: "16px",
-            },
+    columns,
+    data: salesData,
+    enablePagination: true,
+
+    muiTableHeadCellProps: {
+        style: {
+            backgroundColor: "#E9ECEF",
+            color: "black",
+            fontSize: "16px",
         },
-    });
+    },
+
+    
+    renderBottomToolbar: ({ table }) => (
+        <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mr={4}
+        
+        >
+            {/* ⬅️ Pagination on Left */}
+            <MUITablePagination table={table} />
+
+            {/* ➡️ Grand Total on Right */}
+            <Box display="flex" alignItems="center">
+                <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                    <b>Grand Total:</b>
+                </Typography>
+
+                <Typography variant="subtitle1" color="primary">
+                    <b>{grandTotal.toLocaleString("en-IN")}</b>
+                </Typography>
+            </Box>
+        </Box>
+    ),
+});
+
 
     //grand Total
     const grandTotal = useMemo(() => {
@@ -639,7 +687,7 @@ const exportToExcel = async (data) => {
                                     <DialogTitle sx={{ textAlign: 'center' }}>
                                         <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                                             <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                                            <Typography >Arohan Agro Kolhapur</Typography>
+                                            <Typography >Aarohan Agro Kolhapur</Typography>
                                         </Box>
                                         <Typography sx={{ mt: 1 }}>
                                             Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
@@ -654,55 +702,7 @@ const exportToExcel = async (data) => {
                                                 <Box>
 
 
-                                                    {/* Table to display sales data */}
-                                                    {/* <TableContainer fullWidth component={Paper} sx={{ mt: 3 }}>
-                                                        <Table>
-                                                            <TableHead>
-                                                                <TableRow>
-                                                                    <TableCell><b>Invoice No</b></TableCell>
-                                                                    <TableCell><b>Invoice Date</b></TableCell>
-                                                                    <TableCell><strong>Account Name</strong></TableCell>
-                                                                    
-                                                                    <TableCell> <b>Product  Name</b></TableCell>
-                                                                    <TableCell><b>Rate</b></TableCell>
-                                                                    <TableCell><strong>Quantity (Nos)</strong></TableCell>
-                                                                    <TableCell><strong>Amount (Rs)</strong></TableCell>
-                                                                    <TableCell><strong>CGST</strong></TableCell>
-                                                                    <TableCell><strong>IGST</strong></TableCell>
-                                                                    <TableCell><strong>SGST</strong></TableCell>
-                                                                    <TableCell><strong>Transport</strong></TableCell>
-
-                                                                    <TableCell><strong>Sub Total</strong></TableCell>
-                                                                    <TableCell><strong>Total Amount</strong></TableCell>
-
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {salesData.map((item, index) => (
-                                                                    <TableRow key={index}>
-                                                                        <TableCell>{item.InvoiceNo}</TableCell>
-                                                                        <TableCell>{item.InvoiceDate}</TableCell>
-                                                                        <TableCell>{item.AccountName || 'N/A'}</TableCell>
-
-                                                                        
-                                                                        <TableCell>{item.ProductName || 'N/A'}</TableCell>
-                                                                        <TableCell>{item.Rate || 'N/A'}</TableCell>
-                                                                        <TableCell>{item.Quantity || 0}</TableCell>
-                                                                        <TableCell>{item.Amount || 0}</TableCell>
-
-                                                                        <TableCell>{item["Product CGST AMT"] || "0"}</TableCell>
-                                                                        <TableCell>{item["Product IGST AMT"] || "0"}</TableCell>
-                                                                        <TableCell>{item["Product SGST AMT"] || "0"}</TableCell>
-                                                                        <TableCell>{item.Transport || 0}</TableCell>
-                                                                        <TableCell>{item["Product Subtotal" || 0]}</TableCell>
-                                                                        <TableCell>{item["Total amt"]}</TableCell>
-
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer> */}
-
+                                                    
                                                     <Box>
                                                         <MaterialReactTable table={table}
                                                             enableColumnResizing
@@ -713,14 +713,7 @@ const exportToExcel = async (data) => {
                                                     </Box>
 
 
-                                                    {/* <Box>
-                                                        <Typography variant="h6" sx={{ mr: 2 }}>
-                                                            Grand Total:
-                                                        </Typography>
-                                                        <Typography variant="h6" color="primary">
-                                                            {grandTotal.toLocaleString("en-IN")}
-                                                        </Typography>
-                                                    </Box> */}
+                                                   
 
 
 
@@ -732,32 +725,8 @@ const exportToExcel = async (data) => {
                                             )}
                                         </Box>
                                     </DialogContent>
-                                    {/* <DialogActions>
-                                        <Box display="flex"
-                                            justifyContent="flex-end"
-                                            alignItems="center"
-                                            mt={2}
-                                            p={2}
-                                            sx={{
-                                                borderTop: "2px solid #ddd",
-                                                fontWeight: "bold",
-                                                backgroundColor: "#f8f9fa",
-                                            }}>
-                                            <Typography variant="h6" sx={{ mr: 2 }}>
-                                                Grand Total:
-                                            </Typography>
-                                            <Typography variant="h6" color="primary">
-                                                {grandTotal.toLocaleString("en-IN")}
-                                            </Typography>
-                                        </Box>
-
-
-
-                                        <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{ fontSize: 35 }} /></Button>
-                                        <Button variant='contained' endIcon={<FileDownloadIcon />} onClick={() => exportToExcel(salesData)}>Excel Data</Button>
-
-                                        <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
-                                    </DialogActions> */}
+                                    
+                                    
 
                                     <DialogActions sx={{ p: 0 }}>
                                         <Box
@@ -789,14 +758,14 @@ const exportToExcel = async (data) => {
                                             </Box>
 
                                             {/* ✅ Right side: Grand Total */}
-                                            <Box display="flex" alignItems="center" fontWeight="bold">
+                                            {/* <Box display="flex" alignItems="center" fontWeight="bold">
                                                 <Typography variant="h6" sx={{ mr: 2 }}>
                                                    <b>Grand Total:</b> 
                                                 </Typography>
                                                 <Typography variant="h6" color="primary">
                                                    <b> {grandTotal.toLocaleString("en-IN")} </b> 
                                                 </Typography>
-                                            </Box>
+                                            </Box> */}
                                         </Box>
                                     </DialogActions>
 

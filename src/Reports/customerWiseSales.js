@@ -3,7 +3,7 @@ import { useState,useMemo } from 'react';
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { Paper, Dialog, DialogActions, DialogContent, DialogTitle, Box, TableBody, TableCell, TableContainer, TableHead, TableRow, Table, Typography, Button } from '@mui/material';
+import {  Dialog, DialogActions, DialogContent, DialogTitle, Box, Typography, Button } from '@mui/material';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -13,6 +13,8 @@ import ExcelJS from "exceljs";
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useMaterialReactTable, } from "material-react-table";
 import { MaterialReactTable, } from 'material-react-table';
+import { MRT_TablePagination as MRTTablePagination } from "material-react-table";
+
 
 const CustomerWiseSales = () => {
     const [fromDate, setFromDate] = useState(null);
@@ -89,7 +91,7 @@ const CustomerWiseSales = () => {
         y += height + 6;
 
         doc.setFontSize(16);
-        doc.text("Arohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
+        doc.text("Aarohan Agro", pageWidth / 2, y, { align: "center", margin: 2 });
         y += 7;
         doc.setFontSize(10)
         doc.text(" Shop No.5 Atharva Vishwa,  Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003", pageWidth / 2, y, { align: "center" });
@@ -394,6 +396,30 @@ const CustomerWiseSales = () => {
                 fontSize: "16px",
             },
         },
+
+         renderBottomToolbar: ({ table }) => (
+        <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+          mr={4}
+        
+        >
+            {/* ⬅️ Pagination on Left */}
+            <MRTTablePagination table={table} />
+
+            {/* ➡️ Grand Total on Right */}
+            <Box display="flex" alignItems="center">
+                <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                    <b>Grand Total:</b>
+                </Typography>
+
+                <Typography variant="subtitle1" color="primary">
+                    <b>{grandTotal.toLocaleString("en-IN")}</b>
+                </Typography>
+            </Box>
+        </Box>
+    ),
     });
 
     //grand Total
@@ -474,131 +500,78 @@ const CustomerWiseSales = () => {
                                     <DialogTitle sx={{ textAlign: 'center' }}>
                                         <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
                                             <img src={logonew} alt="Logo" style={{ borderRadius: 50, width: "70px", height: 70 }} />
-                                            <Typography variant="h6">Arohan Agro Kolhapur</Typography>
+                                            <Typography variant="h6">Aarohan Agro Kolhapur</Typography>
                                         </Box>
-                                        <Typography sx={{ mt: 1 }}>
-                                            Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
-                                        </Typography>
-                                        <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
-                                            Customerwise Sales Report for  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
-                                        </Typography>
-                                    </DialogTitle>
-                                    <DialogContent dividers>
-                                        <Box>
-                                            {salesData.length > 0 ? (
+                                    <Typography sx={{ mt: 1 }}>
+                                        Shop No.5 Atharva Vishwa, Near Reliance Digital Tarabai park Pitali, Ganpati Road, Kolhapur, Maharashtra 416003
+                                    </Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 'bold', mt: 1 }}>
+                                        Customerwise Sales Report for  {fromDate ? new Date(fromDate).toLocaleDateString('en-GB') : '-'}  to  {toDate ? new Date(toDate).toLocaleDateString('en-GB') : '-'}
+                                    </Typography>
+                                </DialogTitle>
+                                <DialogContent dividers>
+                                    <Box>
+                                        {salesData.length > 0 ? (
+                                            <Box>
+
+
                                                 <Box>
-
-
-                                                    {/* Table to display sales data */}
-                                                    {/* <TableContainer fullWidth component={Paper} sx={{ mt: 3 }}>
-                                                        <Table>
-                                                            <TableHead>
-                                                                <TableRow>
-                                                                    <TableCell><b>Customer Name</b></TableCell>
-                                                                    <TableCell><b>Contact No</b></TableCell>
-                                                                    <TableCell><strong>ProductName</strong></TableCell>
-                                                                    <TableCell><b>Rate</b></TableCell>
-                                                                    <TableCell><b>Quantity</b></TableCell>
-                                                                    <TableCell> <b>Amount</b></TableCell>
-                                                                    <TableCell><b>CGST</b></TableCell>
-                                                                    <TableCell><b>SGST</b></TableCell>
-                                                                    <TableCell><b>IGST</b></TableCell>
-                                                                    <TableCell><b>Payment Mode</b></TableCell>
-                                                                    <TableCell><b>Transport</b></TableCell>
-                                                                    <TableCell><b>Sub total</b></TableCell>
-                                                                    <TableCell><b>Total</b></TableCell>
-
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {salesData.map((item, index) => (
-                                                                    <TableRow key={index}>
-                                                                        <TableCell>{item.AccountName}</TableCell>
-                                                                        <TableCell>{item.ContactNo || "-"}</TableCell>
-                                                                        <TableCell>{item.ProductName}</TableCell>
-
-                                                                        <TableCell>{item.Rate || 0}</TableCell>
-                                                                        <TableCell>{item["Ttl qtd"] || 0}</TableCell>
-                                                                        <TableCell>{item["Ttl Amt"] || 0}</TableCell>
-                                                                        <TableCell>{item["Ttl CGST Amt"] || 0}</TableCell>
-
-
-                                                                        <TableCell>{item["Ttl SGST Amt"] || 0}</TableCell>
-                                                                        <TableCell>{item["Ttl IGST Amt"] || 0}</TableCell>
-                                                                        <TableCell>{item.PaymentMode || 0}</TableCell>
-                                                                        <TableCell>{item.Transport || 0}</TableCell>
-
-                                                                        <TableCell>{item["Product Subtotal"] || 0}</TableCell>
-                                                                        <TableCell>{item.Total || 0}</TableCell>
-
-                                                                    </TableRow>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer> */}
-
-                                                     <Box>
-                                                        <MaterialReactTable table={table}
-                                                            enableColumnResizing
-                                                            muiTableHeadCellProps={{
-                                                                sx: { color: 'var(--primary-color)', },
-                                                            }}
-                                                        />
-                                                    </Box>
-
-
+                                                    <MaterialReactTable table={table}
+                                                        enableColumnResizing
+                                                        muiTableHeadCellProps={{
+                                                            sx: { color: 'var(--primary-color)', },
+                                                        }}
+                                                    />
                                                 </Box>
-                                            ) : (
-                                                <Typography>No data to preview</Typography>
-                                            )}
-                                        </Box>
-                                    </DialogContent>
-                                    {/* <DialogActions>
-                                        <Button onClick={generatePDF} color="primary" ><PrintIcon sx={{ fontSize: 35 }} /></Button>
-                                        <Button variant='contained' endIcon={<FileDownloadIcon />} onClick={() => exportToExcel(salesData)}>Excel Data</Button>
 
-                                        <Button variant='contained' onClick={() => setPreviewOpen(false)} color="primary">Close</Button>
-                                    </DialogActions> */}
-                                     <DialogActions sx={{ p: 0 }}>
-                                                                            <Box
-                                                                                display="flex"
-                                                                                justifyContent="space-between"
-                                                                                alignItems="center"
-                                                                                width="100%"
-                                                                                sx={{ borderTop: "2px solid #ddd", backgroundColor: "#f8f9fa", p: 2 }}
-                                                                            >
-                                                                                {/* ✅ Left side: Buttons */}
-                                                                                <Box display="flex" gap={2}>
-                                                                                    <Button onClick={generatePDF} color="primary">
-                                                                                        <PrintIcon sx={{ fontSize: 35 }} />
-                                                                                    </Button>
-                                                                                    <Button
-                                                                                        variant="contained"
-                                                                                        endIcon={<FileDownloadIcon />}
-                                                                                        onClick={() => exportToExcel(salesData)}
-                                                                                    >
-                                                                                        Excel Data
-                                                                                    </Button>
-                                                                                    <Button
-                                                                                        variant="contained"
-                                                                                        onClick={() => setPreviewOpen(false)}
-                                                                                        color="primary"
-                                                                                    >
-                                                                                        Close
-                                                                                    </Button>
-                                                                                </Box>
-                                    
-                                                                                {/* ✅ Right side: Grand Total */}
-                                                                                <Box display="flex" alignItems="center" fontWeight="bold">
-                                                                                    <Typography variant="h6" sx={{ mr: 2 }}>
-                                                                                       <b>Grand Total:</b> 
-                                                                                    </Typography>
-                                                                                    <Typography variant="h6" color="primary">
-                                                                                       <b> {grandTotal.toLocaleString("en-IN")} </b> 
-                                                                                    </Typography>
-                                                                                </Box>
-                                                                            </Box>
-                                                                        </DialogActions>
+
+                                            </Box>
+                                        ) : (
+                                            <Typography>No data to preview</Typography>
+                                        )}
+                                    </Box>
+                                </DialogContent>
+
+                                <DialogActions sx={{ p: 0 }}>
+                                    <Box
+                                        display="flex"
+                                        justifyContent="space-between"
+                                        alignItems="center"
+                                        width="100%"
+                                        sx={{ borderTop: "2px solid #ddd", backgroundColor: "#f8f9fa", p: 2 }}
+                                    >
+                                        {/* ✅ Left side: Buttons */}
+                                        <Box display="flex" gap={2}>
+                                            <Button onClick={generatePDF} color="primary">
+                                                <PrintIcon sx={{ fontSize: 35 }} />
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                endIcon={<FileDownloadIcon />}
+                                                onClick={() => exportToExcel(salesData)}
+                                            >
+                                                Excel Data
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => setPreviewOpen(false)}
+                                                color="primary"
+                                            >
+                                                Close
+                                            </Button>
+                                        </Box>
+
+                                        {/* ✅ Right side: Grand Total */}
+                                        {/* <Box display="flex" alignItems="center" fontWeight="bold">
+                                            <Typography variant="h6" sx={{ mr: 2 }}>
+                                                <b>Grand Total:</b>
+                                            </Typography>
+                                            <Typography variant="h6" color="primary">
+                                                <b> {grandTotal.toLocaleString("en-IN")} </b>
+                                            </Typography>
+                                        </Box> */}
+                                    </Box>
+                                </DialogActions>
                                 </Dialog>
                             </>
                         )}
